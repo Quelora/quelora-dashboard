@@ -1,7 +1,7 @@
 @import url('./variables.css');
 
 .client-container {
-  padding: var(--spacing-lg);
+  padding: var(--spacing-sm);
   background-color: var(--background-gray);
   min-height: 100vh;
 }

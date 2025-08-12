@@ -23,6 +23,10 @@ code {
   font-family: 'Roboto Mono', monospace;
 }
 
+main{
+  padding: 5px!important;
+}
+
 .container {
   padding: var(--spacing-md);
   max-width: 1200px;
