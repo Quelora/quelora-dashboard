@@ -143,6 +143,12 @@ const VapidConfigModal = ({
         privateKey: vapidKeys.privateKey
       }));
       showToast(t('client.vapid_keys_generated'));
+      Swal.fire({
+        title: t('client.vapid_keys_success'),
+        text: t('client.vapid_keys_success_message'),
+        icon: 'success',
+        confirmButtonText: t('common.ok')
+      });
     } catch (error) {
       showToast(t('client.vapid_keys_generation_error'));
       console.error('Error generating VAPID keys:', error);
@@ -367,7 +373,6 @@ const VapidConfigModal = ({
                   {option.name}
                 </Box>
               )}
-
               renderInput={(params) => (
                 <TextField
                   {...params}

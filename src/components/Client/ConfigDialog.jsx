@@ -36,6 +36,7 @@ const ConfigDialog = ({
   setOpenConfigDialog,
   setEditingClient,
   resetConfig,
+  cid
 }) => {
   const { t } = useTranslation();
   const [configTab, setConfigTab] = useState(0);
@@ -57,13 +58,6 @@ const ConfigDialog = ({
     const value = e.target.value;
     if (value.length <= MAX_API_URL_LENGTH) {
       setConfig((prev) => ({ ...prev, apiUrl: value }));
-    }
-  };
-
-  const handleBaseUrlChange = (e) => {
-    const value = e.target.value;
-    if (value.length <= MAX_API_URL_LENGTH) {
-      setConfig((prev) => ({ ...prev, baseUrl: value }));
     }
   };
 
@@ -106,7 +100,6 @@ const ConfigDialog = ({
     const urlWithReference = new URL(urlWithReplacedReference);
       
       setOpenConfigDialog(false); // Cerramos el modal de MUI nuevamente
-      console.log("Aca!!");
       Swal.fire({
         title: t('client.testing_url'),
         text: urlWithReference,
@@ -166,7 +159,7 @@ const ConfigDialog = ({
       PaperProps={{ className: 'client-dialog client-config-dialog', elevation: 3 }}
     >
       <DialogTitle className="client-dialog-title">
-        {editingClient ? t('client.edit_cid') : t('client.add_newCID')}
+        {editingClient ? t('client.edit_cid') : t('client.add_newCID')} {cid}
       </DialogTitle>
       <DialogContent className="client-dialog-content">
         <Grid container direction="column" spacing={2}>

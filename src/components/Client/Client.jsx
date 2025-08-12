@@ -912,6 +912,7 @@ const Client = () => {
         setOpenConfigDialog={setOpenConfigDialog}
         setEditingClient={setEditingClient}
         resetConfig={resetConfig}
+        cid={editingClient?.cid || ''}
       />
       <CodeModal
         open={codeModalOpen}

@@ -13,9 +13,9 @@ import Button from '@mui/material/Button';
 import CopyIcon from '@mui/icons-material/ContentCopy';
 import DownloadIcon from '@mui/icons-material/Download';
 
-const CodeModal = ({ open, currentClientCode, setOpen, showToast }) => {
+const CodeModal = ({ open, currentClientCode, setOpen, showToast, client }) => {
   const { t } = useTranslation();
-
+  const cid = client?.cid || 'unknown';
   const handleCopyCode = () => {
     navigator.clipboard.writeText(currentClientCode);
     showToast(t('client.copy_success'));
@@ -26,8 +26,7 @@ const CodeModal = ({ open, currentClientCode, setOpen, showToast }) => {
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    const match = currentClientCode.match(/cid: "([^"]+)"/);
-    link.download = `quelora-config-${match ? match[1] : 'unknown'}.js`;
+    link.download = `quelora-config-${cid}.js`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -42,7 +41,7 @@ const CodeModal = ({ open, currentClientCode, setOpen, showToast }) => {
       PaperProps={{ className: 'client-dialog client-code-dialog' }}
     >
       <DialogTitle className="client-dialog-title">
-        {t('client.code_modal_title')}
+        {t('client.code_modal_title')}: {client?.cid}
       </DialogTitle>
       <DialogContent>
         <SyntaxHighlighter language="javascript" className="client-code-block">
