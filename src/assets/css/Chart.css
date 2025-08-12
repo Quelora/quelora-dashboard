@@ -1,0 +1,41 @@
+@import url('./variables.css');
+
+.recharts-responsive-container {
+  width: 100% !important;
+  background: var(--chart-bg);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: var(--acrylic-blur);
+}
+
+.recharts-cartesian-axis-tick {
+  font-family: 'Inter', sans-serif !important;
+  fill: var(--chart-text) !important;
+  font-size: 0.75rem !important;
+}
+
+.recharts-legend-item-text {
+  font-family: 'Inter', sans-serif !important;
+  color: var(--chart-text) !important;
+  font-size: 0.75rem !important;
+}
+
+.recharts-tooltip-wrapper {
+  font-family: 'Inter', sans-serif !important;
+  background: var(--acrylic-bg) !important;
+  border: 1px solid var(--border-gray) !important;
+  border-radius: 8px !important;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: var(--acrylic-blur) !important;
+  color: var(--chart-text) !important;
+}
+
+.recharts-tooltip-label {
+  font-weight: 500 !important;
+  color: var(--chart-text) !important;
+}
+
+.recharts-tooltip-item {
+  font-size: 0.75rem !important;
+  color: var(--chart-text) !important;
+}

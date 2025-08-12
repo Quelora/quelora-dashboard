@@ -1,0 +1,80 @@
+:root {
+  /* Color Palette */
+  --primary-color: #007AFF;
+  --primary-blue: #007AFF;
+  --secondary-color: #8E8E93;
+  --secondary-gray: #8E8E93;
+  --background-color: #F5F5F7;
+  --background-gray: #F5F5F7;
+  --surface-color: #FFFFFF;
+  --white: #FFFFFF;
+  --black: #1A1A1A;
+  --text-color: #1A1A1A;
+  --text-primary: #1A1A1A;
+  --text-secondary-color: #636366;
+  --text-secondary: #636366;
+  
+  /* Functional Colors */
+  --border-color: rgba(142, 142, 147, 0.2);
+  --border-gray: rgba(142, 142, 147, 0.2);
+  --shadow-color: rgba(0, 0, 0, 0.05);
+  --success: #34C759;
+  --warning: #FF9500;
+  --error: #FF3B30;
+  
+  /* Chart Colors */
+  --chart-bg: #FFFFFF;
+  --chart-text: #202124;
+  --chart-accent: #1A73E8;
+  
+  /* Effects */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --acrylic-bg: rgba(255, 255, 255, 0.7);
+  --acrylic-blur: blur(20px);
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  
+  /* Typography */
+  --font-size-small: 0.8rem;
+  --font-size-normal: 0.875rem;
+  --font-size-large: 1rem;
+  
+  /* Transitions */
+  --transition-default: none;
+  --transition-slow: none;
+}
+
+[data-theme="dark"] {
+  /* Color Palette */
+  --primary-color: #0A84FF;
+  --primary-blue: #0A84FF;
+  --secondary-color: #AEAEB2;
+  --secondary-gray: #AEAEB2;
+  --background-color: #1C2526;
+  --background-gray: #1C2526;
+  --surface-color: #2C2C2E;
+  --white: #2C2C2E;
+  --black: #FFFFFF;
+  --text-color: #FFFFFF;
+  --text-primary: #FFFFFF;
+  --text-secondary-color: #AEAEB2;
+  --text-secondary: #AEAEB2;
+  
+  /* Functional Colors */
+  --border-color: rgba(174, 174, 178, 0.2);
+  --border-gray: rgba(174, 174, 178, 0.2);
+  --shadow-color: rgba(0, 0, 0, 0.2);
+  
+  /* Chart Colors */
+  --chart-bg: #2C2C2E;
+  --chart-text: #E8EAED;
+  --chart-accent: #8AB4F8;
+  
+  /* Effects */
+  --acrylic-bg: rgba(44, 44, 46, 0.7);
+}

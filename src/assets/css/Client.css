@@ -1,0 +1,269 @@
+@import url('./variables.css');
+
+.client-container {
+  padding: var(--spacing-lg);
+  background-color: var(--background-gray);
+  min-height: 100vh;
+}
+
+.client-header {
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.client-header .MuiTypography-h5 {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 1.5rem;
+}
+
+.full-width-tabs {
+  width: 100%;
+}
+
+.client-menu {
+  margin-top: var(--spacing-xs) !important;
+  box-shadow: var(--shadow-md) !important;
+  border-radius: 8px !important;
+  background-color: var(--acrylic-bg) !important;
+  backdrop-filter: var(--acrylic-blur) !important;
+}
+
+.client-menu-content {
+  padding: var(--spacing-md) !important;
+  width: 360px !important;
+}
+
+.client-menu-content .MuiTypography-subtitle1 {
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.client-tabs {
+  margin-bottom: var(--spacing-md) !important;
+  border-bottom: 1px solid var(--border-gray) !important;
+}
+
+.client-tabs .MuiTab-root {
+  text-transform: none !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+}
+
+.client-tabs .MuiTab-root.Mui-selected {
+  color: var(--primary-blue) !important;
+}
+
+.client-tabs .MuiTab-root:hover {
+  background-color: rgba(10, 132, 255, 0.1) !important;
+}
+
+.client-url-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.client-url-input .MuiInputBase-root {
+  background-color: var(--acrylic-bg) !important;
+  border: 1px solid var(--border-gray) !important;
+  border-radius: 8px !important;
+  font-size: 0.875rem !important;
+}
+
+.client-copy-button {
+  margin-left: var(--spacing-sm) !important;
+  min-width: 48px !important;
+  background-color: var(--acrylic-bg) !important;
+  border: 1px solid var(--border-gray) !important;
+  border-radius: 8px !important;
+}
+
+.client-copy-button:hover {
+  background-color: rgba(10, 132, 255, 0.1) !important;
+}
+
+.client-download-zip {
+  color: var(--primary-blue) !important;
+  justify-content: flex-start !important;
+  text-transform: none !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  padding: var(--spacing-sm) !important;
+}
+
+.client-download-zip:hover {
+  background-color: rgba(10, 132, 255, 0.1) !important;
+}
+
+.client-paper,
+.client-list-item,
+.client-description-section,
+.client-config-tab-section {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--acrylic-bg) !important;
+  border: 1px solid var(--border-gray) !important;
+  border-radius: 8px !important;
+  box-shadow: var(--shadow-sm) !important;
+  backdrop-filter: var(--acrylic-blur) !important;
+}
+
+.client-cid-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.client-cid-header .MuiSvgIcon-root {
+  color: var(--primary-blue);
+  margin-right: var(--spacing-sm);
+  font-size: 1.5rem;
+}
+
+.client-cid-header .MuiTypography-h6 {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 1.25rem;
+}
+
+.client-list-item {
+  padding: var(--spacing-sm) var(--spacing-sm) !important;
+  margin:var(--spacing-sm) var(--spacing-sm) !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.client-list-item:hover {
+  background-color: rgba(10, 132, 255, 0.05) !important;
+}
+
+.client-list-item .MuiTypography-body2 {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.client-list-item .MuiTypography-caption {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.client-add-button {
+  margin-top: var(--spacing-md) !important;
+  border: 1px solid var(--border-gray) !important;
+  color: var(--primary-blue) !important;
+  text-transform: none !important;
+  border-radius: 8px !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+}
+
+.client-add-button:hover {
+  background-color: rgba(10, 132, 255, 0.1) !important;
+}
+
+.client-dialog {
+  width: 960px !important;
+  max-width: 960px !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--border-gray) !important;
+  background: var(--acrylic-bg) !important;
+  backdrop-filter: var(--acrylic-blur) !important;
+}
+
+.client-dialog-title {
+  color: var(--text-primary) !important;
+  font-weight: 500 !important;
+  font-size: 1.25rem !important;
+  padding: var(--spacing-md) !important;
+  border-bottom: 1px solid var(--border-gray) !important;
+  background: var(--acrylic-bg) !important;
+}
+
+.client-dialog-content {
+  padding: var(--spacing-lg) !important;
+  background: var(--acrylic-bg) !important;
+}
+
+.client-dialog-actions {
+  padding: var(--spacing-md) !important;
+  border-top: 1px solid var(--border-gray) !important;
+  background: var(--acrylic-bg) !important;
+}
+
+.client-code-block {
+  background: var(--acrylic-bg) !important;
+  padding: var(--spacing-md) !important;
+  border-radius: 8px !important;
+  font-family: 'Roboto Mono', monospace !important;
+  font-size: 0.8125rem !important;
+  border: 1px solid var(--border-gray) !important;
+}
+
+.client-code-actions {
+  margin-top: var(--spacing-md) !important;
+  display: flex !important;
+  gap: var(--spacing-sm) !important;
+}
+
+.client-select{
+  margin:  var(--spacing-md)!important;
+}
+.client-cancel-button {
+  text-transform: none !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  color: var(--text-secondary) !important;
+}
+
+.client-cancel-button:hover {
+  background-color: rgba(10, 132, 255, 0.1) !important;
+}
+
+.client-text-field {
+  margin: var(--spacing-md) !important;
+}
+
+.client-text-field .MuiInputLabel-root {
+  font-size: 0.875rem !important;
+  color: var(--text-secondary) !important;
+}
+
+.client-section-label {
+  color: var(--text-secondary) !important;
+  margin-bottom: var(--spacing-sm) !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+}
+
+.client-checkbox {
+  padding: var(--spacing-xs) !important;
+}
+
+.client-checkbox.Mui-checked {
+  color: var(--primary-blue) !important;
+}
+
+.client-form-control-label .MuiTypography-root {
+  font-size: 0.875rem !important;
+  color: var(--text-primary) !important;
+}
+
+.client-config-tabs {
+  margin-bottom: var(--spacing-md) !important;
+  border-bottom: 1px solid var(--border-gray) !important;
+}
+
+.client-select .MuiSelect-root {
+  font-size: 0.875rem !important;
+  border-radius: 8px !important;
+}

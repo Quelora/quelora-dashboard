@@ -1,0 +1,176 @@
+/* Dashboard.css */
+:root {
+  --sidebar-bg: rgba(248,250,252,0.95);
+  --sidebar-border: rgba(226,232,240,0.65);
+  --sidebar-text: #4a5568;
+  --sidebar-text-hover: #2d3748;
+  --sidebar-highlight: rgba(45,127,249,0.1);
+  --sidebar-icon: #718096;
+  --appbar-bg: rgba(255,255,255,0.86);
+  --appbar-text: #1a202c;
+  --content-bg: #f8fafc;
+  --card-bg: #ffffff;
+  --success: #38a169;
+  --warning: #dd6b20;
+  --error: #e53e3e;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+/* ===== ESTILOS BASE ===== */
+body {
+  background-color: var(--content-bg);
+  color: #1a202c;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  margin: 0;
+}
+
+/* ===== COMPONENTES PRINCIPALES ===== */
+.MuiBox-root.main-content {
+  background-color: var(--content-bg);
+  margin-top: 48px;
+  min-height: calc(100vh - 48px);
+  padding: var(--spacing-lg);
+  position: relative;
+}
+
+/* ===== SIDEBAR ===== */
+.MuiDrawer-root .MuiPaper-root.MuiDrawer-paper {
+  backdrop-filter: blur(12px);
+  background-color: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
+  box-shadow: var(--shadow-sm);
+  color: var(--sidebar-text);
+  top: 0;
+  -webkit-backdrop-filter: blur(12px);
+  width: 240px;
+}
+
+.MuiDrawer-root .MuiList-root {
+  padding: var(--spacing-sm);
+}
+
+.MuiDrawer-root .MuiListItemButton-root {
+  border-radius: 6px;
+  color: var(--sidebar-text);
+  margin: var(--spacing-xs) 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  transition: all 0.2s ease;
+}
+
+.MuiDrawer-root .MuiListItemButton-root:hover {
+  background-color: rgba(45,127,249,0.08);
+  color: var(--sidebar-text-hover);
+}
+
+.MuiDrawer-root .Mui-selected {
+  background-color: var(--sidebar-highlight);
+  color: var(--sidebar-text-hover);
+}
+
+.MuiDrawer-root .MuiListItemText-primary {
+  color: var(--sidebar-text);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.MuiDrawer-root .Mui-selected .MuiListItemText-primary {
+  color: var(--sidebar-text-hover);
+  font-weight: 600;
+}
+
+.MuiDrawer-root .MuiListItemIcon-root {
+  color: var(--sidebar-icon);
+  min-width: 36px;
+}
+
+.MuiDrawer-root .MuiDivider-root {
+  border-color: rgba(226,232,240,0.6);
+  margin: var(--spacing-sm) var(--spacing-md);
+}
+
+/* ===== APP BAR ===== */
+.app-bar {
+  position: fixed;
+  z-index: 1100;
+  color: var(--appbar-text);
+  transition: all 0.3s ease;
+  width: 100%;
+  left: 0;
+}
+
+.app-bar.scrolled {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.toolbar {
+  align-items: center;
+  background-color: rgba(255,255,255,0.8);
+  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-md);
+  width: 100%;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.toolbar .left-section {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.toolbar .right-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .MuiBox-root.main-content {
+    padding: var(--spacing-md);
+  }
+  
+  .MuiDrawer-root .MuiPaper-root.MuiDrawer-paper {
+    box-shadow: 2px 0 15px rgba(0,0,0,0.1);
+  }
+}
+
+@media (max-width: 600px) {
+  .MuiPaper-root.content-card {
+    border-left: none;
+    border-radius: 0;
+    border-right: none;
+  }
+  
+  .MuiDrawer-root .MuiPaper-root.MuiDrawer-paper {
+    width: 260px;
+  }
+}
+
+/* ===== UTILITARIOS ===== */
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.02);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.15);
+}

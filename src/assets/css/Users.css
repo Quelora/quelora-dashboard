@@ -1,0 +1,111 @@
+@import url('./variables.css');
+
+.users-container {
+  padding: var(--spacing-md);
+  background-color: var(--background-gray);
+  min-height: calc(100vh - 64px);
+}
+
+.client-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.title {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+}
+
+.actions-section {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.add-button {
+  background-color: var(--primary-blue);
+  color: var(--white);
+  border-radius: 8px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-transform: none;
+}
+
+.add-button:hover {
+  background-color: var(--primary-blue);
+  opacity: 0.9;
+}
+
+.refresh-button {
+  border: 1px solid var(--border-gray);
+  background-color: var(--acrylic-bg);
+  border-radius: 8px;
+}
+
+.refresh-button:hover {
+  background-color: rgba(10, 132, 255, 0.1);
+}
+
+.filters-paper {
+  padding: var(--spacing-md) 0;
+  margin-bottom: var(--spacing-lg);
+  background: var(--acrylic-bg);
+}
+
+.filters-container {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.search-field, .filter-field {
+  background: var(--acrylic-bg);
+  border-radius: 8px;
+  border: 1px solid var(--border-gray);
+}
+
+.search-field {
+  flex-grow: 1;
+  max-width: 300px;
+}
+
+.filter-field {
+  min-width: 120px;
+}
+
+.users-table-container {
+  border-radius: 12px;
+  background: var(--acrylic-bg);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: var(--acrylic-blur);
+}
+
+.user-title {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.push-chip.enabled {
+  background-color: rgba(52, 199, 89, 0.1);
+  color: var(--success);
+}
+
+.push-chip.disabled {
+  background-color: rgba(255, 59, 48, 0.1);
+  color: var(--error);
+}
+
+.pagination {
+  margin-top: var(--spacing-md);
+  border-radius: 8px;
+  background: var(--acrylic-bg);
+  box-shadow: var(--shadow-sm);
+}
+
+.client-select {
+  min-width: 200px;
+  background: var(--acrylic-bg);
+  border-radius: 8px;
+  border: 1px solid var(--border-gray);
+}

@@ -1,0 +1,414 @@
+@import url('./variables.css');
+
+/* Global Styles */
+* {
+  font-size: var(--font-size-small);
+  transition: all var(--transition-default);
+}
+
+/* Paper Component */
+.MuiPaper-root {
+  background-color:transparent!important;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px var(--shadow-color);
+  backdrop-filter: var(--acrylic-blur);
+  transition: transform var(--transition-default), box-shadow var(--transition-default), background var(--transition-slow);
+}
+
+.MuiPaper-root:hover {
+  box-shadow: 0 12px 32px var(--shadow-color);
+}
+
+/* Button Component */
+.MuiButton-root {
+  border-radius: 8px;
+  text-transform: none;
+  font-weight: 500;
+  padding: var(--spacing-sm) var(--spacing-md);
+  box-shadow: 0 2px 8px var(--shadow-color);
+  transition: transform var(--transition-default), box-shadow var(--transition-default), background var(--transition-default);
+}
+
+.MuiFormControl-fullWidth {
+  width: -webkit-fill-available!important;
+}
+.MuiButton-containedPrimary {
+  background: var(--primary-color);
+  color: var(--white);
+}
+
+.MuiButton-containedPrimary:hover {
+  background: #0066cc;
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+}
+
+.MuiTableCell-root{
+  padding: var(--spacing-sm)!important;
+}
+/* Layout Components */
+.MuiBox-root.main-content {
+  background-color: var(--background-gray);
+  margin-top: 48px;
+  min-height: calc(100vh - 48px);
+  padding: var(--spacing-lg);
+}
+
+/* Drawer Components */
+.MuiDrawer-root .MuiPaper-root.MuiDrawer-paper {
+  backdrop-filter: var(--acrylic-blur);
+  background-color: var(--acrylic-bg)!important;
+  border-right: 1px solid var(--border-gray);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-primary);
+  width: 240px;
+  top: 0;
+}
+
+.MuiDrawer-root .MuiListItemButton-root,
+.MuiListItemButton-root {
+  border-radius: 10px;
+  color: var(--text-secondary);
+  margin: var(--spacing-xs) var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  transition: all 0.2s ease, transform var(--transition-default), background var(--transition-default);
+}
+
+.MuiDrawer-root .MuiListItemButton-root:hover,
+.MuiListItemButton-root:hover {
+  background-color: rgba(10, 132, 255, 0.1);
+  color: var(--text-primary);
+  transform: translateX(4px);
+}
+
+.MuiDrawer-root .Mui-selected,
+.Mui-selected {
+  background-color: rgba(10, 132, 255, 0.15);
+  color: var(--text-primary);
+}
+
+.MuiDrawer-root .MuiListItemText-primary {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.MuiDrawer-root .MuiListItemIcon-root {
+  color: var(--text-secondary);
+  min-width: 36px;
+}
+
+/* App Bar */
+.app-bar {
+  position: fixed;
+  z-index: 1100;
+  width: 100%;
+  left: 0;
+}
+
+.toolbar {
+  background-color: var(--acrylic-bg);
+  border: 1px solid var(--border-gray);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  backdrop-filter: var(--acrylic-blur);
+}
+
+/* Stats Card */
+.stats-card {
+  background: var(--acrylic-bg);
+  border: 1px solid var(--border-gray);
+  border-radius: 12px;
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: var(--acrylic-blur);
+}
+
+.stats-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.stats-card-title {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: var(--spacing-sm);
+}
+
+.stats-card-value {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: var(--spacing-sm) 0;
+}
+
+.stats-card-icon {
+  color: var(--primary-blue);
+  font-size: 1.25rem;
+  background: rgba(10, 132, 255, 0.1);
+  border-radius: 8px;
+  padding: var(--spacing-sm);
+}
+
+.stats-card:hover .stats-card-icon {
+  background: rgba(10, 132, 255, 0.2);
+}
+
+/* Charts */
+.recharts-responsive-container {
+  width: 100% !important;
+  background: var(--chart-bg);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.recharts-cartesian-axis-tick,
+.recharts-legend-item-text {
+  font-family: 'Inter', sans-serif !important;
+  fill: var(--chart-text) !important;
+  font-size: 0.75rem !important;
+}
+
+.recharts-tooltip-wrapper {
+  font-family: 'Inter', sans-serif !important;
+  background: var(--acrylic-bg) !important;
+  border: 1px solid var(--border-gray) !important;
+  border-radius: 8px !important;
+  backdrop-filter: var(--acrylic-blur) !important;
+}
+
+/* Typography */
+.MuiTypography-h5 {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+  transition: color var(--transition-default);
+}
+
+.client-header {
+  font-weight: 500;
+  font-size: 1.5rem;
+  border-bottom: 1px solid #dadce0;
+  padding-bottom: 16px;
+}
+
+/* Last Updated */
+.last-updated {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 400;
+  text-align: right;
+  padding: var(--spacing-sm) 0;
+  opacity: 0.7;
+}
+
+.last-updated:hover {
+  opacity: 1;
+}
+
+/* Client Components */
+.client-container {
+  padding: var(--spacing-lg);
+  background-color: var(--background-gray);
+  min-height: 100vh;
+}
+
+.client-code-button,
+.client-download-button,
+.client-save-button {
+  background-color: var(--primary-blue) !important;
+  color: var(--white) !important;
+  border-radius: 8px !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  text-transform: none !important;
+}
+
+.client-code-button:hover,
+.client-download-button:hover,
+.client-save-button:hover {
+  background-color: var(--primary-blue) !important;
+  opacity: 0.9 !important;
+}
+
+.client-paper {
+  padding: var(--spacing-md) !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--border-gray) !important;
+  background: var(--acrylic-bg) !important;
+  box-shadow: var(--shadow-sm) !important;
+  backdrop-filter: var(--acrylic-blur) !important;
+}
+
+/* Tabs */
+.MuiTab-root,
+.client-tabs .MuiTab-root {
+  text-transform: none;
+  font-size: var(--font-size-small);
+  font-weight: 500;
+  padding: var(--spacing-sm) var(--spacing-md);
+  transition: background var(--transition-default), color var(--transition-default);
+}
+
+.MuiTab-root:hover,
+.client-tabs .MuiTab-root:hover {
+  background: rgba(10, 132, 255, 0.1);
+}
+
+.MuiTab-root.Mui-selected,
+.client-tabs .MuiTab-root.Mui-selected {
+  color: var(--primary-color);
+}
+
+/* Input Components */
+.MuiInputBase-root,
+.client-url-input .MuiInputBase-root {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: var(--font-size-small);
+  transition: border-color var(--transition-default), box-shadow var(--transition-default);
+}
+
+.MuiInputBase-root:hover,
+.client-url-input .MuiInputBase-root:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.MuiInputBase-input {
+  padding: var(--spacing-sm);
+}
+
+.client-text-field .MuiOutlinedInput-root {
+  border-radius: 8px !important;
+  font-size: 0.875rem !important;
+}
+
+.client-text-field:hover .MuiOutlinedInput-notchedOutline {
+  border-color: var(--primary-blue) !important;
+}
+
+.client-text-field.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: var(--primary-blue) !important;
+  border-width: 2px !important;
+}
+
+/* Copy Button */
+.client-copy-button {
+  border: 1px solid var(--border-gray) !important;
+  color: var(--primary-blue) !important;
+  border-radius: 8px !important;
+}
+
+.client-copy-button:hover {
+  background-color: rgba(10, 132, 255, 0.1) !important;
+}
+
+/* Dialog */
+.MuiDialog-paper,
+.client-dialog {
+  border-radius: 16px !important;
+  box-shadow: 0 12px 32px var(--shadow-color) !important;
+  transition: transform var(--transition-slow);
+  background: var(--acrylic-bg) !important;
+  backdrop-filter: var(--acrylic-blur) !important;
+  max-width: 960px !important;
+}
+
+/* Chip */
+.MuiChip-root {
+  font-size: 0.7rem;
+  height: 22px;
+  border-radius: 11px;
+  transition: transform var(--transition-default), background var(--transition-default);
+}
+
+.MuiChip-root:hover {
+  transform: scale(1.05);
+}
+
+/* Menu */
+.MuiMenu-paper {
+  border-radius: 12px;
+  box-shadow: 0 8px 24px var(--shadow-color);
+  transition: opacity var(--transition-default), transform var(--transition-default);
+}
+
+/* Card */
+.MuiCard-root {
+  border-radius: 16px;
+  box-shadow: 0 8px 24px var(--shadow-color);
+  transition: transform var(--transition-default), box-shadow var(--transition-default);
+}
+
+.MuiCard-root:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px var(--shadow-color);
+}
+
+/* Table */
+.MuiTableContainer-root {
+  border-radius: 12px;
+  box-shadow: 0 8px 24px var(--shadow-color);
+  transition: box-shadow var(--transition-default);
+}
+
+.MuiTableCell-root {
+  font-size: var(--font-size-small);
+  transition: background var(--transition-default);
+}
+
+/* Pagination */
+.MuiPagination-root {
+  margin-top: var(--spacing-md);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px var(--shadow-color);
+  transition: transform var(--transition-default);
+}
+
+.MuiPagination-root:hover {
+  transform: scale(1.01);
+}
+
+/* Tooltip */
+.MuiPopper-root.MuiTooltip-popper,
+.MuiPopper-root.MuiTooltip-popperInteractive {
+  transition: none;
+}
+
+.MuiPopper-root.MuiTooltip-popper .MuiTooltip-tooltip,
+.MuiPopper-root.MuiTooltip-popperInteractive .MuiTooltip-tooltip {
+  background: linear-gradient(135deg, var(--surface-color) 0%, rgba(255, 255, 255, 0.9) 100%);
+  color: var(--text-color);
+  font-size: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px var(--shadow-color);
+  backdrop-filter: var(--acrylic-blur);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  transform: scale(0);
+  transition: opacity var(--transition-default), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.MuiPopper-root.MuiTooltip-popper .MuiTooltip-tooltip[aria-hidden="false"],
+.MuiPopper-root.MuiTooltip-popperInteractive .MuiTooltip-tooltip[aria-hidden="false"] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.MuiPopper-root.MuiTooltip-popper .MuiTooltip-tooltip[aria-hidden="true"],
+.MuiPopper-root.MuiTooltip-popperInteractive .MuiTooltip-tooltip[aria-hidden="true"] {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+/* Toast */
+.toast-message {
+  background: var(--acrylic-bg);
+  color: var(--text-primary);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: var(--acrylic-blur);
+}

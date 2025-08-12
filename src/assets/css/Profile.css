@@ -1,0 +1,63 @@
+@import url('./variables.css');
+
+.client-container {
+  padding: var(--spacing-lg);
+  background: var(--background-gray);
+}
+
+.profile-card {
+  padding: var(--spacing-lg);
+  border-radius: 12px;
+  background: var(--acrylic-bg);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: var(--acrylic-blur);
+}
+
+.profile-card-header {
+  padding: var(--spacing-md);
+  border-radius: 12px;
+}
+
+.profile-card-title {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.profile-card-description {
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-secondary);
+}
+
+.profile-button {
+  border-radius: 8px;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  text-transform: none;
+  color: var(--primary-blue);
+  border: 1px solid var(--border-gray);
+}
+
+.profile-button:hover {
+  background-color: rgba(10, 132, 255, 0.1);
+}
+
+.profile-list {
+  margin-bottom: var(--spacing-md);
+}
+
+.profile-list-item {
+  border-radius: 8px;
+  border: 1px solid var(--border-gray);
+}
+
+.profile-list-text-primary {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.profile-dialog {
+  border-radius: 12px;
+  background: var(--acrylic-bg);
+  backdrop-filter: var(--acrylic-blur);
+  max-width: 500px;
+}

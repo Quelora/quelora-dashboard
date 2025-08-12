@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+@import url('./variables.css');
+@import url('./theme-overrides.css');
+* {
+  box-sizing: border-box;
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: var(--font-size-small);
+  transition: all var(--transition-default);
+}
+
+body {
+  background-color: var(--background-gray)!important;
+  color: var(--text-color);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  margin: 0;
+  transition: background-color var(--transition-slow);
+}
+
+code {
+  font-family: 'Roboto Mono', monospace;
+}
+
+.container {
+  padding: var(--spacing-md);
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.header-title {
+  font-weight: 500;
+  font-size: var(--font-size-large);
+  color: var(--text-color);
+  margin-bottom: var(--spacing-lg);
+  transition: color var(--transition-default);
+}
+
+.swal2-container {
+  z-index: 1500 !important;
+}
+
+.swal2-custom-zindex {
+  z-index: 9999 !important;
+}
+
+.swal2-textarea {
+  pointer-events: auto !important;
+  user-select: auto !important;
+  resize: vertical !important;
+}
+
+.jer-editor-container {
+  width: 100%;
+  min-width: 100% !important;
+}
+
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--border-color);
+  border-radius: 4px;
+  transition: background var(--transition-default);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--secondary-color);
+  border-radius: 4px;
+  transition: background var(--transition-default);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+@media (max-width: 600px) {
+  .MuiDrawer-paper {
+    width: 70% !important;
+  }
+}

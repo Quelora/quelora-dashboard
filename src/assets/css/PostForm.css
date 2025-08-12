@@ -1,0 +1,79 @@
+@import url('./variables.css');
+
+.post-form-container {
+
+}
+
+.settings-tabs {
+  margin-bottom: var(--spacing-sm);
+}
+
+.settings-tab {
+  min-height: 32px !important;
+  padding: 0 var(--spacing-sm) !important;
+  font-size: 0.875rem !important;
+  text-transform: none !important;
+  color: var(--text-secondary) !important;
+}
+
+.settings-tab.Mui-selected {
+  color: var(--primary-blue) !important;
+}
+
+.content-paper, .settings-paper {
+  border-radius: 8px;
+  background: var(--acrylic-bg);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: var(--acrylic-blur);
+  background-color: transparent !important;
+}
+
+.section-title {
+  font-weight: 500;
+  margin-bottom: var(--spacing-md);
+  font-size: 1.125rem;
+}
+
+.text-field {
+  margin: var(--spacing-sm) 0;
+}
+
+.form-control .MuiOutlinedInput-root {
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.form-actions {
+  margin-top: var(--spacing-lg);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border-gray);
+}
+
+.cancel-button, .submit-button {
+  border-radius: 8px !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  font-size: 0.8125rem !important;
+  text-transform: none !important;
+}
+
+.cancel-button {
+  border: 1px solid var(--border-gray) !important;
+  color: var(--text-primary) !important;
+}
+
+.cancel-button:hover {
+  background-color: rgba(10, 132, 255, 0.1) !important;
+}
+
+.submit-button {
+  background-color: var(--primary-blue) !important;
+  color: var(--white) !important;
+}
+
+.submit-button:hover {
+  background-color: var(--primary-blue) !important;
+  opacity: 0.9 !important;
+}

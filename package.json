@@ -1,0 +1,65 @@
+{
+  "name": "dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^7.1.2",
+    "@mui/lab": "^7.0.0-beta.14",
+    "@mui/material": "^7.1.2",
+    "@mui/x-date-pickers": "^8.5.3",
+    "axios": "^1.4.0",
+    "cities.json": "^1.1.50",
+    "crypto-js": "^4.2.0",
+    "date-fns": "^4.1.0",
+    "i18next": "^22.4.14",
+    "json-edit-react": "^1.27.2",
+    "mapbox-gl": "^3.13.0",
+    "react": "^18.2.0",
+    "react-datepicker": "^8.4.0",
+    "react-dom": "^18.2.0",
+    "react-i18next": "^12.3.1",
+    "react-leaflet": "^4.2.1",
+    "react-router-dom": "^6.11.2",
+    "react-scripts": "^5.0.1",
+    "react-simple-maps": "^3.0.0",
+    "react-smooth": "^4.0.4",
+    "react-syntax-highlighter": "^15.5.0",
+    "recharts": "^2.12.7",
+    "recharts-scale": "^0.4.5",
+    "sweetalert2": "^11.6.13",
+    "sweetalert2-react-content": "^5.1.0",
+    "topojson-client": "^3.1.0",
+    "victory-vendor": "^37.3.6"
+  },
+  "scripts": {
+    "start": "react-scripts start --no-overlay",
+    "start:https": "HOST=0.0.0.0 PORT=445 react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "fs": "0.0.1-security",
+    "html-webpack-plugin": "^5.6.3",
+    "https": "^1.0.0"
+  }
+}
