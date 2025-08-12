@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   Box, 
@@ -20,12 +20,20 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  DialogContentText
+  DialogContentText,
+  CircularProgress
 } from '@mui/material';
 import { Visibility, VisibilityOff, Lock as LockIcon } from '@mui/icons-material';
-import { JsonEditor } from 'json-edit-react';
 import { moderation } from '../../api/moderation';
 
+/**
+ * CommentsConfig component for managing comment moderation and toxicity detection settings
+ * @param {Object} props - Component props
+ * @param {Object} props.config - Current configuration object
+ * @param {Function} props.setConfig - Function to update configuration
+ * @param {boolean} props.isFormSubmitted - Flag indicating if form was submitted
+ * @returns {JSX.Element} - Rendered component
+ */
 const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
   const { t } = useTranslation();
   const [showApiKeys, setShowApiKeys] = useState({});
@@ -36,13 +44,28 @@ const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
   const [testCommentError, setTestCommentError] = useState('');
   const [openResultDialog, setOpenResultDialog] = useState(false);
   const [moderationResult, setModerationResult] = useState({ isApproved: false, reason: '' });
+  const [jsonError, setJsonError] = useState({ moderation: false, toxicity: false });
+  const [isTesting, setIsTesting] = useState(false);
 
   const MAX_API_KEY_LENGTH = 250;
   const MAX_PROMPT_LENGTH = 5000;
 
-  // Configuraciones estándar para diferentes proveedores
+  // Standard configurations for different providers
   const DEFAULT_CONFIGS = {
     moderation: {
+      DeepSeek: {
+        apiKey: '',
+        enabled: false,
+        provider: 'DeepSeek',
+        prompt: 'Analyze the following comment: "{text}". Determine if it meets our community guidelines. Respond with "Comment Rejected" if the comment contains offensive language, discrimination, spam or inappropriate content. Otherwise, respond with "Comment Approved".',
+        configJson: {
+          model: 'deepseek-chat',
+          temperature: 0.7,
+          max_tokens: 1000,
+          max_retries: 3,
+          timeout: 5000
+        }
+      },
       OpenAI: {
         apiKey: '',
         enabled: false,
@@ -91,25 +114,60 @@ const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
     }
   };
 
-  // Inicializar configuraciones si están vacías
-  const initializeConfig = (section, provider) => {
-    if (!config.config[section]?.provider || !config.config[section]?.configJson) {
-      const defaultConfig = DEFAULT_CONFIGS[section][provider] || {};
+  // Initialize configurations on component mount
+  useEffect(() => {
+    if (config.config.moderation?.provider && (!config.config.moderation.configJson || Object.keys(config.config.moderation.configJson).length === 0)) {
       setConfig(prev => ({
         ...prev,
         config: {
           ...prev.config,
-          [section]: {
-            ...defaultConfig,
-            // Solo mantener el prompt existente si ya tiene valor
-            ...(prev.config[section]?.prompt ? { prompt: prev.config[section].prompt } : {}),
-            ...prev.config[section]
+          moderation: {
+            ...prev.config.moderation,
+            configJson: DEFAULT_CONFIGS.moderation[prev.config.moderation.provider]?.configJson || {}
           }
         }
       }));
     }
+
+    if (config.config.toxicity?.provider && (!config.config.toxicity.configJson || Object.keys(config.config.toxicity.configJson).length === 0)) {
+      setConfig(prev => ({
+        ...prev,
+        config: {
+          ...prev.config,
+          toxicity: {
+            ...prev.config.toxicity,
+            configJson: DEFAULT_CONFIGS.toxicity[prev.config.toxicity.provider]?.configJson || {}
+          }
+        }
+      }));
+    }
+  }, [config.config.moderation?.provider, config.config.toxicity?.provider, setConfig]);
+
+  /**
+   * Initializes configuration for a section with default values
+   * @param {string} section - Configuration section ('moderation' or 'toxicity')
+   * @param {string} provider - Provider name
+   */
+  const initializeConfig = (section, provider) => {
+    const defaultConfig = DEFAULT_CONFIGS[section][provider] || {};
+    setConfig(prev => ({
+      ...prev,
+      config: {
+        ...prev.config,
+        [section]: {
+          ...defaultConfig,
+          ...prev.config[section],
+          provider,
+          configJson: defaultConfig.configJson || {}
+        }
+      }
+    }));
   };
 
+  /**
+   * Toggles API key visibility
+   * @param {string} section - Configuration section
+   */
   const toggleShowApiKey = (section) => {
     setShowApiKeys(prev => ({
       ...prev,
@@ -117,6 +175,11 @@ const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
     }));
   };
 
+  /**
+   * Handles API key changes with length validation
+   * @param {string} section - Configuration section
+   * @param {string} value - New API key value
+   */
   const handleApiKeyChange = (section, value) => {
     if (value.length <= MAX_API_KEY_LENGTH) {
       setConfig(prev => ({
@@ -129,6 +192,11 @@ const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
     }
   };
 
+  /**
+   * Handles prompt changes with length validation
+   * @param {string} section - Configuration section
+   * @param {string} value - New prompt value
+   */
   const handlePromptChange = (section, value) => {
     if (value.length <= MAX_PROMPT_LENGTH) {
       setConfig(prev => ({
@@ -141,40 +209,59 @@ const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
     }
   };
 
-  const handleConfigJsonChange = (section, newJson) => {
-    setConfig(prev => ({
-      ...prev,
-      config: {
-        ...prev.config,
-        [section]: { ...prev.config[section], configJson: newJson }
-      }
-    }));
+  /**
+   * Handles JSON configuration changes with validation
+   * @param {string} section - Configuration section
+   * @param {string} value - New JSON string value
+   */
+  const handleConfigJsonChange = (section, value) => {
+    try {
+      const parsedValue = value.trim() === '' ? 
+        DEFAULT_CONFIGS[section][config.config[section].provider]?.configJson || {} : 
+        JSON.parse(value);
+      
+      setJsonError(prev => ({ ...prev, [section]: false }));
+      setConfig(prev => ({
+        ...prev,
+        config: {
+          ...prev.config,
+          [section]: { 
+            ...prev.config[section], 
+            configJson: parsedValue 
+          }
+        }
+      }));
+    } catch (error) {
+      setJsonError(prev => ({ ...prev, [section]: true }));
+    }
   };
 
+  /**
+   * Handles provider changes
+   * @param {string} section - Configuration section
+   * @param {string} provider - New provider value
+   */
   const handleProviderChange = (section, provider) => {
     initializeConfig(section, provider);
-    setConfig(prev => ({
-      ...prev,
-      config: {
-        ...prev.config,
-        [section]: {
-          ...prev.config[section],
-          provider
-        }
-      }
-    }));
   };
 
+  /**
+   * Opens the test moderation dialog
+   */
   const handleTestModeration = async () => {
     setOpenTestDialog(true);
   };
 
+  /**
+   * Submits a test comment for moderation
+   */
   const handleTestCommentSubmit = async () => {
     if (!testComment.trim()) {
       setTestCommentError(t('client.test_comment_required'));
       return;
     }
 
+    setIsTesting(true);
     try {
       const response = await moderation(config.cid, testComment, config.config.moderation);
       const { isApproved, reason = 'This comment complies with our community guidelines.' } = response;
@@ -182,51 +269,70 @@ const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
       setModerationResult({ isApproved, reason });
       setOpenTestDialog(false);
       setOpenResultDialog(true);
-      setTestComment('');
-      setTestCommentError('');
     } catch (error) {
       console.error('Error testing moderation:', error);
-      setOpenTestDialog(false);
       setModerationResult({
         isApproved: false,
         reason: t('client.test_moderation_error')
       });
       setOpenResultDialog(true);
+    } finally {
+      setIsTesting(false);
       setTestComment('');
       setTestCommentError('');
     }
   };
 
+  /**
+   * Closes the test dialog
+   */
   const handleTestDialogClose = () => {
     setOpenTestDialog(false);
     setTestComment('');
     setTestCommentError('');
   };
 
+  /**
+   * Closes the result dialog
+   */
   const handleResultDialogClose = () => {
     setOpenResultDialog(false);
     setModerationResult({ isApproved: false, reason: '' });
   };
 
+  /**
+   * Handles moderation tab changes
+   */
   const handleModerationTabChange = (event, newValue) => {
     setModerationTab(newValue);
   };
 
+  /**
+   * Handles toxicity tab changes
+   */
   const handleToxicityTabChange = (event, newValue) => {
     setToxicityTab(newValue);
   };
 
-  const parseConfigJson = (json, defaultConfig) => {
+  /**
+   * Stringifies configuration JSON for display
+   * @param {string} section - Configuration section
+   * @returns {string} - Stringified JSON
+   */
+  const stringifyConfigJson = (section) => {
     try {
-      return typeof json === 'string' ? JSON.parse(json) : json || defaultConfig;
+      const jsonToDisplay = config.config[section]?.configJson || 
+                          DEFAULT_CONFIGS[section][config.config[section]?.provider]?.configJson || 
+                          {};
+      return JSON.stringify(jsonToDisplay, null, 2);
     } catch {
-      return defaultConfig;
+      return '{}';
     }
   };
 
   return (
     <Grid container spacing={2} direction="column">
-      {/* Moderation Fieldset */}
+      {/* Moderation Configuration Section */}
       <Grid item xs={12}>
         <Box component="fieldset" sx={{ border: '1px solid #e0e0e0', borderRadius: '4px', padding: '16px', mb: 3 }}>
           <Typography component="legend" sx={{ padding: '0 8px' }}>{t('client.moderation_config')}</Typography>
@@ -383,14 +489,21 @@ const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
             {moderationTab === 2 && (
               <Box sx={{ mt: 2 }}>
                 <Typography variant="body2" sx={{ mb: 1 }}>{t('client.config_json')}</Typography>
-                <JsonEditor
-                  data={parseConfigJson(config.config.moderation.configJson, DEFAULT_CONFIGS.moderation[config.config.moderation.provider]?.configJson || {})}
-                  onChange={(newJson) => handleConfigJsonChange('moderation', newJson)}
-                  restrictEdit={false}
-                  restrictAdd={false}
-                  restrictDelete={false}
-                  rootFontSize="14px"
-                  style={{ minHeight: '300px', border: '1px solid #ccc', borderRadius: '4px' }}
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={10}
+                  variant="outlined"
+                  value={stringifyConfigJson('moderation')}
+                  onChange={(e) => handleConfigJsonChange('moderation', e.target.value)}
+                  error={jsonError.moderation}
+                  helperText={jsonError.moderation ? t('client.invalid_json_format') : ''}
+                  sx={{
+                    '& .MuiInputBase-root': {
+                      fontFamily: 'monospace',
+                      fontSize: '0.875rem'
+                    }
+                  }}
                 />
                 <Typography variant="caption" color="textSecondary" sx={{ mt: 1 }}>
                   {t('client.config_json_help')}
@@ -401,7 +514,7 @@ const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
         </Box>
       </Grid>
 
-      {/* Toxicity Fieldset */}
+      {/* Toxicity Detection Section */}
       <Grid item xs={12}>
         <Box component="fieldset" sx={{ border: '1px solid #e0e0e0', borderRadius: '4px', padding: '16px' }}>
           <Typography component="legend" sx={{ padding: '0 8px' }}>{t('client.toxicity_config')}</Typography>
@@ -501,14 +614,21 @@ const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
             {toxicityTab === 1 && (
               <Box sx={{ mt: 2 }}>
                 <Typography variant="body2" sx={{ mb: 1 }}>{t('client.config_json')}</Typography>
-                <JsonEditor
-                  data={parseConfigJson(config.config.toxicity.configJson, DEFAULT_CONFIGS.toxicity.Perspective.configJson)}
-                  onChange={(newJson) => handleConfigJsonChange('toxicity', newJson)}
-                  restrictEdit={false}
-                  restrictAdd={false}
-                  restrictDelete={false}
-                  rootFontSize="14px"
-                  style={{ minHeight: '300px', border: '1px solid #ccc', borderRadius: '4px' }}
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={10}
+                  variant="outlined"
+                  value={stringifyConfigJson('toxicity')}
+                  onChange={(e) => handleConfigJsonChange('toxicity', e.target.value)}
+                  error={jsonError.toxicity}
+                  helperText={jsonError.toxicity ? t('client.invalid_json_format') : ''}
+                  sx={{
+                    '& .MuiInputBase-root': {
+                      fontFamily: 'monospace',
+                      fontSize: '0.875rem'
+                    }
+                  }}
                 />
                 <Typography variant="caption" color="textSecondary" sx={{ mt: 1 }}>
                   {t('client.config_json_help')}
@@ -550,11 +670,27 @@ const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleTestDialogClose} className="client-swal-cancel-button">
+          <Button 
+            onClick={handleTestDialogClose} 
+            className="client-swal-cancel-button"
+            disabled={isTesting}
+          >
             {t('client.cancel')}
           </Button>
-          <Button onClick={handleTestCommentSubmit} variant="contained" className="client-swal-confirm-button">
-            {t('client.test')}
+          <Button 
+            onClick={handleTestCommentSubmit} 
+            variant="contained" 
+            className="client-swal-confirm-button"
+            disabled={isTesting || !testComment.trim()}
+          >
+            {isTesting ? (
+              <>
+                <CircularProgress size={24} sx={{ color: 'white', mr: 1 }} />
+                {t('client.testing')}
+              </>
+            ) : (
+              t('client.test')
+            )}
           </Button>
         </DialogActions>
       </Dialog>
