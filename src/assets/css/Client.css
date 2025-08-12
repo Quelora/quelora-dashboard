@@ -174,7 +174,7 @@
   max-width: 960px !important;
   border-radius: 12px !important;
   border: 1px solid var(--border-gray) !important;
-  background: var(--acrylic-bg) !important;
+  background: #FFF !important;
   backdrop-filter: var(--acrylic-blur) !important;
 }
 

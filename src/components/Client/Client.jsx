@@ -402,11 +402,6 @@ const Client = () => {
       return false;
     }
 
-    if (config.config.geolocation.enabled && (!config.config.geolocation.apiKey || !config.config.geolocation.apiKey.trim())) {
-      showErrorAlert(t('client.geolocation_api_key_required'));
-      return false;
-    }
-
     if (config.config.language.enabled && (!config.config.language.apiKey || !config.config.language.apiKey.trim())) {
       showErrorAlert(t('client.language_api_key_required'));
       return false;
@@ -429,6 +424,11 @@ const Client = () => {
 
     if (config.config.modeDiscovery && (!config.config.discoveryDataUrl || !isValidUrl(config.config.discoveryDataUrl))) {
       showErrorAlert(t('client.api_url_required_valid'));
+      return false;
+    }
+
+    if (!config.config.login.jwtSecret || !config.config.login.jwtSecret.trim()) {
+      showErrorAlert(t('client.jwt_secret_required'));
       return false;
     }
 
@@ -756,6 +756,7 @@ const Client = () => {
         ...client.config,
         login: {
           baseUrl: client.config?.login?.baseUrl || baseLoginUrl,
+          jwtSecret: client.config?.login?.jwtSecret || '',
           providers: Array.isArray(client.config?.login?.providers) ? client.config.login.providers : [],
           providerDetails: client.config?.login?.providerDetails || {
             Google: { clientId: '', clientSecret: '' },

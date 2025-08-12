@@ -147,6 +147,14 @@
     "cid_updated": "Descripción del cliente actualizada exitosamente"
   },
   "client": {
+    "jwt_secret": "Secreto JWT",
+    "jwt_secret_required": "Se requiere Secreto JWT",
+    "enable_provider": "Activar {{provider}}",
+    "google_instructions": "Crea credenciales en Google Cloud Console. Establece la URI de redirección a: {{baseUrl}}/google/callback",
+    "facebook_instructions": "Crea una app en Facebook Developers. Establece URIs de redirección OAuth válidas a: {{baseUrl}}/facebook/callback",
+    "x_instructions": "Crea una app en X Developer Portal. Establece la URL de callback a: {{baseUrl}}/x/callback",
+    "apple_instructions": "Crea un identificador en Apple Developer. Establece las URLs de retorno a: {{baseUrl}}/apple/callback",
+    "quelora_instructions": "Contacta al soporte para activar SSO de Quelora para tu cuenta",
     "title": "Gestión de Clientes",
     "code_button": "Descargar",
     "clone_title": "Clonar Repositorio",
@@ -167,7 +175,7 @@
     "cid_generated": "Cliente creado exitosamente",
     "cid_updated": "Cliente actualizado exitosamente",
     "cancel": "Cancelar",
-    "generate": "Confirmar",
+    "generate": "Generar",
     "save": "Confirmar",
     "login_config": "Configuración de Sesión",
     "comments_config": "Configuración de Comentarios",

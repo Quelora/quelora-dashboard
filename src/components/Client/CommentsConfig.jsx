@@ -1,4 +1,3 @@
-//./src/components/Client/CommentsConfig.jsx
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -41,7 +40,76 @@ const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
   const MAX_API_KEY_LENGTH = 250;
   const MAX_PROMPT_LENGTH = 5000;
 
-  
+  // Configuraciones estándar para diferentes proveedores
+  const DEFAULT_CONFIGS = {
+    moderation: {
+      OpenAI: {
+        apiKey: '',
+        enabled: false,
+        provider: 'OpenAI',
+        prompt: 'Analyze the following comment: "{text}." Determine if it meets our community guidelines. Respond with "Comment Rejected" if the comment contains offensive language, discrimination, spam, or inappropriate content. Otherwise, respond with "Comment Approved."',
+        configJson: {
+          model: 'gpt-3.5-turbo',
+          temperature: 0.7,
+          max_tokens: 1000,
+          max_retries: 3,
+          timeout: 5000
+        }
+      },
+      Confluence: {
+        apiKey: '',
+        enabled: false,
+        provider: 'Confluence',
+        configJson: {
+          strictness: 'medium',
+          filters: {
+            profanity: true,
+            personal_attacks: true,
+            sexual_content: true,
+            discrimination: true
+          }
+        }
+      }
+    },
+    toxicity: {
+      Perspective: {
+        apiKey: '',
+        enabled: false,
+        provider: 'Perspective',
+        configJson: {
+          requestedAttributes: {
+            TOXICITY: {},
+            SEVERE_TOXICITY: {},
+            IDENTITY_ATTACK: {},
+            INSULT: {},
+            PROFANITY: {},
+            THREAT: {}
+          },
+          languages: ['es', 'en']
+        }
+      }
+    }
+  };
+
+  // Inicializar configuraciones si están vacías
+  const initializeConfig = (section, provider) => {
+    if (!config.config[section]?.provider || !config.config[section]?.configJson) {
+      const defaultConfig = DEFAULT_CONFIGS[section][provider] || {};
+      setConfig(prev => ({
+        ...prev,
+        config: {
+          ...prev.config,
+          [section]: {
+            ...defaultConfig,
+            // Solo mantener el prompt existente si ya tiene valor
+            ...(prev.config[section]?.prompt ? { prompt: prev.config[section].prompt } : {}),
+            ...prev.config[section]
+          }
+        }
+      }));
+    }
+  };
+
   const toggleShowApiKey = (section) => {
     setShowApiKeys(prev => ({
       ...prev,
@@ -79,6 +147,20 @@ const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
       config: {
         ...prev.config,
         [section]: { ...prev.config[section], configJson: newJson }
+      }
+    }));
+  };
+
+  const handleProviderChange = (section, provider) => {
+    initializeConfig(section, provider);
+    setConfig(prev => ({
+      ...prev,
+      config: {
+        ...prev.config,
+        [section]: {
+          ...prev.config[section],
+          provider
+        }
       }
     }));
   };
@@ -134,10 +216,6 @@ const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
     setToxicityTab(newValue);
   };
 
-  const defaultModerationConfigJson = {};
-
-  const defaultToxicityConfigJson = {};
-
   const parseConfigJson = (json, defaultConfig) => {
     try {
       return typeof json === 'string' ? JSON.parse(json) : json || defaultConfig;
@@ -169,14 +247,8 @@ const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
                 <FormControl fullWidth className="client-form-control">
                   <InputLabel className="client-input-label">{t('client.provider')}</InputLabel>
                   <Select
-                    value={config.config.moderation.provider}
-                    onChange={(e) => setConfig(prev => ({
-                      ...prev,
-                      config: {
-                        ...prev.config,
-                        moderation: { ...prev.config.moderation, provider: e.target.value }
-                      }
-                    }))}
+                    value={config.config.moderation.provider || ''}
+                    onChange={(e) => handleProviderChange('moderation', e.target.value)}
                     size="small"
                     className="client-select"
                   >
@@ -184,6 +256,7 @@ const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
                     <MenuItem value="Gemini">Gemini</MenuItem>
                     <MenuItem value="Grok">Grok</MenuItem>
                     <MenuItem value="OpenAI">OpenAI</MenuItem>
+                    <MenuItem value="Confluence">Confluence</MenuItem>
                   </Select>
                 </FormControl>
 
@@ -264,7 +337,7 @@ const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
                   size="small"
                   multiline
                   rows={10}
-                  value={config.config.moderation.prompt || ''}
+                  value={config.config.moderation.prompt || DEFAULT_CONFIGS.moderation[config.config.moderation.provider]?.prompt || ''}
                   onChange={(e) => handlePromptChange('moderation', e.target.value)}
                   className="client-text-field"
                   error={isFormSubmitted && (
@@ -311,7 +384,7 @@ const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
               <Box sx={{ mt: 2 }}>
                 <Typography variant="body2" sx={{ mb: 1 }}>{t('client.config_json')}</Typography>
                 <JsonEditor
-                  data={parseConfigJson(config.config.moderation.configJson, defaultModerationConfigJson)}
+                  data={parseConfigJson(config.config.moderation.configJson, DEFAULT_CONFIGS.moderation[config.config.moderation.provider]?.configJson || {})}
                   onChange={(newJson) => handleConfigJsonChange('moderation', newJson)}
                   restrictEdit={false}
                   restrictAdd={false}
@@ -348,14 +421,8 @@ const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
                 <FormControl fullWidth className="client-form-control">
                   <InputLabel className="client-input-label">{t('client.provider')}</InputLabel>
                   <Select
-                    value={config.config.toxicity.provider}
-                    onChange={(e) => setConfig(prev => ({
-                      ...prev,
-                      config: {
-                        ...prev.config,
-                        toxicity: { ...prev.config.toxicity, provider: e.target.value }
-                      }
-                    }))}
+                    value={config.config.toxicity.provider || 'Perspective'}
+                    onChange={(e) => handleProviderChange('toxicity', e.target.value)}
                     size="small"
                     className="client-select"
                   >
@@ -435,7 +502,7 @@ const CommentsConfig = ({ config, setConfig, isFormSubmitted }) => {
               <Box sx={{ mt: 2 }}>
                 <Typography variant="body2" sx={{ mb: 1 }}>{t('client.config_json')}</Typography>
                 <JsonEditor
-                  data={parseConfigJson(config.config.toxicity.configJson, defaultToxicityConfigJson)}
+                  data={parseConfigJson(config.config.toxicity.configJson, DEFAULT_CONFIGS.toxicity.Perspective.configJson)}
                   onChange={(newJson) => handleConfigJsonChange('toxicity', newJson)}
                   restrictEdit={false}
                   restrictAdd={false}

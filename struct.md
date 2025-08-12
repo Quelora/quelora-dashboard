@@ -1,5 +1,8 @@
 ├── .env
+├── .env.prod
 ├── .gitignore
+├── LICENSE
+├── nginx.conf
 ├── package-lock.json
 ├── package.json
 ├── public

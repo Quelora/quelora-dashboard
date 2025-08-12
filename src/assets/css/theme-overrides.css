@@ -29,6 +29,10 @@
   transition: transform var(--transition-default), box-shadow var(--transition-default), background var(--transition-default);
 }
 
+.MuiIconButton-edgeEnd{
+  margin-right: 0px!important;
+}
+
 .MuiFormControl-fullWidth {
   width: -webkit-fill-available!important;
 }
