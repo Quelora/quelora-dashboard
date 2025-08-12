@@ -1,3 +1,4 @@
+// ./components/Dashboard/GeoDistributionChart.jsx
 import { Box, Paper, Typography, Stack, IconButton } from '@mui/material';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { MapContainer, TileLayer, Popup, Circle, useMap } from 'react-leaflet';

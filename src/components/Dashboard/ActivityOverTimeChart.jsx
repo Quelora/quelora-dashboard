@@ -1,3 +1,4 @@
+// ./components/Dashboard/ActivityOverTimeChart.jsx
 import { Box, Paper, Typography, Stack, Tooltip } from '@mui/material';
 import {
   AreaChart,

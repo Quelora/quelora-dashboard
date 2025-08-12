@@ -1,3 +1,4 @@
+// ./components/Dashboard/HourlyActivityChart.jsx
 import { Box, Paper, Typography, Stack, Tooltip } from '@mui/material';
 import {
   BarChart,
