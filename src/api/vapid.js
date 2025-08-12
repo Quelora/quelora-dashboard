@@ -1,4 +1,3 @@
-// ./src/api/vapid.js
 import api from './axiosConfig';
 
 export const vapid = async (cid, author, title, body) => {
@@ -18,5 +17,14 @@ export const searchAuthors = async (searchTerm) => {
     return response.data;
   } catch (error) {
     throw new Error("Author search error");
+  }
+};
+
+export const generateVapidKeys = async () => {
+  try {
+    const response = await api.get('/notifications/generate-vapid-keys');
+    return response.data;
+  } catch (error) {
+    throw new Error("VAPID keys generation error");
   }
 };

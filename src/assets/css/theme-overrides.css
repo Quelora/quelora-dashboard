@@ -20,13 +20,14 @@
 }
 
 /* Button Component */
-.MuiButton-root {
-  border-radius: 8px;
-  text-transform: none;
-  font-weight: 500;
-  padding: var(--spacing-sm) var(--spacing-md);
-  box-shadow: 0 2px 8px var(--shadow-color);
-  transition: transform var(--transition-default), box-shadow var(--transition-default), background var(--transition-default);
+.MuiButton-root, .swal2-styled {
+  border-radius: 8px!important;;
+  text-transform: none!important;
+  font-weight: 500!important;;
+  padding: var(--spacing-sm) var(--spacing-lg)!important;
+  font-size: var(--font-size-large)!important;
+  box-shadow: 0 2px 8px var(--shadow-color)!important;;
+  transition: transform var(--transition-default), box-shadow var(--transition-default), background var(--transition-default)!important;;
 }
 
 .MuiIconButton-edgeEnd{
@@ -246,10 +247,9 @@
 }
 
 /* Tabs */
-.MuiTab-root,
-.client-tabs .MuiTab-root {
+.MuiTab-root {
   text-transform: none;
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-large)!important;
   font-weight: 500;
   padding: var(--spacing-sm) var(--spacing-md);
   transition: background var(--transition-default), color var(--transition-default);

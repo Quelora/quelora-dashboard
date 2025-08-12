@@ -1,6 +1,6 @@
-// ./src/components/Client/VapidConfigModal.jsx
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import Swal from 'sweetalert2';
 import {
   Dialog,
   DialogTitle,
@@ -19,10 +19,21 @@ import {
   Autocomplete,
   Avatar
 } from '@mui/material';
-
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { vapid, searchAuthors } from '../../api/vapid';
+import { vapid, searchAuthors, generateVapidKeys } from '../../api/vapid';
 
+/**
+ * Modal component for configuring VAPID keys and testing push notifications
+ * @param {Object} props - Component props
+ * @param {boolean} props.open - Whether the modal is open
+ * @param {Function} props.onClose - Callback when modal closes
+ * @param {Object} props.initialData - Initial VAPID configuration data
+ * @param {Function} props.onSave - Callback when saving configuration
+ * @param {string} props.cid - Client ID
+ * @param {Function} props.showToast - Function to display toast messages
+ * @param {boolean} props.loading - Whether save operation is in progress
+ * @param {boolean} props.isFormSubmitted - Whether form has been submitted
+ */
 const VapidConfigModal = ({
   open,
   onClose,
@@ -53,6 +64,7 @@ const VapidConfigModal = ({
   const [searchValue, setSearchValue] = useState('');
   const DEBOUNCE_DELAY = 800;
 
+  // Field length constraints
   const maxLengths = {
     publicKey: 88,
     privateKey: 44,
@@ -63,9 +75,11 @@ const VapidConfigModal = ({
     body: 500
   };
 
+  // Email validation regex
   const isValidEmail = (email) =>
     /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 
+  // Check if VAPID configuration is complete
   const isVapidComplete = () =>
     vapidConfig.publicKey &&
     vapidConfig.publicKey.length >= 10 &&
@@ -74,6 +88,7 @@ const VapidConfigModal = ({
     vapidConfig.email &&
     isValidEmail(vapidConfig.email);
 
+  // Initialize form with initial data when modal opens
   useEffect(() => {
     if (open && initialData?.vapid) {
       setVapidConfig({
@@ -85,6 +100,7 @@ const VapidConfigModal = ({
     }
   }, [open, initialData]);
 
+  // Debounced author search
   useEffect(() => {
     if (!searchValue || searchValue.length < 2) {
       setAuthors([]);
@@ -96,12 +112,42 @@ const VapidConfigModal = ({
         const results = await searchAuthors(searchValue);
         setAuthors(results);
       } catch (error) {
-        showToast('Error al buscar autores');
+        showToast('Error searching authors');
       }
     }, DEBOUNCE_DELAY);
 
     return () => clearTimeout(debounceSearch);
   }, [searchValue, showToast]);
+
+  /**
+   * Generates new VAPID keys by calling server-side endpoint
+   */
+  const handleGenerateKeys = async () => {
+    if (vapidConfig.publicKey || vapidConfig.privateKey) {
+      const result = await Swal.fire({
+        title: t('client.vapid_keys_regenerate_warning'),
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: t('common.generate'),
+        cancelButtonText: t('client.cancel')
+      });
+
+      if (!result.isConfirmed) return;
+    }
+
+    try {
+      const vapidKeys = await generateVapidKeys();
+      setVapidConfig(prev => ({
+        ...prev,
+        publicKey: vapidKeys.publicKey,
+        privateKey: vapidKeys.privateKey
+      }));
+      showToast(t('client.vapid_keys_generated'));
+    } catch (error) {
+      showToast(t('client.vapid_keys_generation_error'));
+      console.error('Error generating VAPID keys:', error);
+    }
+  };
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -124,6 +170,10 @@ const VapidConfigModal = ({
     }));
   };
 
+  /**
+   * Handles image upload and conversion to base64
+   * @param {Object} event - File input change event
+   */
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -160,6 +210,9 @@ const VapidConfigModal = ({
     setSearchValue(value);
   };
 
+  /**
+   * Sends a test push notification
+   */
   const handleSendTestMessage = async () => {
     setIsTestSubmitted(true);
     if (!testMessage.author || !testMessage.title || !testMessage.body) {
@@ -205,6 +258,17 @@ const VapidConfigModal = ({
 
         {tabValue === 0 && (
           <Box sx={{ mt: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+              <Button 
+                variant="outlined" 
+                onClick={handleGenerateKeys}
+                sx={{ mr: 1 }}
+                data-testid="generate-keys-button"
+              >
+                {t('client.vapid_generate_keys')}
+              </Button>
+            </Box>
+
             <TextField
               label={t('client.vapid_public_key')}
               value={vapidConfig.publicKey}
@@ -218,7 +282,9 @@ const VapidConfigModal = ({
                   ? t('client.vapid_public_key_required')
                   : `${vapidConfig.publicKey.length}/${maxLengths.publicKey}`
               }
+              inputProps={{ 'data-testid': 'public-key-field' }}
             />
+            
             <TextField
               label={t('client.vapid_private_key')}
               value={vapidConfig.privateKey}
@@ -236,13 +302,19 @@ const VapidConfigModal = ({
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={toggleShowPrivateKey} edge="end">
+                    <IconButton 
+                      onClick={toggleShowPrivateKey} 
+                      edge="end"
+                      data-testid="toggle-private-key-visibility"
+                    >
                       {showPrivateKey ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 )
               }}
+              inputProps={{ 'data-testid': 'private-key-field' }}
             />
+            
             <TextField
               label={t('client.vapid_email')}
               value={vapidConfig.email}
@@ -257,7 +329,9 @@ const VapidConfigModal = ({
                   ? t('client.vapid_email_invalid')
                   : `${vapidConfig.email.length}/${maxLengths.email}`
               }
+              inputProps={{ 'data-testid': 'email-field' }}
             />
+            
             <Box sx={{ mt: 2 }}>
               <Input
                 type="file"
@@ -265,6 +339,7 @@ const VapidConfigModal = ({
                 onChange={handleImageChange}
                 sx={{ display: 'none' }}
                 id="vapid-icon-upload"
+                inputProps={{ 'data-testid': 'icon-upload' }}
               />
               <label htmlFor="vapid-icon-upload">
                 <Button variant="outlined" component="span">
@@ -292,6 +367,7 @@ const VapidConfigModal = ({
                   {option.name}
                 </Box>
               )}
+
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -302,6 +378,10 @@ const VapidConfigModal = ({
                       ? t('client.vapid_test_message_incomplete')
                       : ''
                   }
+                  inputProps={{ 
+                    ...params.inputProps,
+                    'data-testid': 'author-autocomplete' 
+                  }}
                 />
               )}
               onChange={(event, newValue) => {
@@ -325,7 +405,9 @@ const VapidConfigModal = ({
                   ? t('client.vapid_test_message_incomplete')
                   : `${testMessage.title.length}/${maxLengths.title}`
               }
+              inputProps={{ 'data-testid': 'test-title-field' }}
             />
+            
             <TextField
               label={t('client.vapid_test_body')}
               value={testMessage.body}
@@ -341,12 +423,15 @@ const VapidConfigModal = ({
                   ? t('client.vapid_test_message_incomplete')
                   : `${testMessage.body.length}/${maxLengths.body}`
               }
+              inputProps={{ 'data-testid': 'test-body-field' }}
             />
+            
             <Button
               variant="contained"
               onClick={handleSendTestMessage}
               disabled={testLoading}
               sx={{ mt: 2 }}
+              data-testid="send-test-button"
             >
               {testLoading ? <CircularProgress size={24} /> : t('client.vapid_send_test')}
             </Button>
@@ -354,12 +439,15 @@ const VapidConfigModal = ({
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>{t('client.close')}</Button>
+        <Button onClick={onClose} data-testid="close-button">
+          {t('client.close')}
+        </Button>
         {tabValue === 0 && (
           <Button
             variant="contained"
             onClick={() => onSave(vapidConfig)}
             disabled={loading}
+            data-testid="save-button"
           >
             {loading ? <CircularProgress size={24} /> : t('client.save')}
           </Button>
