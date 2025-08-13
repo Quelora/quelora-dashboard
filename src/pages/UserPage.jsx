@@ -1,3 +1,4 @@
+// ./src/pages/UserPage.jsx
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -37,9 +38,12 @@ import {
   ArrowUpward as ArrowUpwardIcon,  
   Share as ShareIcon,
   Notifications as NotificationsIcon,
+  Email as EmailIcon,
+  Send as SendIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { getUsersByClient } from '../api/users';
+import { vapid } from '../api/vapid';
 import Swal from 'sweetalert2';
 import '../assets/css/Users.css';
 
@@ -138,6 +142,40 @@ const UsersPage = () => {
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
+
+  const handleSendPushNotification = async (userId) => {
+    const { value: message } = await Swal.fire({
+      title: t('users.send_push_title'),
+      input: 'text',
+      inputLabel: t('users.push_message'),
+      inputPlaceholder: t('users.enter_message_placeholder'),
+      showCancelButton: true,
+      confirmButtonText: t('common.send'),
+      cancelButtonText: t('common.cancel'),
+      inputValidator: (value) => {
+        if (!value) {
+          return t('users.message_required');
+        }
+      }
+    });
+
+    if (message) {
+      try {
+        await vapid(selectedCid, userId, t('users.new_message'), message);
+        Swal.fire({
+          title: t('common.success'),
+          text: t('users.push_sent_success'),
+          icon: 'success'
+        });
+      } catch (error) {
+        Swal.fire({
+          title: t('common.error'),
+          text: t('users.push_send_error'),
+          icon: 'error'
+        });
+      }
+    }
+  };
 
   const handleSearchChange = (e) => {
     const value = cleanTextInput(e.target.value);
@@ -378,9 +416,31 @@ const UsersPage = () => {
                         </Avatar>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" className="user-title">
-                          {user.name || t('users.noName')}
-                        </Typography>
+                        <Box>
+                          <Typography variant="body2" className="user-title">
+                            {user.name || t('users.noName')}
+                          </Typography>
+                          {user.email && (
+                            <Typography 
+                              variant="body2" 
+                              color="textSecondary"
+                              sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}
+                            >
+                              <EmailIcon fontSize="small" sx={{ mr: 0.5 }} />
+                              <a 
+                                href={`mailto:${user.email}`} 
+                                style={{ 
+                                  textDecoration: 'none', 
+                                  color: 'inherit',
+                                  display: 'flex',
+                                  alignItems: 'center'
+                                }}
+                              >
+                                {user.email}
+                              </a>
+                            </Typography>
+                          )}
+                        </Box>
                       </TableCell>
                       <TableCell>
                         {user.given_name || '--'}
@@ -406,8 +466,19 @@ const UsersPage = () => {
                           <Chip 
                             label={user.pushSubscriptions?.length || 0}
                             size="small"
-                            className="subscription-chip"
+                            className="sub
+                            scription-chip"
                           />
+                          {user.pushSubscriptions?.length > 0 && (
+                            <Tooltip title={t('users.send_push')}>
+                              <IconButton 
+                                size="small"
+                                onClick={() => handleSendPushNotification(user.author)}
+                              >
+                                <SendIcon fontSize="small" color="primary" />
+                              </IconButton>
+                            </Tooltip>
+                          )}
                         </Box>
                       </TableCell>
                       <TableCell>
