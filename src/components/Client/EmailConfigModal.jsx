@@ -1,4 +1,3 @@
-// ./src/components/Client/EmailConfigModal.jsx
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Swal from 'sweetalert2';
@@ -28,7 +27,8 @@ const EmailConfigModal = ({
   loading,
   setLoading,
   isFormSubmitted,
-  keepOpenOnSave = false
+  keepOpenOnSave = false,
+  setOpenEmailConfigModal
 }) => {
   const { t } = useTranslation();
   const [emailConfig, setEmailConfig] = useState({
@@ -127,6 +127,9 @@ const EmailConfigModal = ({
       await onSave(emailConfig); // Save the configuration
       showToast(t('client.config_saved_before_test'));
 
+      // Hide the EmailConfigModal before showing Swal
+      setOpenEmailConfigModal(false);
+
       const { value: formValues, isDismissed } = await Swal.fire({
         title: t('client.test_email_title'),
         html: `
@@ -162,6 +165,10 @@ const EmailConfigModal = ({
             return false;
           }
           return { recipientEmail, body };
+        },
+        didClose: () => {
+          // Restore the EmailConfigModal after Swal closes
+          setOpenEmailConfigModal(true);
         }
       });
 

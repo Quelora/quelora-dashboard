@@ -1,4 +1,3 @@
-// ./src/components/Client/Client.jsx
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Swal from 'sweetalert2';
@@ -1114,6 +1113,7 @@ const Client = () => {
         setLoading={setLoading}
         isFormSubmitted={isFormSubmitted}
         keepOpenOnSave={true}
+        setOpenEmailConfigModal={setOpenEmailConfigModal}
       />
     </Box>
   );
