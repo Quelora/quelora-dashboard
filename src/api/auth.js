@@ -62,7 +62,7 @@ export const changePassword = async (currentPassword, newPassword) => {
   }
 };
 
-export const upsertClient = async (cid, description, apiUrl, config, vapid, postConfig) => {
+export const upsertClient = async (cid, description, apiUrl, config, vapid, postConfig, email) => {
   try {
     const response = await api.post('/client/upsert', {
       cid,
@@ -70,6 +70,7 @@ export const upsertClient = async (cid, description, apiUrl, config, vapid, post
       apiUrl,
       config,
       vapid,
+      email,
       postConfig
     });
     return response.data;

@@ -1,5 +1,5 @@
 ├── .env
-├── .env.prod
+├── .env.example
 ├── .gitignore
 ├── LICENSE
 ├── nginx.conf
@@ -59,6 +59,7 @@
 │   │   │   ├── CommentsConfig.jsx
 │   │   │   ├── ConfigDialog.jsx
 │   │   │   ├── CorsConfig.jsx
+│   │   │   ├── EmailConfigModal.jsx
 │   │   │   ├── EntityConfig.jsx
 │   │   │   ├── LoginConfig.jsx
 │   │   │   ├── OtherConfig.jsx

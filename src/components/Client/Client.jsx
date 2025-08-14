@@ -1,4 +1,4 @@
-// ./components/Client/Client.jsx
+// ./src/components/Client/Client.jsx
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Swal from 'sweetalert2';
@@ -9,6 +9,7 @@ import ClientHeader from './ClientHeader';
 import ConfigDialog from './ConfigDialog';
 import CodeModal from './CodeModal';
 import VapidConfigModal from './VapidConfigModal';
+import EmailConfigModal from './EmailConfigModal';
 import PostModal from '../Post/PostModal';
 import '../../assets/css/Client.css';
 import { generateKeyFromString, encryptJSON, decryptJSON } from '../../utils/crypto';
@@ -19,6 +20,7 @@ const Client = () => {
   const [openConfigDialog, setOpenConfigDialog] = useState(false);
   const [openGeneralConfigModal, setOpenGeneralConfigModal] = useState(false);
   const [openVapidConfigModal, setOpenVapidConfigModal] = useState(false);
+  const [openEmailConfigModal, setOpenEmailConfigModal] = useState(false);
   const defaultConfig = {
     description: '',
     apiUrl: 'https://api.quelora.org',
@@ -84,6 +86,12 @@ const Client = () => {
       email: '',
       iconBase64: '',
     },
+    email: {
+      smtp_host: '',
+      smtp_port: '',
+      smtp_user: '',
+      smtp_pass: ''
+    },
     postConfig: {
       interaction: {
         allow_comments: true,
@@ -118,6 +126,7 @@ const Client = () => {
   const [editingClient, setEditingClient] = useState(null);
   const [editingGeneralConfigClient, setEditingGeneralConfigClient] = useState(null);
   const [editingVapidConfigClient, setEditingVapidConfigClient] = useState(null);
+  const [editingEmailConfigClient, setEditingEmailConfigClient] = useState(null);
   const [loading, setLoading] = useState(false);
   const [codeModalOpen, setCodeModalOpen] = useState(false);
   const [currentClientCode, setCurrentClientCode] = useState('');
@@ -150,12 +159,15 @@ const Client = () => {
               return null;
             }
 
-            let decryptedConfig;
+            let decryptedConfig, decryptedVapid, decryptedEmail, decryptedPostConfig;
             try {
               const key = generateKeyFromString(client.cid);
               decryptedConfig = decryptJSON(client.config || {}, key);
+              decryptedVapid = decryptJSON(client.vapid || {}, key);
+              decryptedEmail = decryptJSON(client.email || {}, key);
+              decryptedPostConfig = decryptJSON(client.postConfig || {}, key);
             } catch (error) {
-              console.error(`Error decrypting config for client ${client.cid}:`, error);
+              console.error(`Error decrypting data for client ${client.cid}:`, error);
               return null;
             }
 
@@ -174,8 +186,9 @@ const Client = () => {
                   }
                 }
               },
-              vapid: client.vapid || { publicKey: '', privateKey: '', email: '', iconBase64: '' },
-              postConfig: client.postConfig || {
+              vapid: decryptedVapid || { publicKey: '', privateKey: '', email: '', iconBase64: '' },
+              email: decryptedEmail || { smtp_host: '', smtp_port: '', smtp_user: '', smtp_pass: '' },
+              postConfig: decryptedPostConfig || {
                 interaction: {
                   allow_comments: true,
                   allow_likes: true,
@@ -306,6 +319,18 @@ const Client = () => {
         email: '',
         iconBase64: '',
       },
+    }));
+  };
+
+  const resetEmailConfig = () => {
+    setConfig((prev) => ({
+      ...prev,
+      email: {
+        smtp_host: '',
+        smtp_port: '',
+        smtp_user: '',
+        smtp_pass: ''
+      }
     }));
   };
 
@@ -452,6 +477,32 @@ const Client = () => {
     return true;
   };
 
+  const validateEmailConfig = (email) => {
+    setIsFormSubmitted(true);
+    if (!email.smtp_host || email.smtp_host.trim().length < 3) {
+      showErrorAlert(t('client.smtp_host_required'));
+      return false;
+    }
+    if (!email.smtp_port || !isValidPort(email.smtp_port)) {
+      showErrorAlert(t('client.smtp_port_invalid'));
+      return false;
+    }
+    if (!email.smtp_user || email.smtp_user.trim().length < 3) {
+      showErrorAlert(t('client.smtp_user_required'));
+      return false;
+    }
+    if (!email.smtp_pass || email.smtp_pass.trim().length < 6) {
+      showErrorAlert(t('client.smtp_pass_required'));
+      return false;
+    }
+    return true;
+  };
+
+  const isValidPort = (port) => {
+    const portNum = parseInt(port);
+    return !isNaN(portNum) && portNum >= 1 && portNum <= 65535;
+  };
+
   const validateGeneralConfig = (postConfig) => {
     if (!postConfig || !postConfig.interaction || !postConfig.moderation || !postConfig.limits || !postConfig.editing) {
       console.error('Client: postConfig o sus propiedades están indefinidas:', postConfig);
@@ -482,13 +533,20 @@ const Client = () => {
       setLoading(true);
       let updatedClients;
 
+      const key = generateKeyFromString(editingClient ? editingClient.cid : config.cid);
+      const encryptedConfig = encryptJSON(config.config, key);
+      const encryptedVapid = encryptJSON(config.vapid, key);
+      const encryptedEmail = encryptJSON(config.email, key);
+      const encryptedPostConfig = encryptJSON(config.postConfig, key);
+      
       const response = await upsertClient(
         editingClient ? editingClient.cid : undefined,
         config.description,
         config.apiUrl,
-        config.config,
-        config.vapid,
-        config.postConfig
+        encryptedConfig,
+        encryptedVapid,
+        encryptedPostConfig,
+        encryptedEmail
       );
 
       const newClient = {
@@ -497,6 +555,7 @@ const Client = () => {
         apiUrl: config.apiUrl,
         config: config.config,
         vapid: config.vapid,
+        email: config.email,
         postConfig: config.postConfig,
       };
 
@@ -514,11 +573,13 @@ const Client = () => {
         if (!client.cid || typeof client.cid !== 'string' || client.cid.trim() === '') {
           throw new Error(`Invalid CID for client: ${JSON.stringify(client)}`);
         }
+        const key = generateKeyFromString(client.cid);
         return {
           ...client,
-          config: encryptJSON(client.config, generateKeyFromString(client.cid)),
-          vapid: filterEmptyConfig(client.vapid),
-          postConfig: filterEmptyConfig(client.postConfig),
+          config: encryptJSON(client.config, key),
+          vapid: encryptJSON(client.vapid, key),
+          email: encryptJSON(client.email, key),
+          postConfig: encryptJSON(client.postConfig, key),
         };
       });
 
@@ -560,25 +621,35 @@ const Client = () => {
       );
 
       const clientToUpdate = updatedClients.find((client) => client.cid === editingGeneralConfigClient.cid);
+      const key = generateKeyFromString(clientToUpdate.cid);
 
       await upsertClient(
         clientToUpdate.cid,
         clientToUpdate.description,
         clientToUpdate.apiUrl,
-        clientToUpdate.config,
-        clientToUpdate.vapid,
-        clientToUpdate.postConfig
+        encryptJSON(clientToUpdate.config, key),
+        encryptJSON(clientToUpdate.vapid, key),
+        encryptJSON({
+          interaction: newGeneralConfig.interaction,
+          moderation: newGeneralConfig.moderation,
+          limits: newGeneralConfig.limits,
+          editing: newGeneralConfig.editing,
+          audio: newGeneralConfig.audio
+        }, key),
+        encryptJSON(clientToUpdate.email, key)
       );
 
       const encryptedClients = updatedClients.map((client) => {
         if (!client.cid || typeof client.cid !== 'string' || client.cid.trim() === '') {
           throw new Error(`Invalid CID for client: ${JSON.stringify(client)}`);
         }
+        const key = generateKeyFromString(client.cid);
         return {
           ...client,
-          config: encryptJSON(client.config, generateKeyFromString(client.cid)),
-          vapid: filterEmptyConfig(client.vapid),
-          postConfig: filterEmptyConfig(client.postConfig),
+          config: encryptJSON(client.config, key),
+          vapid: encryptJSON(client.vapid, key),
+          email: encryptJSON(client.email, key),
+          postConfig: encryptJSON(client.postConfig, key),
         };
       });
 
@@ -610,25 +681,29 @@ const Client = () => {
       );
 
       const clientToUpdate = updatedClients.find((client) => client.cid === editingVapidConfigClient.cid);
+      const key = generateKeyFromString(clientToUpdate.cid);
 
       await upsertClient(
         clientToUpdate.cid,
         clientToUpdate.description,
         clientToUpdate.apiUrl,
-        clientToUpdate.config,
-        clientToUpdate.vapid,
-        clientToUpdate.postConfig
+        encryptJSON(clientToUpdate.config, key),
+        encryptJSON(vapidConfig, key),
+        encryptJSON(clientToUpdate.postConfig, key),
+        encryptJSON(clientToUpdate.email, key)
       );
 
       const encryptedClients = updatedClients.map((client) => {
         if (!client.cid || typeof client.cid !== 'string' || client.cid.trim() === '') {
           throw new Error(`Invalid CID for client: ${JSON.stringify(client)}`);
         }
+        const key = generateKeyFromString(client.cid);
         return {
           ...client,
-          config: encryptJSON(client.config, generateKeyFromString(client.cid)),
-          vapid: filterEmptyConfig(client.vapid),
-          postConfig: filterEmptyConfig(client.postConfig),
+          config: encryptJSON(client.config, key),
+          vapid: encryptJSON(client.vapid, key),
+          email: encryptJSON(client.email, key),
+          postConfig: encryptJSON(client.postConfig, key),
         };
       });
 
@@ -695,6 +770,73 @@ const Client = () => {
       }
     }));
     setOpenVapidConfigModal(true);
+  };
+
+  const handleSaveEmailConfig = async (emailConfig) => {
+    if (!validateEmailConfig(emailConfig)) {
+      return false; // Validation failed, modal stays open
+    }
+
+    try {
+      setLoading(true);
+      const updatedClients = clients.map((client) =>
+        client.cid === editingEmailConfigClient.cid
+          ? { ...client, email: emailConfig }
+          : client
+      );
+
+      const clientToUpdate = updatedClients.find((client) => client.cid === editingEmailConfigClient.cid);
+      const key = generateKeyFromString(clientToUpdate.cid);
+
+      await upsertClient(
+        clientToUpdate.cid,
+        clientToUpdate.description,
+        clientToUpdate.apiUrl,
+        encryptJSON(clientToUpdate.config, key),
+        encryptJSON(clientToUpdate.vapid, key),
+        encryptJSON(clientToUpdate.postConfig, key),
+        encryptJSON(emailConfig, key)
+      );
+
+      const encryptedClients = updatedClients.map((client) => {
+        if (!client.cid || typeof client.cid !== 'string' || client.cid.trim() === '') {
+          throw new Error(`Invalid CID for client: ${JSON.stringify(client)}`);
+        }
+        const key = generateKeyFromString(client.cid);
+        return {
+          ...client,
+          config: encryptJSON(client.config, key),
+          vapid: encryptJSON(client.vapid, key),
+          email: encryptJSON(client.email, key),
+          postConfig: encryptJSON(client.postConfig, key),
+        };
+      });
+
+      sessionStorage.setItem('clients', JSON.stringify(encryptedClients));
+      setClients(updatedClients);
+      showSuccessAlert(t('client.email_config_saved'));
+      return true; // Indicate success, keep modal open
+    } catch (err) {
+      console.error('Client: Error saving email config:', err);
+      showErrorAlert(t('client.email_config_save_error'));
+      return false; // Keep modal open on error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEmailConfig = (client) => {
+    setEditingEmailConfigClient(client);
+    setConfig((prev) => ({
+      ...prev,
+      email: {
+        smtp_host: client.email?.smtp_host || '',
+        smtp_port: client.email?.smtp_port || '',
+        smtp_user: client.email?.smtp_user || '',
+        smtp_pass: client.email?.smtp_pass || ''
+      }
+    }));
+    setOpenEmailConfigModal(true);
   };
 
   const handleShowCode = (client) => {
@@ -800,7 +942,13 @@ const Client = () => {
         email: '',
         iconBase64: '',
       },
-      postConfig: client.config?.postConfig || {
+      email: client.email || {
+        smtp_host: '',
+        smtp_port: '',
+        smtp_user: '',
+        smtp_pass: ''
+      },
+      postConfig: client.postConfig || {
         interaction: {
           allow_comments: true,
           allow_likes: true,
@@ -866,11 +1014,13 @@ const Client = () => {
           if (!client.cid || typeof client.cid !== 'string' || client.cid.trim() === '') {
             throw new Error(`Invalid CID for client: ${JSON.stringify(client)}`);
           }
+          const key = generateKeyFromString(client.cid);
           return {
             ...client,
-            config: encryptJSON(client.config, generateKeyFromString(client.cid)),
-            vapid: filterEmptyConfig(client.vapid),
-            postConfig: filterEmptyConfig(client.postConfig),
+            config: encryptJSON(client.config, key),
+            vapid: encryptJSON(client.vapid, key),
+            email: encryptJSON(client.email, key),
+            postConfig: encryptJSON(client.postConfig, key),
           };
         });
 
@@ -899,6 +1049,7 @@ const Client = () => {
         showToast={showToast}
         handleGeneralConfig={handleGeneralConfig}
         handleVapidConfig={handleVapidConfig}
+        handleEmailConfig={handleEmailConfig}
         handleDeleteClient={handleDeleteClient}
       />
       <ConfigDialog
@@ -945,6 +1096,24 @@ const Client = () => {
         showToast={showToast}
         loading={loading}
         isFormSubmitted={isFormSubmitted}
+      />
+      <EmailConfigModal
+        open={openEmailConfigModal}
+        onClose={() => {
+          setOpenEmailConfigModal(false);
+          setEditingEmailConfigClient(null);
+          resetEmailConfig();
+        }}
+        initialData={{ email: config.email }}
+        onSave={async (emailConfig) => {
+          return await handleSaveEmailConfig(emailConfig);
+        }}
+        cid={editingEmailConfigClient?.cid}
+        showToast={showToast}
+        loading={loading}
+        setLoading={setLoading}
+        isFormSubmitted={isFormSubmitted}
+        keepOpenOnSave={true}
       />
     </Box>
   );

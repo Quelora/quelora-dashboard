@@ -212,7 +212,8 @@
       "edit_client": "Editar configuración del cliente",
       "general_comment_config": "Configurar ajustes generales de comentarios",
       "vapid_config": "Configurar Ajustes de VAPID",
-      "delete_client": "Eliminar cliente"
+      "delete_client": "Eliminar cliente",
+      "email_config": "Configurar Ajustes de Email"
     },
     "description_required_min_length":"Se requiere una descripción",
     "login_base_url_required": "La URL base de inicio de sesión es requerida",
@@ -332,7 +333,25 @@
     "test_results": "Resultados de la prueba",
     "url_tested": "URL probada",
     "canonical": "URL canónica",
-    "test_failed": "Prueba fallida"
+    "test_failed": "Prueba fallida",
+    "email_config_title": "Configuración de correo",
+    "smtp_host_required": "El host SMTP es requerido y debe tener al menos 3 caracteres",
+    "smtp_port_invalid": "El puerto SMTP debe ser un número válido entre 1 y 65535",
+    "smtp_user_required": "El usuario SMTP es requerido y debe tener al menos 3 caracteres",
+    "smtp_pass_required": "La contraseña SMTP es requerida y debe tener al menos 6 caracteres",
+    "email_config_saved": "Configuración de correo guardada con éxito",
+    "email_config_save_error": "Error al guardar la configuración de correo",
+    "email_config_incomplete": "Por favor completa todos los campos requeridos",
+    "test_email_sent_successfully": "El correo fue enviado con éxito",
+    "sending_email":"Enviando el correo...",
+    "test_email_error": "Error al enviar el correo electrónico de prueba. Por favor, revise su configuración.",
+    "test_message":"Esto es un correo de prueba",
+    "test_email":"Probar configuracion",
+    "test_email_title":"Correo de prueba",
+    "smtp_host": "Host SMTP",
+    "smtp_port": "Puerto SMTP",
+    "smtp_user": "Usuario SMTP",
+    "smtp_pass": "Contraseña SMTP"
   },
   "common": {
     "cancel": "Cancelar",
@@ -343,6 +362,7 @@
     "of":"de",
     "send":"Enviar",
     "success":"¡Exito!",
+    "error":"¡Error!",
     "rangedate": {
       "date_range": "Rango de fechas",
       "today": "Hoy",

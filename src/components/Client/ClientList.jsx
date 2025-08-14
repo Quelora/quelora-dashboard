@@ -1,4 +1,4 @@
-// ./src/components/Client/ClientList.jsx
+// src/components/Client/ClientList.jsx
 import { useTranslation } from 'react-i18next';
 import { 
   Grid, 
@@ -21,10 +21,11 @@ import {
   Add as AddIcon,
   RateReview as RateReviewIcon,
   Notifications as NotificationsIcon,
-  Delete as DeleteIcon
+  Delete as DeleteIcon,
+  Email as EmailIcon // Nuevo import
 } from '@mui/icons-material';
 
-const ClientList = ({ clients, handleShowCode, handleEditClient, setOpenConfigDialog, resetConfig, showToast, handleGeneralConfig, handleVapidConfig, handleDeleteClient }) => {
+const ClientList = ({ clients, handleShowCode, handleEditClient, setOpenConfigDialog, resetConfig, showToast, handleGeneralConfig, handleVapidConfig, handleEmailConfig, handleDeleteClient }) => {
   const { t } = useTranslation();
 
   const handleDownloadCode = (client) => {
@@ -54,6 +55,11 @@ const ClientList = ({ clients, handleShowCode, handleEditClient, setOpenConfigDi
         publicKey: client.vapid.publicKey,
         iconBase64: client.vapid.iconBase64,
       },
+      email: { // Nueva configuración
+        smtp_host: client.email.smtp_host,
+        smtp_port: client.email.smtp_port,
+        smtp_user: client.email.smtp_user
+      }
     };
 
     const code = `<script> window.QUELORA_CONFIG = ${JSON.stringify(configObj, null, 2)}; </script>`;
@@ -113,6 +119,11 @@ const ClientList = ({ clients, handleShowCode, handleEditClient, setOpenConfigDi
                 <Tooltip title={t('client.tooltip.vapid_config')}>
                   <IconButton onClick={() => handleVapidConfig(client)}>
                     <NotificationsIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={t('client.tooltip.email_config')}>
+                  <IconButton onClick={() => handleEmailConfig(client)}>
+                    <EmailIcon />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title={t('client.tooltip.delete_client')}>
