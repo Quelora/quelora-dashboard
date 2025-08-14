@@ -104,10 +104,13 @@ const EmailConfigModal = ({
     try {
       setLoading(true);
       const saveResult = await onSave(emailConfig);
-      showToast(t('client.email_config_saved'));
-      
-      if (!keepOpenOnSave) {
-        onClose();
+      if (saveResult) {
+        // Update local state with the saved email configuration
+        setEmailConfig({ ...emailConfig });
+        showToast(t('client.email_config_saved'));
+        if (!keepOpenOnSave) {
+          onClose();
+        }
       }
     } catch (err) {
       showToast(t('client.email_config_save_error'));
@@ -124,77 +127,81 @@ const EmailConfigModal = ({
 
     try {
       setLoading(true);
-      await onSave(emailConfig); // Save the configuration
-      showToast(t('client.config_saved_before_test'));
+      const saveResult = await onSave(emailConfig); // Save the configuration
+      if (saveResult) {
+        // Update local state with the saved email configuration
+        setEmailConfig({ ...emailConfig });
+        showToast(t('client.config_saved_before_test'));
 
-      // Hide the EmailConfigModal before showing Swal
-      setOpenEmailConfigModal(false);
+        // Hide the EmailConfigModal before showing Swal
+        setOpenEmailConfigModal(false);
 
-      const { value: formValues, isDismissed } = await Swal.fire({
-        title: t('client.test_email_title'),
-        html: `
-          <div style="width: 100%; margin-bottom: 1rem;">
-            <input 
-              id="swal-input-email" 
-              class="swal2-input" 
-              placeholder="${t('client.email_recipient')}" 
-              value="${emailConfig.smtp_user}"
-              style="width: 100%; margin:0px;"
-            >
-          </div>
-          <div style="width: 100%;">
-            <textarea 
-              id="swal-input-body" 
-              class="swal2-textarea" 
-              placeholder="${t('client.email_body')}"
-              style="width: 100%; min-height: 120px; margin:0px; resize: vertical;"
-            >${t('client.test_message')}</textarea>
-          </div>
-        `,
-        focusConfirm: false,
-        showCancelButton: true,
-        confirmButtonText: t('common.send'),
-        cancelButtonText: t('common.cancel'),
-        width: '600px',
-        allowOutsideClick: () => !Swal.isLoading(),
-        preConfirm: () => {
-          const recipientEmail = document.getElementById('swal-input-email').value;
-          const body = document.getElementById('swal-input-body').value;
-          if (!recipientEmail) {
-            Swal.showValidationMessage(t('client.email_recipient_required'));
-            return false;
+        const { value: formValues, isDismissed } = await Swal.fire({
+          title: t('client.test_email_title'),
+          html: `
+            <div style="width: 100%; margin-bottom: 1rem;">
+              <input 
+                id="swal-input-email" 
+                class="swal2-input" 
+                placeholder="${t('client.email_recipient')}" 
+                value="${emailConfig.smtp_user}"
+                style="width: 100%; margin:0px;"
+              >
+            </div>
+            <div style="width: 100%;">
+              <textarea 
+                id="swal-input-body" 
+                class="swal2-textarea" 
+                placeholder="${t('client.email_body')}"
+                style="width: 100%; min-height: 120px; margin:0px; resize: vertical;"
+              >${t('client.test_message')}</textarea>
+            </div>
+          `,
+          focusConfirm: false,
+          showCancelButton: true,
+          confirmButtonText: t('common.send'),
+          cancelButtonText: t('common.cancel'),
+          width: '600px',
+          allowOutsideClick: () => !Swal.isLoading(),
+          preConfirm: () => {
+            const recipientEmail = document.getElementById('swal-input-email').value;
+            const body = document.getElementById('swal-input-body').value;
+            if (!recipientEmail) {
+              Swal.showValidationMessage(t('client.email_recipient_required'));
+              return false;
+            }
+            return { recipientEmail, body };
+          },
+          didClose: () => {
+            // Restore the EmailConfigModal after Swal closes
+            setOpenEmailConfigModal(true);
           }
-          return { recipientEmail, body };
-        },
-        didClose: () => {
-          // Restore the EmailConfigModal after Swal closes
-          setOpenEmailConfigModal(true);
-        }
-      });
-
-      if (formValues) {
-        Swal.fire({
-          title: t('client.sending_email'),
-          allowOutsideClick: false,
-          didOpen: () => Swal.showLoading(),
-          showConfirmButton: false
         });
 
-        try {
-          await email(cid, formValues.recipientEmail, 'Test Email', formValues.body);
-          await Swal.fire({
-            icon: 'success',
-            title: t('common.success'),
-            text: t('client.test_email_sent_successfully'),
-            confirmButtonText: t('common.ok')
+        if (formValues) {
+          Swal.fire({
+            title: t('client.sending_email'),
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading(),
+            showConfirmButton: false
           });
-        } catch (err) {
-          await Swal.fire({
-            icon: 'error',
-            title: t('client.error'),
-            text: t('client.test_email_error'),
-            confirmButtonText: t('common.ok')
-          });
+
+          try {
+            await email(cid, formValues.recipientEmail, 'Test Email', formValues.body);
+            await Swal.fire({
+              icon: 'success',
+              title: t('common.success'),
+              text: t('client.test_email_sent_successfully'),
+              confirmButtonText: t('common.ok')
+            });
+          } catch (err) {
+            await Swal.fire({
+              icon: 'error',
+              title: t('common.error'),
+              text: t('client.test_email_error'),
+              confirmButtonText: t('common.ok')
+            });
+          }
         }
       }
     } catch (err) {

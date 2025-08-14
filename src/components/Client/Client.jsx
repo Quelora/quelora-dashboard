@@ -813,6 +813,11 @@ const Client = () => {
 
       sessionStorage.setItem('clients', JSON.stringify(encryptedClients));
       setClients(updatedClients);
+      // Update config state to reflect the new email configuration
+      setConfig((prev) => ({
+        ...prev,
+        email: { ...emailConfig }
+      }));
       showSuccessAlert(t('client.email_config_saved'));
       return true; // Indicate success, keep modal open
     } catch (err) {
