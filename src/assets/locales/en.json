@@ -586,5 +586,16 @@
     "storageTooltip": "Data: {{data}} | Indexes: {{indexes}}",
     "queries": "Queries: {{queries}}",
     "queriesTooltip": "Read operations"
+  },
+  "cache": {
+    "title": "CACHE",
+    "memoryTooltip": "Memory used by Redis",
+    "keysTooltip": "Keys stored",
+    "opsTooltip": "Operations per second",
+    "clientsTooltip": "Connected clients",
+    "uptimeTooltip": "Redis server uptime",
+    "clients": "clients",
+    "keys": "keys",
+    "ops": "ops/seg"
   }
 }

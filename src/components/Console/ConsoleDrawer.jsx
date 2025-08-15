@@ -58,13 +58,20 @@ const ServerStatusBar = memo(function ServerStatusBar({ status, history }) {
     
     if (!status?.app || !status?.database) return null;
 
-    const { app, database } = status;
+    const { app, database, cache } = status;
     const appMemoryUsed = app.system.totalMemory - app.system.freeMemory;
     const appMemoryPercentage = ((appMemoryUsed / app.system.totalMemory) * 100).toFixed(1);
     const appCpuLoad = app.system.loadAvg[0].toFixed(2);
     const processMemory = formatBytes(app.process.memoryUsage.rss);
     const dbMemory = `${database.memory.resident} MB`;
     const dbStorage = formatBytes(database.storage.data + database.storage.indexes);
+
+    // Redis (cache) data
+    const redisMemory = cache?.redis?.used_memory_human || '0B';
+    const redisKeys = cache?.db0?.keys || 0;
+    const redisOps = cache?.redis?.instantaneous_ops_per_sec || 0;
+    const redisUptime = cache?.redis?.uptime_in_seconds ? formatUptime(cache.redis.uptime_in_seconds) : '0m';
+    const redisClients = cache?.redis?.connected_clients || 0;
 
     const SparkInline = ({ data, color }) => (
       <Sparklines data={data} width={100} height={20} margin={2}>
@@ -106,7 +113,7 @@ const ServerStatusBar = memo(function ServerStatusBar({ status, history }) {
                 <Tooltip title={t('app.processMemoryTooltip')}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <MemoryIcon sx={{ fontSize: '1rem', color: '#8be9fd', opacity: 0.6 }} />
-                        <Typography variant="caption" sx={{ width:'130px' }}>{t('app.processMemory', { memory: processMemory })}</Typography>
+                        <Typography variant="caption" sx={{ width:'80px' }}>{t('app.processMemory', { memory: processMemory })}</Typography>
                     </Box>
                 </Tooltip>
 
@@ -156,6 +163,48 @@ const ServerStatusBar = memo(function ServerStatusBar({ status, history }) {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Assessment sx={{ fontSize: '1rem', color: '#50fa7b' }} />
                         <Typography variant="caption">{t('db.queries', { queries: database.operations.query.toLocaleString('es-AR') })}</Typography>
+                    </Box>
+                </Tooltip>
+            </Box>
+
+            <Divider orientation="vertical" flexItem sx={{ mx: 2, borderColor: 'rgba(255,255,255,0.2)' }} />
+
+            {/* CACHE (REDIS) */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flex: 1, flexWrap: 'wrap' }}>
+                <Typography variant="caption" sx={{ color: '#ffffff', fontWeight: 'bold' }}>{t('cache.title')}</Typography>
+
+                <Tooltip title={t('cache.memoryTooltip')}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <MemoryIcon sx={{ fontSize: '1rem', color: '#ff79c6' }} />
+                        <Typography variant="caption">{redisMemory}</Typography>
+                    </Box>
+                </Tooltip>
+
+                <Tooltip title={t('cache.keysTooltip')}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Storage sx={{ fontSize: '1rem', color: '#ffb86c' }} />
+                        <Typography variant="caption">{redisKeys} {t('cache.keys')}</Typography>
+                    </Box>
+                </Tooltip>
+
+                <Tooltip title={t('cache.opsTooltip')}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <SpeedIcon sx={{ fontSize: '1rem', color: '#50fa7b' }} />
+                        <Typography variant="caption">{redisOps} {t('cache.ops')}</Typography>
+                    </Box>
+                </Tooltip>
+
+                <Tooltip title={t('cache.clientsTooltip')}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <DnsIcon sx={{ fontSize: '1rem', color: '#bd93f9' }} />
+                        <Typography variant="caption">{redisClients} {t('cache.clients')}</Typography>
+                    </Box>
+                </Tooltip>
+
+                <Tooltip title={t('cache.uptimeTooltip')}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <TimerIcon sx={{ fontSize: '1rem', color: '#6a9955' }} />
+                        <Typography variant="caption">{redisUptime}</Typography>
                     </Box>
                 </Tooltip>
             </Box>
@@ -255,7 +304,7 @@ const ConsoleDrawer = ({ open, onClose }) => {
       const newLogs = response.logs;
 
       if (response.app && response.database) {
-        setServerStatus({ app: response.app, database: response.database });
+        setServerStatus({ app: response.app, database: response.database, cache: response.cache });
 
         const appMemUsed = ((response.app.system.totalMemory - response.app.system.freeMemory) / response.app.system.totalMemory) * 100;
         const appCpu = response.app.system.loadAvg[0];
