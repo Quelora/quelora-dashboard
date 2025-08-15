@@ -564,5 +564,27 @@
     "timestamp": "Hora",
     "level": "Nivel",
     "message": "Mensaje"
+  },
+  "app": {
+    "title": "APP",
+    "cpu": "CPU: {{load}}",
+    "cpuTooltip": "Carga (1m, 5m, 15m): {{load1}}, {{load5}}, {{load15}} | Núcleos: {{cores}}",
+    "ram": "RAM: {{percent}}%",
+    "memoryTooltip": "Sistema - Usado: {{used}} / Total: {{total}}",
+    "processMemory": "Proc: {{memory}}",
+    "processMemoryTooltip": "Memoria del Proceso (RSS)",
+    "nodeVersion": "Node.js v{{version}}",
+    "uptime": "Uptime: {{uptime}}"
+  },
+  "db": {
+    "title": "DB",
+    "connections": "Conexiones: {{current}}",
+    "connectionsTooltip": "Activas: {{active}} | Disponibles: {{available}}",
+    "memory": "Mem: {{memory}}",
+    "memoryTooltip": "Memoria Residente DB (v{{version}})",
+    "storage": "Storage: {{storage}}",
+    "storageTooltip": "Datos: {{data}} | Índices: {{indexes}}",
+    "queries": "Queries: {{queries}}",
+    "queriesTooltip": "Operaciones de lectura"
   }
 }

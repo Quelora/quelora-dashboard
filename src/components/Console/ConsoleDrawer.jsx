@@ -17,12 +17,12 @@ import {
   Dns as DnsIcon,
   Storage,
   Assessment
-  
 } from '@mui/icons-material';
-import { getLogs } from '../../api/logs'; // Asegúrate que esta es la función corregida
+import { getLogs } from '../../api/logs';
+import { Sparklines, SparklinesLine } from 'react-sparklines';
 import '../../assets/css/Console.css';
 
-// --- Funciones auxiliares para la Barra de Estado ---
+// --- Funciones auxiliares ---
 const formatBytes = (bytes, decimals = 2) => {
   if (!+bytes) return '0 Bytes';
   const k = 1024;
@@ -44,99 +44,118 @@ const formatUptime = (seconds) => {
     return str.trim();
 };
 
-// --- Componente de la Barra de Estado del Servidor ---
-const ServerStatusBar = memo(function ServerStatusBar({ status }) {
+// --- Sparkline mini componente ---
+const Spark = ({ data, color }) => (
+  <Sparklines data={data} width={50} height={16}>
+    <SparklinesLine color={color} style={{ strokeWidth: 2, fill: "none" }} />
+  </Sparklines>
+);
+
+// --- ServerStatusBar  & sparklines ---
+
+const ServerStatusBar = memo(function ServerStatusBar({ status, history }) {
+    const { t } = useTranslation();
+    
     if (!status?.app || !status?.database) return null;
 
     const { app, database } = status;
-
-    // Métricas de la App
     const appMemoryUsed = app.system.totalMemory - app.system.freeMemory;
     const appMemoryPercentage = ((appMemoryUsed / app.system.totalMemory) * 100).toFixed(1);
     const appCpuLoad = app.system.loadAvg[0].toFixed(2);
     const processMemory = formatBytes(app.process.memoryUsage.rss);
-
-    // Métricas de la DB
     const dbMemory = `${database.memory.resident} MB`;
     const dbStorage = formatBytes(database.storage.data + database.storage.indexes);
 
-    return (
-        <Box
-            sx={{
-                display: 'flex',
-                alignItems: 'center',
-                p: '4px 16px',
-                backgroundColor: 'rgba(0,0,0,0.25)',
-                borderBlock: '1px solid rgba(255,255,255,0.1)',
-                fontFamily: '"Ubuntu Mono", monospace',
-                fontSize: '0.8rem',
-                color: '#ddd'
-            }}
-        >
-            {/* === SECCIÓN APP === */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flex: 1 }}>
-                <Typography variant="caption" sx={{ color: '#ffffff', fontWeight: 'bold' }}>APP</Typography>
+    const SparkInline = ({ data, color }) => (
+      <Sparklines data={data} width={100} height={20} margin={2}>
+        <SparklinesLine color={color} style={{ strokeWidth: 2, fill: "none" }} />
+      </Sparklines>
+    );
 
-                <Tooltip title={`Carga (1m, 5m, 15m): ${app.system.loadAvg.map(l => l.toFixed(2)).join(', ')} | Núcleos: ${app.system.cpus}`}>
+    return (
+        <Box sx={{ display: 'flex', alignItems: 'center', p: '4px 16px', backgroundColor: 'rgba(0,0,0,0.25)', borderBlock: '1px solid rgba(255,255,255,0.1)', fontFamily: '"Ubuntu Mono", monospace', fontSize: '0.8rem', color: '#ddd' }}>
+            
+            {/* APP */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1, flexWrap: 'wrap' }}>
+                <Typography variant="caption" sx={{ color: '#ffffff', fontWeight: 'bold' }}>{t('app.title')}</Typography>
+
+                <Tooltip title={t('app.cpuTooltip', { 
+                    load1: app.system.loadAvg[0].toFixed(2),
+                    load5: app.system.loadAvg[1].toFixed(2),
+                    load15: app.system.loadAvg[2].toFixed(2),
+                    cores: app.system.cpus 
+                })}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <SpeedIcon sx={{ fontSize: '1rem', color: '#f1fa8c' }} />
-                        <Typography variant="caption">{`CPU: ${appCpuLoad}`}</Typography>
+                        <Typography variant="caption" sx={{ width:'100px' }}>{t('app.cpu', { load: appCpuLoad })}</Typography>
+                        <SparkInline data={history.appCpu} color="#f1fa8c" />
                     </Box>
                 </Tooltip>
 
-                <Tooltip title={`Sistema - Usado: ${formatBytes(appMemoryUsed)} / Total: ${formatBytes(app.system.totalMemory)}`}>
+                <Tooltip title={t('app.memoryTooltip', {
+                    used: formatBytes(appMemoryUsed),
+                    total: formatBytes(app.system.totalMemory)
+                })}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <MemoryIcon sx={{ fontSize: '1rem', color: '#8be9fd' }} />
-                        <Typography variant="caption">{`RAM: ${appMemoryPercentage}%`}</Typography>
-                    </Box>
-                </Tooltip>
-                 
-                <Tooltip title="Memoria del Proceso (RSS)">
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <MemoryIcon sx={{ fontSize: '1rem', color: '#8be9fd', opacity: 0.6 }} />
-                        <Typography variant="caption">{`Proc: ${processMemory}`}</Typography>
+                        <Typography variant="caption" sx={{ width:'130px' }}>{t('app.ram', { percent: appMemoryPercentage })}</Typography>
+                        <SparkInline data={history.appMem} color="#8be9fd" />
                     </Box>
                 </Tooltip>
 
-                <Tooltip title={`Node.js v${app.process.version}`}>
+                <Tooltip title={t('app.processMemoryTooltip')}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <MemoryIcon sx={{ fontSize: '1rem', color: '#8be9fd', opacity: 0.6 }} />
+                        <Typography variant="caption" sx={{ width:'130px' }}>{t('app.processMemory', { memory: processMemory })}</Typography>
+                    </Box>
+                </Tooltip>
+
+                <Tooltip title={t('app.nodeVersion', { version: app.process.version })}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <TimerIcon sx={{ fontSize: '1rem', color: '#6a9955' }} />
-                        <Typography variant="caption">{`Uptime: ${formatUptime(app.process.uptime)}`}</Typography>
+                        <Typography variant="caption">{t('app.uptime', { uptime: formatUptime(app.process.uptime) })}</Typography>
                     </Box>
                 </Tooltip>
             </Box>
 
             <Divider orientation="vertical" flexItem sx={{ mx: 2, borderColor: 'rgba(255,255,255,0.2)' }} />
 
-            {/* === SECCIÓN DB === */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flex: 1 }}>
-                <Typography variant="caption" sx={{ color: '#ffffff', fontWeight: 'bold' }}>DB</Typography>
+            {/* DB */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flex: 1, flexWrap: 'wrap' }}>
+                <Typography variant="caption" sx={{ color: '#ffffff', fontWeight: 'bold' }}>{t('db.title')}</Typography>
 
-                <Tooltip title={`Activas: ${database.connections.active} | Disponibles: ${database.connections.available}`}>
+                <Tooltip title={t('db.connectionsTooltip', {
+                    active: database.connections.active,
+                    available: database.connections.available
+                })}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <DnsIcon sx={{ fontSize: '1rem', color: '#bd93f9' }} />
-                        <Typography variant="caption">{`Conexiones: ${database.connections.current}`}</Typography>
+                        <Typography variant="caption">{t('db.connections', { current: database.connections.current })}</Typography>
                     </Box>
                 </Tooltip>
 
-                <Tooltip title={`Memoria Residente DB (v${database.version})`}>
+                <Tooltip title={t('db.memoryTooltip', { version: database.version })}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <MemoryIcon sx={{ fontSize: '1rem', color: '#ff6b6b' }} />
-                        <Typography variant="caption">{`Mem: ${dbMemory}`}</Typography>
+                        <Typography variant="caption" sx={{ width:'130px' }}>{t('db.memory', { memory: dbMemory })}</Typography>
+                        <SparkInline data={history.dbMem} color="#ff6b6b" />
                     </Box>
                 </Tooltip>
 
-                <Tooltip title={`Datos: ${formatBytes(database.storage.data)} | Índices: ${formatBytes(database.storage.indexes)}`}>
+                <Tooltip title={t('db.storageTooltip', {
+                    data: formatBytes(database.storage.data),
+                    indexes: formatBytes(database.storage.indexes)
+                })}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Storage  sx={{ fontSize: '1rem', color: '#ffb86c' }} />
-                        <Typography variant="caption">{`Storage: ${dbStorage}`}</Typography>
+                        <Storage sx={{ fontSize: '1rem', color: '#ffb86c' }} />
+                        <Typography variant="caption">{t('db.storage', { storage: dbStorage })}</Typography>
                     </Box>
                 </Tooltip>
-                
-                <Tooltip title={`Operaciones de lectura`}>
+
+                <Tooltip title={t('db.queriesTooltip')}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Assessment sx={{ fontSize: '1rem', color: '#50fa7b' }} />
-                        <Typography variant="caption">{`Queries: ${database.operations.query.toLocaleString('es-AR')}`}</Typography>
+                        <Typography variant="caption">{t('db.queries', { queries: database.operations.query.toLocaleString('es-AR') })}</Typography>
                     </Box>
                 </Tooltip>
             </Box>
@@ -144,7 +163,8 @@ const ServerStatusBar = memo(function ServerStatusBar({ status }) {
     );
 });
 
-// --- Componente de Fila de Log Individual ---
+
+// --- Componente LogRow ---
 const ConsoleLogRow = memo(function ConsoleLogRow({ log, formatTime, getLogColor }) {
   return (
     <div className={`console-log ${log.animated ? 'fade-in' : ''}`}>
@@ -157,7 +177,7 @@ const ConsoleLogRow = memo(function ConsoleLogRow({ log, formatTime, getLogColor
   );
 });
 
-// --- Componente Principal de la Consola ---
+// --- Componente principal ConsoleDrawer ---
 const ConsoleDrawer = ({ open, onClose }) => {
   const { t } = useTranslation();
   const [logs, setLogs] = useState([]);
@@ -167,6 +187,7 @@ const ConsoleDrawer = ({ open, onClose }) => {
   const [logQueue, setLogQueue] = useState([]);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [serverStatus, setServerStatus] = useState(null);
+  const [history, setHistory] = useState({ appCpu: [], appMem: [], dbMem: [] });
 
   const processingRef = useRef(false);
   const seqRef = useRef(0);
@@ -178,9 +199,7 @@ const ConsoleDrawer = ({ open, onClose }) => {
   });
 
   useEffect(() => {
-    if (lastTimestamp) {
-      localStorage.setItem('lastLogTimestamp', lastTimestamp);
-    }
+    if (lastTimestamp) localStorage.setItem('lastLogTimestamp', lastTimestamp);
   }, [lastTimestamp, open]);
 
   const formatTime = (timestamp) => {
@@ -210,9 +229,7 @@ const ConsoleDrawer = ({ open, onClose }) => {
       processingRef.current = true;
       const batchToProcess = [...logQueue];
       setLogQueue([]);
-      if (batchToProcess.length > 0) {
-        setLastTimestamp(batchToProcess[0].time);
-      }
+      if (batchToProcess.length > 0) setLastTimestamp(batchToProcess[0].time);
       const chronoBatch = [...batchToProcess].reverse();
       const batchInterval = 2000;
       const step = chronoBatch.length > 0 ? batchInterval / (chronoBatch.length + 1) : 0;
@@ -234,12 +251,21 @@ const ConsoleDrawer = ({ open, onClose }) => {
     try {
       const params = { from: lastTimestamp };
       if (filterLevel !== 'all') params.level = filterLevel;
-      
       const response = await getLogs(params);
       const newLogs = response.logs;
 
       if (response.app && response.database) {
         setServerStatus({ app: response.app, database: response.database });
+
+        const appMemUsed = ((response.app.system.totalMemory - response.app.system.freeMemory) / response.app.system.totalMemory) * 100;
+        const appCpu = response.app.system.loadAvg[0];
+        const dbMem = response.database.memory.resident;
+
+        setHistory(prev => ({
+          appCpu: [...prev.appCpu, appCpu].slice(-10),
+          appMem: [...prev.appMem, appMemUsed].slice(-10),
+          dbMem: [...prev.dbMem, dbMem].slice(-10)
+        }));
       }
 
       if (Array.isArray(newLogs) && newLogs.length > 0) {
@@ -274,6 +300,7 @@ const ConsoleDrawer = ({ open, onClose }) => {
       setLastTimestamp(tenMinutesAgo);
       setIsFirstLoad(true);
       setServerStatus(null);
+      setHistory({ appCpu: [], appMem: [], dbMem: [] });
     }
   }, [filterLevel, open]);
 
@@ -290,6 +317,7 @@ const ConsoleDrawer = ({ open, onClose }) => {
     setLastTimestamp(nowIso);
     localStorage.setItem('lastLogTimestamp', nowIso);
     setIsFirstLoad(false);
+    setHistory({ appCpu: [], appMem: [], dbMem: [] });
   };
 
   const handleTogglePause = () => setPaused(p => !p);
@@ -300,8 +328,9 @@ const ConsoleDrawer = ({ open, onClose }) => {
   return (
     <div className="console-drawer" style={{ display: open ? 'block' : 'none' }}>
       <Drawer open={open} onClose={onClose} variant="persistent" classes={{ paper: 'console-paper' }}>
+        <ServerStatusBar status={serverStatus} history={history} />
         <Toolbar className="console-toolbar">
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: '#ffffff' }}>{t('console.title')}</Typography>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: '#ffffff' }}></Typography>
           <FormControl size="small" sx={{ minWidth: 120, mr: 2 }}>
             <InputLabel sx={{ color: '#ffffff', top: '-6px', '&.Mui-focused': { color: '#ffffff' }, '&.MuiInputLabel-shrink': { transform: 'translate(14px, -9px) scale(0.75)' } }}>
               <FilterIcon fontSize="small" sx={{ mr: 1, color: '#ffffff' }} /> {t('console.filter')}
@@ -321,16 +350,11 @@ const ConsoleDrawer = ({ open, onClose }) => {
           </ButtonGroup>
           <IconButton edge="end" onClick={onClose} sx={{ ml: 2, color: '#ffffff' }}><CloseIcon /></IconButton>
         </Toolbar>
-        <ServerStatusBar status={serverStatus} />
         <Box ref={logsContainerRef} className="console-content">
           {visibleLogs.length === 0 ? (
-            <Typography variant="body2" sx={{ color: '#aaaa7f', textAlign: 'center', p: 2 }}>
-              {searchText ? t('console.noMatches', 'Sin coincidencias para la búsqueda') : t('console.noLogs')}
-            </Typography>
+            <Typography variant="caption" sx={{ color: '#888', p: 2 }}>{t('console.noLogs', 'No hay logs disponibles')}</Typography>
           ) : (
-            visibleLogs.map((log) => (
-              <ConsoleLogRow key={log._cid} log={log} formatTime={formatTime} getLogColor={getLogColor} />
-            ))
+            visibleLogs.map((log) => <ConsoleLogRow key={log._cid} log={log} formatTime={formatTime} getLogColor={getLogColor} />)
           )}
         </Box>
       </Drawer>

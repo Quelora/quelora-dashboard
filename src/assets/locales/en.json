@@ -564,5 +564,27 @@
     "timestamp": "Timestamp",
     "level": "Level",
     "message": "Message"
+  },
+  "app": {
+    "title": "APP",
+    "cpu": "CPU: {{load}}",
+    "cpuTooltip": "Load (1m, 5m, 15m): {{load1}}, {{load5}}, {{load15}} | Cores: {{cores}}",
+    "ram": "RAM: {{percent}}%",
+    "memoryTooltip": "System - Used: {{used}} / Total: {{total}}",
+    "processMemory": "Proc: {{memory}}",
+    "processMemoryTooltip": "Process Memory (RSS)",
+    "nodeVersion": "Node.js v{{version}}",
+    "uptime": "Uptime: {{uptime}}"
+  },
+  "db": {
+    "title": "DB",
+    "connections": "Connections: {{current}}",
+    "connectionsTooltip": "Active: {{active}} | Available: {{available}}",
+    "memory": "Mem: {{memory}}",
+    "memoryTooltip": "DB Resident Memory (v{{version}})",
+    "storage": "Storage: {{storage}}",
+    "storageTooltip": "Data: {{data}} | Indexes: {{indexes}}",
+    "queries": "Queries: {{queries}}",
+    "queriesTooltip": "Read operations"
   }
 }
