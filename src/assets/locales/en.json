@@ -551,5 +551,18 @@
       "en": "English",
       "un": "Unknown"
     }
+  },
+  "console": {
+    "title": "Console Logs",
+    "toggle": "Toggle Console",
+    "pause": "Pause",
+    "resume": "Resume",
+    "clear": "Clear",
+    "filter": "Filter",
+    "allLevels": "All Levels",
+    "noLogs": "No logs available",
+    "timestamp": "Timestamp",
+    "level": "Level",
+    "message": "Message"
   }
 }

@@ -8,7 +8,6 @@
 
 /* Paper Component */
 .MuiPaper-root {
-  background-color:transparent!important;
   border-radius: 12px;
   box-shadow: 0 8px 24px var(--shadow-color);
   backdrop-filter: var(--acrylic-blur);
@@ -60,8 +59,7 @@
 
 /* Drawer Components */
 .MuiDrawer-root .MuiPaper-root.MuiDrawer-paper {
-  backdrop-filter: var(--acrylic-blur);
-  background-color: var(--acrylic-bg)!important;
+
   border-right: 1px solid var(--border-gray);
   box-shadow: var(--shadow-sm);
   color: var(--text-primary);

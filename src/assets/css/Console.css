@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono&display=swap');
+
+.console-paper {
+  height: 30vh !important;
+  width: 100% !important;
+  background-color: rgba(48, 10, 36, 0.7) !important;
+  color: #ffffff;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin-left: 0;
+  margin-right: 0;
+  border-radius: 0 !important;
+  top: auto !important;
+  bottom: 0 !important;
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  box-shadow: 0 -6px 16px rgba(0,0,0,0.4);
+}
+
+.console-resize-handle {
+  width: 100%;
+  height: 8px;
+  background: rgba(255,255,255,0.2);
+  cursor: ns-resize;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.console-resize-handle:hover {
+  background: rgba(255,255,255,0.4);
+}
+
+.console-toolbar {
+  color: #ffffff !important;
+  min-height: 48px !important;
+  padding: 0 16px !important;
+}
+
+.console-toolbar .MuiFormLabel-root {
+  visibility: hidden;
+}
+
+.console-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  font-family: 'Ubuntu Mono', 'Courier New', monospace !important;
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+  background: transparent !important;
+}
+
+/* Fila de log */
+.console-log {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+  line-height: 1.4;
+  color: #ffffff;
+}
+
+.console-time {
+  color: #6a9955; /* estilo terminal */
+  flex-shrink: 0;
+}
+
+.console-level {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.console-message {
+  flex: 1;
+  word-break: break-word;
+}
+
+/* Animación solo en nuevos (no en primer lote) */
+.fade-in {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeInSlide 0.35s ease-out forwards;
+}
+
+@keyframes fadeInSlide {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scrollbar styling */
+.console-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.console-content::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+}
+
+.console-content::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.25);
+  border-radius: 4px;
+}
+
+.console-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.4);
+}

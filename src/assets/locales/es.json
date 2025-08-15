@@ -551,5 +551,18 @@
       "en": "Inglés",
       "un": "Desconocido"
     }
+  },
+  "console": {
+    "title": "Consola de Logs",
+    "toggle": "Mostrar/Ocultar Consola",
+    "pause": "Pausar",
+    "resume": "Continuar",
+    "clear": "Limpiar",
+    "filter": "Filtro",
+    "allLevels": "Todos los niveles",
+    "noLogs": "No hay logs disponibles",
+    "timestamp": "Hora",
+    "level": "Nivel",
+    "message": "Mensaje"
   }
 }

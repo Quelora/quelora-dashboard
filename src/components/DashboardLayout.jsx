@@ -3,6 +3,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import LanguageMenu from './Dashboard/LanguageMenu';
+import ConsoleToolbarButton from './Console/ConsoleToolbarButton';
+import ConsoleDrawer from './Console/ConsoleDrawer';
+
 import { 
   Box, 
   CssBaseline, 
@@ -32,6 +35,10 @@ const DashboardLayout = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
+  const [open, setOpen] = useState(() => {
+    const saved = sessionStorage.getItem('consoleDrawerOpen');
+    return saved === 'true';
+  });
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -90,7 +97,6 @@ const DashboardLayout = () => {
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <CssBaseline />
-      
       <header className={`app-bar ${scrolled ? 'scrolled' : ''}`}>
         <Toolbar className="toolbar">
           <div className="left-section">
@@ -114,6 +120,7 @@ const DashboardLayout = () => {
           </div>
           
           <div className="right-controls">
+            <ConsoleToolbarButton open={open} setOpen={setOpen} />
             <LanguageMenu />
             <IconButton
               onClick={handleProfileMenuOpen}
@@ -166,6 +173,7 @@ const DashboardLayout = () => {
       >
         <Toolbar />
         <Outlet />
+        <ConsoleDrawer open={open} onClose={() => setOpen(false)} />
       </Box>
     </Box>
   );
