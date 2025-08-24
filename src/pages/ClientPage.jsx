@@ -1,4 +1,4 @@
-// ./src/pages/ProfilePage.jsx
+// ./src/pages/ClientPage.jsx
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Client from '../components/Client/Client';

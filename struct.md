@@ -1,6 +1,7 @@
 ├── .env
 ├── .env.example
 ├── .gitignore
+├── Dockerfile
 ├── LICENSE
 ├── nginx.conf
 ├── package-lock.json
@@ -24,6 +25,8 @@
 │   ├── api
 │   │   ├── auth.js
 │   │   ├── axiosConfig.js
+│   │   ├── email.js
+│   │   ├── logs.js
 │   │   ├── moderation.js
 │   │   ├── posts.js
 │   │   ├── stats.js
@@ -34,6 +37,7 @@
 │   │   │   ├── Chart.css
 │   │   │   ├── Client.css
 │   │   │   ├── ClientPosts.css
+│   │   │   ├── Console.css
 │   │   │   ├── Dashboard.css
 │   │   │   ├── Login.css
 │   │   │   ├── PostComments.css
@@ -66,6 +70,9 @@
 │   │   │   └── VapidConfigModal.jsx
 │   │   ├── Common
 │   │   │   └── DateRangeSelector.jsx
+│   │   ├── Console
+│   │   │   ├── ConsoleDrawer.jsx
+│   │   │   └── ConsoleToolbarButton.jsx
 │   │   ├── Dashboard
 │   │   │   ├── ActivityOverTimeChart.jsx
 │   │   │   ├── GeoDistributionChart.jsx

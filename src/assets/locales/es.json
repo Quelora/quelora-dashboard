@@ -155,6 +155,15 @@
     "cid_updated": "Descripción del cliente actualizada exitosamente"
   },
   "client": {
+    "credentials": "Credenciales",
+    "captcha_config": "CAPTCHA",
+    "captcha_enabled": "Habilitar CAPTCHA",
+    "captcha_site_key": "Clave del Sitio",
+    "captcha_site_key_required": "La clave del sitio es requerida",
+    "captcha_secret_key": "Clave Secreta",
+    "captcha_secret_key_required": "La clave secreta es requerida",
+    "captcha_credentials_json": "Credenciales de Cuenta de Servicio Google (JSON)",
+    "captcha_credentials_json_help": "Pega tus credenciales JSON de cuenta de servicio de Google para reCAPTCHA",
     "jwt_secret": "Secreto JWT",
     "jwt_secret_required": "Se requiere Secreto JWT",
     "enable_provider": "Activar {{provider}}",

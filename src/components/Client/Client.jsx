@@ -1,3 +1,4 @@
+// ./src/components/Client/Client.jsx
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Swal from 'sweetalert2';
@@ -67,6 +68,13 @@ const Client = () => {
       cors: {
         enabled: false,
         allowedOrigins: [],
+      },
+      captcha: {
+        enabled: false,
+        provider: 'turnstile',
+        siteKey: '',
+        secretKey: '',
+        credentialsJson: '{}',
       },
       modeDiscovery: false,
       discoveryDataUrl: '',
@@ -428,6 +436,16 @@ const Client = () => {
 
     if (config.config.language.enabled && (!config.config.language.apiKey || !config.config.language.apiKey.trim())) {
       showErrorAlert(t('client.language_api_key_required'));
+      return false;
+    }
+
+    if (config.config.captcha.enabled && (!config.config.captcha.siteKey || !config.config.captcha.siteKey.trim())) {
+      showErrorAlert(t('client.captcha_site_key_required'));
+      return false;
+    }
+
+    if (config.config.captcha.enabled && (!config.config.captcha.secretKey || !config.config.captcha.secretKey.trim())) {
+      showErrorAlert(t('client.captcha_secret_key_required'));
       return false;
     }
 
@@ -847,6 +865,7 @@ const Client = () => {
     let clientConfig = client.config || {};
     let postConfig = client.postConfig || {};
     let vapidConfig = client.vapid || {};
+    let captchaConfig = client.config.captcha || {};
 
     const providerDetails = clientConfig.login?.providerDetails || {};
 
@@ -876,6 +895,11 @@ const Client = () => {
       vapid: {
         publicKey: vapidConfig.publicKey || '',
         iconBase64: vapidConfig.iconBase64 || '',
+      },
+      captcha: {
+        enabled: captchaConfig.enabled || false,
+        provider: captchaConfig.provider || 'turnstile',
+        siteKey: captchaConfig.siteKey || '',
       },
       entityConfig: clientConfig.entityConfig || {
         selector: 'article',
@@ -929,6 +953,13 @@ const Client = () => {
         geolocation: client.config?.geolocation || { enabled: false, provider: 'ipapi', apiKey: '' },
         language: client.config?.language || { enabled: false, provider: 'DLA', apiKey: '' },
         cors: client.config?.cors || { enabled: false, allowedOrigins: [] },
+        captcha: client.config?.captcha || {
+          enabled: false,
+          provider: 'turnstile',
+          siteKey: '',
+          secretKey: '',
+          credentialsJson: '{}',
+        },
         modeDiscovery: client.config?.modeDiscovery || false,
         discoveryDataUrl: client.config?.discoveryDataUrl || '',
         entityConfig: client.config?.entityConfig || {

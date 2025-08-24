@@ -1,4 +1,4 @@
-// ./components/Client/ConfigDialog.jsx
+// ./src/components/Client/ConfigDialog.jsx
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -21,8 +21,8 @@ import CommentsConfig from './CommentsConfig';
 import OtherConfig from './OtherConfig';
 import CorsConfig from './CorsConfig';
 import EntityConfig from './EntityConfig';
+import CaptchaConfig from './CaptchaConfig';
 import Swal from 'sweetalert2';
-
 import { getTestPost } from '../../api/posts';
 
 const ConfigDialog = ({
@@ -71,7 +71,6 @@ const ConfigDialog = ({
   };
 
   const testDiscoveryUrl = async () => {
-    // Cerramos temporalmente el modal de MUI para que SweetAlert2 funcione correctamente
     setOpenConfigDialog(false);
 
     const { value: referenceId, isDismissed } = await Swal.fire({
@@ -88,21 +87,20 @@ const ConfigDialog = ({
       }
     });
 
-    // Si el usuario cancela, volvemos a abrir el diálogo y salimos
     if (isDismissed || !referenceId) {
       setOpenConfigDialog(true);
       return;
     }
 
     try {
-    const rawUrl = config.config.discoveryDataUrl;
-    const urlWithReplacedReference = rawUrl.replace(/\{\{?reference\}?\}/g, referenceId);
-    const urlWithReference = new URL(urlWithReplacedReference);
+      const rawUrl = config.config.discoveryDataUrl;
+      const urlWithReplacedReference = rawUrl.replace(/\{\{?reference\}?\}/g, referenceId);
+      const urlWithReference = new URL(urlWithReplacedReference);
       
-      setOpenConfigDialog(false); // Cerramos el modal de MUI nuevamente
+      setOpenConfigDialog(false);
       Swal.fire({
         title: t('client.testing_url'),
-        text: urlWithReference,
+        text: urlWithReference.toString(),
         icon: 'info',
         showConfirmButton: false,
         showCancelButton: true,
@@ -114,10 +112,8 @@ const ConfigDialog = ({
           Swal.showLoading();
         }
       });
-      console.clear();
-      console.log("Url", urlWithReference);
+
       const response = await getTestPost(urlWithReference.toString());
-      
       const { data } = response;
 
       await Swal.fire({
@@ -142,10 +138,10 @@ const ConfigDialog = ({
         confirmButtonText: t('client.close')
       });
     } finally {
-      setOpenConfigDialog(true); // Aseguramos que el modal de MUI se reabra
+      setOpenConfigDialog(true);
     }
   };
-
+  
   return (
     <Dialog
       open={open}
@@ -156,7 +152,10 @@ const ConfigDialog = ({
       }}
       maxWidth="lg"
       fullWidth
-      PaperProps={{ className: 'client-dialog client-config-dialog', elevation: 3 }}
+      PaperProps={{
+        className: 'client-dialog client-config-dialog',
+        elevation: 3
+      }}
     >
       <DialogTitle className="client-dialog-title">
         {editingClient ? t('client.edit_cid') : t('client.add_newCID')} {cid}
@@ -174,6 +173,7 @@ const ConfigDialog = ({
               <Tab label={t('client.entity_config')} />
               <Tab label={t('client.login_config')} />
               <Tab label={t('client.comments_config')} />
+              <Tab label={t('client.captcha_config')} />
               <Tab label={t('client.other_config')} />
               <Tab label={t('client.cors_config')} />
             </Tabs>
@@ -312,12 +312,15 @@ const ConfigDialog = ({
               <LoginConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted} />
             )}
             {configTab === 3 && (
-              <CommentsConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
+              <CommentsConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted} />
             )}
             {configTab === 4 && (
-              <OtherConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted} />
+              <CaptchaConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted} />
             )}
             {configTab === 5 && (
+              <OtherConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted} />
+            )}
+            {configTab === 6 && (
               <CorsConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted} />
             )}
           </Grid>

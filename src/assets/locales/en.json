@@ -155,6 +155,15 @@
     "cid_updated": "Client description updated successfully"
   },
   "client": {
+    "credentials": "Credentials",
+    "captcha_config": "CAPTCHA",
+    "captcha_enabled": "Enable CAPTCHA",
+    "captcha_site_key": "Site Key",
+    "captcha_site_key_required": "Site key is required",
+    "captcha_secret_key": "Secret Key",
+    "captcha_secret_key_required": "Secret key is required",
+    "captcha_credentials_json": "Google Service Account Credentials (JSON)",
+    "captcha_credentials_json_help": "Paste your Google service account JSON credentials for reCAPTCHA",
     "jwt_secret": "JWT Secret",
     "jwt_secret_required": "JWT Secret is required",
     "enable_provider": "Enable {{provider}}",
