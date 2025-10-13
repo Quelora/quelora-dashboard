@@ -40,8 +40,12 @@
       "under_development": "This section is under development",
       "geo_distribution":"Geographic distribution",
       "top_locations":"Top locations",
-      "top_regions":"Top regions",
-      "top_cities":"Top cities"
+      "country": "Country",
+      "region": "Region",
+      "city": "City",
+      "top_countrys": "Top Countries",
+      "top_regions": "Top Regions",
+      "top_cities": "Top Cities"
     }
   },
   "sidebar": {
@@ -428,6 +432,7 @@
     "allowComments": "Allow comments",
     "allowShares": "Allow shares",
     "allowBookmarks": "Allow bookmarks",
+    "allowQuotes": "Allow quotes", 
     "publishing": "Publishing",
     "publishImmediately": "Publish immediately",
     "newPost": "New Post",

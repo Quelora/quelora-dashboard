@@ -406,7 +406,7 @@ const ClientPostsPage = () => {
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" className="post-title">
-                          {post.description || t('clientPosts.noTitle')}
+                          {post.title || t('clientPosts.noTitle')}
                         </Typography>
                       </TableCell>
                       <TableCell>

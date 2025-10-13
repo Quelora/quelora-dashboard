@@ -1,3 +1,4 @@
+// src/pages/PostCommentsPage.jsx
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';

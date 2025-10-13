@@ -1,3 +1,4 @@
+// src/components/Post/PostForm.jsx
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -51,6 +52,7 @@ const PostForm = ({
           allow_shares: true,
           allow_replies: true,
           allow_bookmarks: true,
+          allow_quotes: true,
         },
         moderation: {
           enable_toxicity_filter: true,

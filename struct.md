@@ -56,6 +56,7 @@
 │   │   │   ├── Login.jsx
 │   │   │   └── PrivateRoute.jsx
 │   │   ├── Client
+│   │   │   ├── CaptchaConfig.jsx
 │   │   │   ├── Client.jsx
 │   │   │   ├── ClientHeader.jsx
 │   │   │   ├── ClientList.jsx

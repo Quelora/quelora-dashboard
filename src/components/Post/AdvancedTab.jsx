@@ -1,3 +1,4 @@
+// src/components/Post/AdvancedTab.jsx
 import { 
   Box, 
   Typography, 

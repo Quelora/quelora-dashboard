@@ -1,3 +1,4 @@
+// src/components/Post/CommentsTab.jsx
 import { 
   Box, 
   Typography, 
@@ -13,7 +14,8 @@ import {
   Comment as CommentIcon,
   Share as ShareIcon,
   Bookmark as BookmarkIcon,
-  AccessTime as AccessTimeIcon
+  AccessTime as AccessTimeIcon,
+  FormatQuote as FormatQuoteIcon 
 } from '@mui/icons-material';
 
 const CommentsTab = ({ formData, handleChange, handleNumberChange, validationErrors, t }) => {
@@ -74,6 +76,24 @@ const CommentsTab = ({ formData, handleChange, handleNumberChange, validationErr
                 className="interaction-chip"
               />
             </Grid>
+          )}
+          {formData.config.interaction.allow_comments && (
+            <Grid item xs={6} className="interaction-grid-item">
+              <Chip 
+                icon={<FormatQuoteIcon />}
+                label={t('postForm.allowQuotes')}
+                color={formData.config.interaction.allow_quotes ? 'primary' : 'default'}
+                onClick={() => handleChange({
+                target: {
+                  name: 'config.interaction.allow_quotes',
+                  type: 'checkbox',
+                  checked: !formData.config.interaction.allow_quotes
+                  }
+                })}
+                variant={formData.config.interaction.allow_quotes ? 'filled' : 'outlined'}
+                className="interaction-chip"
+              />
+              </Grid>
           )}
           <Grid item xs={6} className="interaction-grid-item">
             <Chip 

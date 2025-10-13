@@ -40,8 +40,12 @@
       "under_development": "Esta sección está en desarrollo",
       "geo_distribution":"Distribución geográfica",
       "top_locations":"Ubicaciones principales",
-      "top_regions":"Regiones principales",
-      "top_cities":"Ciudades principales"
+      "country": "País",
+      "region": "Región",
+      "city": "Ciudad",
+      "top_countrys": "Principales Países",
+      "top_regions": "Principales Regiones",
+      "top_cities": "Principales Ciudades"
     }
   },
   "sidebar": {
@@ -429,6 +433,7 @@
     "allowShares": "Permitir compartir",
     "publishing": "Publicación",
     "allowBookmarks": "Permitir marcadores",
+    "allowQuotes": "Permitir citas",
     "publishImmediately": "Publicar inmediatamente",
     "newPost": "Nueva Publicación",
     "editPost": "Editar Publicación",

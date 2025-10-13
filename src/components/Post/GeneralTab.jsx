@@ -1,3 +1,4 @@
+// src/components/Post/GeneralTab.jsx
 import { 
   Box, 
   TextField, 
