@@ -45,7 +45,8 @@
       "city": "City",
       "top_countrys": "Top Countries",
       "top_regions": "Top Regions",
-      "top_cities": "Top Cities"
+      "top_cities": "Top Cities",
+      "top_citys": "Top Cities"
     },
     "postStats": {
       "title": "Disaggregated Post Statistics",
@@ -96,7 +97,7 @@
     }
   },
   "sidebar": {
-    "dashboard": "Dashboard",
+    "general_analytics": "General Analytics",
     "my_account": "My Account",
     "clients": "Clients",
     "posts": "Posts",
@@ -427,6 +428,9 @@
     "rowsPerPage": "Rows per page:",
     "displayedRows": "{from}-{to} of {count}",
     "loading": "Loading",
+    "items": "items",
+    "drilldown": "Drilldown",
+    "view": "View",
     "rangedate": {
       "date_range": "Date Range",
       "today": "Today",

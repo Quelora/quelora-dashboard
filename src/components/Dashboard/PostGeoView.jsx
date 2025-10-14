@@ -4,7 +4,7 @@ import { Box, Paper, Typography, Stack, ButtonGroup, Button, IconButton, Circula
 import { MapContainer, TileLayer, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { ZoomInMap, Fullscreen, FullscreenExit, Place } from '@mui/icons-material';
+import { Fullscreen, FullscreenExit, Place } from '@mui/icons-material';
 import {
     Table,
     TableBody,
@@ -28,43 +28,44 @@ const useGeoDataAggregator = (rawGeoData) => {
         const countryMap = {};
         const regionMap = {};
         const cityData = [];
-        
+        const sumProps = ['total', 'likes', 'comments', 'shares', 'replies']; 
+
         rawGeoData.forEach(item => {
             const countryKey = item.country || 'Unknown';
-            const regionKey = item.region ? `${item.country}-${item.region}` : countryKey;
+            const lat = parseFloat(item.latitude || item.lat) || 0; 
+            const lng = parseFloat(item.longitude || item.lng) || 0; 
             
-            const lat = parseFloat(item.latitude) || 0;
-            const lng = parseFloat(item.longitude) || 0;
+            if (lat === 0 && lng === 0) return;
+
+            const regionKey = item.region ? `${countryKey}-${item.region}` : countryKey;
             
-            if (lat !== 0 && lng !== 0) {
-                 cityData.push({
-                    ...item,
-                    name: `${item.city || item.region}, ${item.country}`,
-                    type: 'city',
-                    lat, lng,
-                });
-            }
+            cityData.push({
+                ...item,
+                name: `${item.city || item.region || item.country}, ${item.country}`,
+                type: 'city',
+                lat, lng,
+            });
 
             if (!regionMap[regionKey]) {
                 regionMap[regionKey] = {
                     name: item.region || item.country, country: item.country, region: item.region, 
-                    lat: lat, lng: lng,
-                    total: 0, type: 'region'
+                    lat: lat, lng: lng, 
+                    total: 0, likes: 0, comments: 0, shares: 0, replies: 0, type: 'region'
                 };
             }
-            regionMap[regionKey].total += item.total;
+            sumProps.forEach(prop => { regionMap[regionKey][prop] = (regionMap[regionKey][prop] || 0) + (item[prop] || 0); });
             
             if (!countryMap[countryKey]) {
                 countryMap[countryKey] = {
                     name: item.country, country: item.country, 
                     lat: lat, lng: lng,
-                    total: 0, type: 'country'
+                    total: 0, likes: 0, comments: 0, shares: 0, replies: 0, type: 'country'
                 };
             }
-            countryMap[countryKey].total += item.total;
+            sumProps.forEach(prop => { countryMap[countryKey][prop] = (countryMap[countryKey][prop] || 0) + (item[prop] || 0); });
         });
 
-        const filterValid = d => d.total > 0;
+        const filterValid = d => d.total > 0 && d.lat !== 0 && d.lng !== 0;
         
         return {
             countryData: Object.values(countryMap).filter(filterValid),
@@ -78,8 +79,11 @@ const useGeoDataAggregator = (rawGeoData) => {
 const PostGeoView = ({ aggregatedGeoData, loading }) => {
     const { t } = useTranslation();
     const mapRef = useRef(null);
-    const [zoom, setZoom] = useState(2);
+    
     const [currentView, setCurrentView] = useState('country');
+    const [selectedCountry, setSelectedCountry] = useState(null);
+    const [selectedRegion, setSelectedRegion] = useState(null);
+    
     const [highlightedItem, setHighlightedItem] = useState(null);
     const [mapReady, setMapReady] = useState(false);
     const [isMaximized, setIsMaximized] = useState(false);
@@ -87,40 +91,81 @@ const PostGeoView = ({ aggregatedGeoData, loading }) => {
 
     const { countryData, regionData, cityData } = useGeoDataAggregator(aggregatedGeoData);
     
-    const maxTotal = useMemo(() => {
-        const data = currentView === 'country' ? countryData : (currentView === 'region' ? regionData : cityData);
-        return data.reduce((max, item) => Math.max(max, item.total), 0);
-    }, [currentView, countryData, regionData, cityData]);
-
-    const getVisibleData = () => {
-        switch (currentView) {
-            case 'country': return countryData;
-            case 'region': return regionData;
-            case 'city': return cityData;
-            default: return [];
+    const getVisibleData = (view = currentView, country = selectedCountry, region = selectedRegion) => {
+        switch (view) {
+            case 'country': 
+                return countryData;
+            case 'region': 
+                return country 
+                    ? regionData.filter(d => d.country === country) 
+                    : regionData; 
+            case 'city':
+                if (region && country) {
+                    return cityData.filter(d => d.country === country && d.region === region);
+                }
+                if (country) {
+                    return cityData.filter(d => d.country === country);
+                }
+                return cityData;
+            default: 
+                return [];
         }
     };
-    const currentVisibleData = getVisibleData();
+    const currentVisibleData = getVisibleData(); 
+    
+    const maxTotal = useMemo(() => {
+        return currentVisibleData.reduce((max, item) => Math.max(max, item.total), 0);
+    }, [currentVisibleData]);
 
+
+    const adjustMapBounds = (data) => {
+        if (!mapRef.current || data.length === 0) return;
+        
+        const map = mapRef.current;
+        const latLngs = data.map(d => [d.lat, d.lng]);
+
+        if (latLngs.length > 0) {
+            try {
+                const bounds = L.latLngBounds(latLngs);
+                map.flyToBounds(bounds, { padding: [50, 50], maxZoom: 10, duration: 0.8 });
+            } catch (e) {
+                if (latLngs.length === 1) {
+                    const targetZoom = data[0].type === 'city' ? 10 : (data[0].type === 'region' ? 7 : 3);
+                    map.flyTo(latLngs[0], targetZoom, { duration: 0.8 });
+                }
+            }
+        } else if (!selectedCountry && !selectedRegion) {
+             map.flyTo([0, 0], 2, { duration: 0.8 });
+        }
+    };
+    
     const MapController = () => {
         const map = useMap();
+        
         useEffect(() => {
             mapRef.current = map;
             setMapReady(true);
             
             if (!initialFocusDone && countryData.length > 0) {
-                 map.fitWorld();
+                 map.fitWorld({ padding: [20, 20] });
                  setInitialFocusDone(true);
             }
             
-            const updateZoomState = () => setZoom(map.getZoom());
-            map.on('zoomend', updateZoomState);
-            updateZoomState();
-            return () => map.off('zoomend', updateZoomState);
-        }, [map]);
+        }, [map, countryData, initialFocusDone]); 
+        
+        useEffect(() => {
+            if (mapReady && initialFocusDone) {
+                const timeout = setTimeout(() => {
+                    const dataToAdjust = getVisibleData(currentView, selectedCountry, selectedRegion);
+                    adjustMapBounds(dataToAdjust);
+                }, 50); 
+                return () => clearTimeout(timeout);
+            }
+        }, [mapReady, initialFocusDone, selectedCountry, selectedRegion, currentView]); 
+
         return null;
     };
-
+    
     const toggleMaximize = () => {
         setIsMaximized(prev => !prev);
         setTimeout(() => {
@@ -132,36 +177,60 @@ const PostGeoView = ({ aggregatedGeoData, loading }) => {
     const focusOnItem = (item) => {
         setHighlightedItem(item);
         if (mapRef.current) {
-            const targetZoom = item.type === 'country' ? 3 : (item.type === 'region' ? 5 : 9);
-            mapRef.current.flyTo([item.lat, item.lng], targetZoom, { duration: 0.5, easeLinearity: 0.25 });
+            const map = mapRef.current;
+            const targetZoom = item.type === 'country' ? 3 : (item.type === 'region' ? 7 : 10);
+            map.flyTo([item.lat, item.lng], targetZoom, { duration: 0.5, easeLinearity: 0.25 });
         }
     };
     
-    const handleViewChange = (newView) => {
-        setCurrentView(newView);
-        setHighlightedItem(null);
-        if (mapRef.current) {
-            const data = newView === 'country' ? countryData : (newView === 'region' ? regionData : cityData);
-            if (data.length > 0) {
-                const topItem = [...data].sort((a, b) => b.total - a.total)[0];
-                focusOnItem(topItem);
-            } else {
-                mapRef.current.flyTo([0, 0], 2, { duration: 1 });
-            }
+    const handleItemClick = (item) => {
+        setHighlightedItem(item); 
+        
+        if (item.type === 'country') {
+            setCurrentView('region');
+            setSelectedCountry(item.country);
+            setSelectedRegion(null); 
+        } else if (item.type === 'region') {
+            setCurrentView('city');
+            setSelectedCountry(item.country); 
+            setSelectedRegion(item.region);
+        } else if (item.type === 'city') {
+            focusOnItem(item);
         }
+    };
+
+    const handleViewChange = (newView) => {
+        setHighlightedItem(null);
+        
+        let nextCountry = selectedCountry;
+        let nextRegion = selectedRegion;
+
+        if (newView === 'country') {
+            nextCountry = null;
+            nextRegion = null;
+            if (mapRef.current) mapRef.current.flyTo([0, 0], 2, { duration: 0.8 });
+        } else if (newView === 'region') {
+            nextRegion = null;
+        } else if (newView === 'city') {
+        }
+        
+        setCurrentView(newView);
+        setSelectedCountry(nextCountry);
+        setSelectedRegion(nextRegion);
     };
 
     const calculateRadius = (total) => {
         if (maxTotal === 0) return 0;
-        const scale = currentView === 'country' ? 500000 : (currentView === 'region' ? 200000 : 80000);
-        const baseMin = currentView === 'city' ? 10000 : 50000;
+        // AJUSTE: Reducción del radio base para 'city' (80000 -> 8000 metros)
+        const scale = currentView === 'country' ? 500000 : (currentView === 'region' ? 200000 : 8000); 
+        // AJUSTE: Reducción del radio mínimo para 'city' (10000 -> 500 metros)
+        const baseMin = currentView === 'city' ? 500 : 50000;
         const totalRatio = Math.sqrt(total) / Math.sqrt(maxTotal);
         const proportionalRadius = baseMin + (totalRatio * (scale - baseMin)); 
-        const zoomCompensation = Math.pow(1.1, zoom - 2); 
-        return Math.max(1000, proportionalRadius / zoomCompensation); 
+        return Math.max(1000, proportionalRadius); 
     };
 
-    const getHighlightStyle = (item) => (highlightedItem === item ?
+    const getHighlightStyle = (item) => (highlightedItem && highlightedItem.name === item.name && highlightedItem.type === item.type ?
         { fillOpacity: 0.9, weight: 3, color: '#ff0000' } :
         { fillOpacity: 0.7, weight: 1, color: STANDARD_COLOR }
     );
@@ -175,11 +244,11 @@ const PostGeoView = ({ aggregatedGeoData, loading }) => {
     }
     
     if (aggregatedGeoData.length === 0) {
-         return (
-            <Box sx={{ height: 600, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                <Typography variant="body1">{t('dashboard.postStats.noGeoData')}</Typography>
-            </Box>
-        );
+          return (
+              <Box sx={{ height: 600, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                  <Typography variant="body1">{t('dashboard.postStats.noGeoData')}</Typography>
+              </Box>
+          );
     }
 
     return (
@@ -188,6 +257,20 @@ const PostGeoView = ({ aggregatedGeoData, loading }) => {
                 <Typography variant="h6" fontWeight={500}>
                     {t('dashboard.postStats.geoMapTitle')}
                 </Typography>
+                
+                <Box sx={{ display: 'flex', alignItems: 'center', mx: 2, flexGrow: 1, justifyContent: 'center' }}>
+                    <Typography variant="caption" sx={{ mr: 1, fontWeight: 'bold' }}>Vista: {t(`dashboard.statistics.${currentView}`)}</Typography>
+                    {selectedCountry && (
+                        <Typography variant="caption" sx={{ mr: 1, p: 0.5, bgcolor: '#f0f0f0', borderRadius: 1 }}>
+                            {t('dashboard.statistics.country')}: <strong>{selectedCountry}</strong>
+                        </Typography>
+                    )}
+                    {selectedRegion && (
+                        <Typography variant="caption" sx={{ mr: 1, p: 0.5, bgcolor: '#e0e0e0', borderRadius: 1 }}>
+                            {t('dashboard.statistics.region')}: <strong>{selectedRegion}</strong>
+                        </Typography>
+                    )}
+                </Box>
                 
                 <ButtonGroup variant="contained" size="small" aria-label="Geographic View Selector">
                     <Button onClick={() => handleViewChange('country')} variant={currentView === 'country' ? 'contained' : 'outlined'} sx={{ minWidth: 80 }}>
@@ -211,27 +294,37 @@ const PostGeoView = ({ aggregatedGeoData, loading }) => {
             </Stack>
             
             <Box sx={{ display: 'flex', height: isMaximized ? 'calc(100% - 60px)' : 'calc(100% - 60px)' }}>
-                {/* Map Container (70%) */}
                 <Box sx={{ flex: '0 0 70%', minHeight: '100%', borderRadius: '4px', overflow: 'hidden' }}>
                     <MapContainer center={[0, 0]} zoom={2} minZoom={2} maxZoom={14} style={{ height: '100%', width: '100%' }} worldCopyJump={true}>
-                        <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' noWrap={false} />
+                        <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" attribution='&copy; <a href="https://www.openstreetmap.com/copyright">OpenStreetMap</a> contributors' noWrap={false} />
                         <MapController />
                         
                         {currentVisibleData.map((item, index) => {
                             const style = getHighlightStyle(item);
-                            const name = item.type === 'city' ? `${item.city || item.region}, ${item.country}` : item.name;
+                            
+                            let name;
+                            if (item.type === 'city') {
+                                name = `${item.city || item.region || 'N/A'}, ${item.country}`;
+                            } else if (item.type === 'region') {
+                                name = `${item.region || 'N/A'}, ${item.country}`;
+                            } else {
+                                name = item.name;
+                            }
                             const popupContent = `${name} - Total: ${item.total.toLocaleString()}`;
+
                             return (
                                 <Circle 
-                                    key={`${item.type}-${index}`} 
-                                    center={[parseFloat(item.lat), parseFloat(item.lng)]} 
+                                    key={`${item.type}-${item.country}-${item.region || ''}-${item.city || ''}`} 
+                                    center={[item.lat, item.lng]} 
                                     radius={calculateRadius(item.total)} 
                                     fillOpacity={style.fillOpacity} 
                                     color={style.color} 
                                     fillColor={STANDARD_COLOR} 
                                     stroke 
                                     weight={style.weight} 
-                                    eventHandlers={{ click: () => focusOnItem(item) }}
+                                    eventHandlers={{ 
+                                        click: () => handleItemClick(item) 
+                                    }}
                                 >
                                     <Popup>{popupContent}</Popup>
                                 </Circle>
@@ -240,17 +333,14 @@ const PostGeoView = ({ aggregatedGeoData, loading }) => {
                     </MapContainer>
                 </Box>
                 
-                {/* Geo Data List (30% with scroll fix) */}
-                <Box sx={{ flex: '0 0 30%', ml: 2, overflowY: 'auto', maxHeight: '100%' }}>
+                <Box sx={{ flex: '0 0 30%', ml: 2, overflowY: 'auto', maxHeight: '100%', minWidth: 200 }}>
                     <Typography variant="subtitle2" gutterBottom>
-                        {t(`dashboard.postStats.top_${currentView}s`)}
+                        {t(`dashboard.postStats.top_${currentView}s`)} ({currentVisibleData.length} {t('common.items')})
                     </Typography>
                     <TableContainer component={Box}>
-                        {/* FIX: Removed minWidth on Table and relied solely on tableLayout: fixed */}
-                        <Table size="small" stickyHeader sx={{ tableLayout: 'fixed' }}>
+                        <Table size="small" stickyHeader>
                             <TableHead>
                                 <TableRow>
-                                    {/* FIX: Adjust column widths to fit content */}
                                     <TableCell sx={{ width: '60%' }}>{t('dashboard.postStats.geoHeader.location')}</TableCell>
                                     <TableCell align="right" sx={{ width: '25%' }}>{t('dashboard.postStats.geoHeader.total')}</TableCell>
                                     <TableCell align="right" sx={{ width: '15%' }}>{t('dashboard.postStats.geoHeader.actions')}</TableCell>
@@ -261,8 +351,8 @@ const PostGeoView = ({ aggregatedGeoData, loading }) => {
                                     <TableRow 
                                         key={index} 
                                         hover 
-                                        onClick={() => focusOnItem(item)}
-                                        selected={highlightedItem === item}
+                                        onClick={() => handleItemClick(item)} 
+                                        selected={highlightedItem && highlightedItem.name === item.name && highlightedItem.type === item.type}
                                         sx={{ cursor: 'pointer' }}
                                     >
                                         <TableCell sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -275,7 +365,15 @@ const PostGeoView = ({ aggregatedGeoData, loading }) => {
                                             <Typography variant="caption" fontWeight="bold">{item.total.toLocaleString()}</Typography>
                                         </TableCell>
                                         <TableCell align="right">
-                                            <Typography variant="caption">({item.type.toUpperCase()})</Typography>
+                                            <Button size="small" 
+                                                onClick={(e) => { 
+                                                    e.stopPropagation(); 
+                                                    handleItemClick(item); 
+                                                }}
+                                                disabled={item.type === 'city'} 
+                                            >
+                                                {item.type === 'city' ? t('common.view') : t('common.drilldown')} 
+                                            </Button>
                                         </TableCell>
                                     </TableRow>
                                 ))}

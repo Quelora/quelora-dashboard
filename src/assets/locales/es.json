@@ -45,7 +45,8 @@
       "city": "City",
       "top_countrys": "Top Countries",
       "top_regions": "Top Regions",
-      "top_cities": "Top Cities"
+      "top_cities": "Top Cities",
+      "top_citys": "Top Cities"
     },
     "postStats": {
       "title": "Disaggregated Post Statistics",
@@ -96,14 +97,14 @@
     }
   },
   "sidebar": {
-    "dashboard": "Dashboard",
-    "my_account": "My Account",
+    "general_analytics": "Analíticas generales",
+    "my_account": "Mi cuenta",
     "clients": "Clients",
-    "posts": "Posts",
-    "trash": "Trash",
-    "logout": "Logout",
-    "users": "Users",
-    "post_analytics": "Post Analytics"
+    "posts": "Publicaciones",
+    "trash": "Basura",
+    "logout": "Salir",
+    "users": "Usuarios",
+    "post_analytics": "Analíticas de publicaciones"
   },
   "users": {
     "title": "Users",
@@ -427,6 +428,9 @@
     "rowsPerPage": "Rows per page:",
     "displayedRows": "{from}-{to} of {count}",
     "loading": "Loading",
+    "items": "items",
+    "drilldown": "Desglosar",
+    "view": "Ver",
     "rangedate": {
       "date_range": "Date Range",
       "today": "Today",

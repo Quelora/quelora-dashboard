@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
     Box,
@@ -17,27 +17,26 @@ const DateRangeSelector = ({
     dateTo: propDateTo 
 }) => {
     const { t } = useTranslation();
+    // FIX: El estado inicial ya es seguro: null si el prop es undefined.
     const [dateFrom, setDateFrom] = useState(propDateFrom || null);
     const [dateTo, setDateTo] = useState(propDateTo || null);
     const [activeButton, setActiveButton] = useState(null);
 
     // FUNCIÓN DE DISPARO UNIFICADA Y RETROCOMPATIBLE
     const dispatchChange = (from, to) => {
-        // 1. Prioriza el nuevo formato (PostStatsPage)
         if (onRangeChange) {
             onRangeChange({ dateFrom: from, dateTo: to });
         } 
-        // 2. Si no está, usa el formato antiguo (otros componentes)
         else if (onDateRangeChange) {
-            // Se asume que el componente antiguo espera los objetos Date como argumentos separados
             onDateRangeChange(from, to); 
         }
     };
     
-    // EFECTO: Sincroniza el estado local con los props de fecha que vienen del padre.
+    // CORRECCIÓN CLAVE: Asegura que el valor de sincronización nunca sea 'undefined'.
     useEffect(() => {
-        setDateFrom(propDateFrom);
-        setDateTo(propDateTo);
+        // Usa el operador de coalescencia nula (??) o un OR para asegurar null en lugar de undefined.
+        setDateFrom(propDateFrom ?? null);
+        setDateTo(propDateTo ?? null);
     }, [propDateFrom, propDateTo]);
 
 
@@ -45,6 +44,7 @@ const DateRangeSelector = ({
         const today = new Date();
         let fromDate, toDate;
 
+        // ... (Tu lógica de cálculo de rangos se mantiene igual)
         switch (range) {
             case 'today':
                 fromDate = new Date(today);
@@ -74,12 +74,12 @@ const DateRangeSelector = ({
         setDateTo(toDate);
         setActiveButton(range);
         
-        // Llamada unificada para recargar
         dispatchChange(fromDate, toDate);
     };
 
     const handleDateFromChange = (newValue) => {
         setActiveButton(null); 
+        // El DatePicker de MUI X asegura que newValue es null o Date, no undefined.
         if (newValue && dateTo && newValue > dateTo) {
             setDateFrom(newValue);
             setDateTo(newValue);
@@ -90,6 +90,7 @@ const DateRangeSelector = ({
 
     const handleDateToChange = (newValue) => {
         setActiveButton(null); 
+        // El DatePicker de MUI X asegura que newValue es null o Date, no undefined.
         if (newValue && dateFrom && newValue < dateFrom) {
             setDateTo(newValue);
             setDateFrom(newValue);
@@ -99,10 +100,10 @@ const DateRangeSelector = ({
     };
 
     const handleCustomRangeSelect = () => {
+        // FIX: Se deben despachar los valores aunque sean null si el usuario así lo decide. 
+        // No obstante, mantenemos la verificación por el botón 'disabled'.
         if (dateFrom && dateTo) {
             setActiveButton('custom');
-            
-            // Llamada unificada para recargar
             dispatchChange(dateFrom, dateTo); 
         }
     };
@@ -167,6 +168,7 @@ const DateRangeSelector = ({
                         sx={{ width: { xs: '100%', sm: 'auto' } }}
                     >
                         <DatePicker
+                            // CORRECCIÓN: el valor siempre será Date o null
                             value={dateFrom}
                             onChange={handleDateFromChange}
                             slotProps={{ 
@@ -174,15 +176,18 @@ const DateRangeSelector = ({
                                     size: 'small',
                                     sx: { 
                                         width: { xs: '100%', sm: 160 },
+                                        // Estilos para evitar el warning 'MuiPickersSectionList'
                                         '& .MuiPickersSectionList-root': { padding: '4px' },
                                         '& .MuiPickersInputBase-sectionsContainer': { padding: '4px' },
-                                        '& .css-1524bp8-MuiPickersSectionList-root-MuiPickersInputBase-sectionsContainer-MuiPickersOutlinedInput-sectionsContainer': { padding: '4px' }
+                                        // FIX: Si el componente es de MUI X v6 o superior, la clase 'css-...' es innecesaria y podría ser inestable.
+                                        // Es mejor confiar en las clases con nombre de MUI.
                                     },
                                     placeholder: t('common.rangedate.from')
                                 } 
                             }}
                         />
                         <DatePicker
+                            // CORRECCIÓN: el valor siempre será Date o null
                             value={dateTo}
                             onChange={handleDateToChange}
                             slotProps={{ 
@@ -192,7 +197,6 @@ const DateRangeSelector = ({
                                         width: { xs: '100%', sm: 160 },
                                         '& .MuiPickersSectionList-root': { padding: '4px' },
                                         '& .MuiPickersInputBase-sectionsContainer': { padding: '4px' },
-                                        '& .css-1524bp8-MuiPickersSectionList-root-MuiPickersInputBase-sectionsContainer-MuiPickersOutlinedInput-sectionsContainer': { padding: '4px' }
                                     },
                                     placeholder: t('common.rangedate.to')
                                 } 
