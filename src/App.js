@@ -12,6 +12,7 @@ import DashboardLayout from './components/DashboardLayout';
 import TrashPage from './pages/TrashPage';
 import UserPage from './pages/UserPage';
 import PostCommentsPage from './pages/PostCommentsPage';
+import PostStatsPage from './pages/PostStatsPage';
 
 const theme = createTheme({
   typography: {
@@ -40,6 +41,7 @@ function App() {
                 <Route path="profile" element={<ProfilePage />} />
                 <Route path="client" element={<ClientPage />} />
                 <Route path="posts" element={<ClientPostsPage />} />
+                <Route path="post-stats" element={<PostStatsPage />} /> 
                 <Route path="/post/:entity?" element={<PostPage />} />
                 <Route path="trash" element={<TrashPage />} />
                 <Route path="users" element={<UserPage />} />

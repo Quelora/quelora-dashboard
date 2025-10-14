@@ -100,3 +100,67 @@ export const fetchGeoStats = async (cid = null, dateFrom = null, dateTo = null) 
     throw error;
   }
 };
+
+
+/**
+ * @name fetchPostListStats
+ * @description Fetches a paginated and sortable list of all posts with their metrics.
+ * @param {string} cid - Client ID.
+ * @param {Object} params - Pagination and sorting parameters (page, limit, sortBy, sortOrder, dateFrom, dateTo).
+ * @returns {Promise<Object>} Paginated list of post statistics.
+ */
+export const fetchPostListStats = async (cid, params) => {
+    try {
+        const urlParams = new URLSearchParams();
+
+        if (cid) urlParams.append('cid', cid);
+        urlParams.append('page', params.page || 1);
+        urlParams.append('limit', params.limit || 10);
+        urlParams.append('sortBy', params.sortBy || 'viewsCount');
+        urlParams.append('sortOrder', params.sortOrder || 'desc');
+        
+        if (params.dateFrom) urlParams.append('dateFrom', new Date(params.dateFrom).toISOString());
+        if (params.dateTo) urlParams.append('dateTo', new Date(params.dateTo).toISOString());
+
+        const response = await api.get('/stats/get/posts/list', {
+            params: urlParams
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching post list stats:', error);
+        throw error;
+    }
+};
+
+/**
+ * @name fetchPostAnalytics
+ * @description Fetches detailed hourly and geographical analytics for a single post.
+ * @param {string} entityId - The ObjectId (entity) of the post.
+ * @param {string} cid - Client ID.
+ * @param {Object} dates - Date range (dateFrom, dateTo).
+ * @returns {Promise<Object>} Detailed post analytics.
+ */
+export const fetchPostAnalytics = async (entityId, cid, dates) => {
+    try {
+        const params = new URLSearchParams();
+        
+        if (cid) params.append('cid', cid);
+        
+        if (dates.dateFrom) {
+            params.append('dateFrom', new Date(dates.dateFrom).toISOString());
+        }
+        
+        if (dates.dateTo) {
+            params.append('dateTo', new Date(dates.dateTo).toISOString());
+        }
+
+        const response = await api.get(`/stats/get/post/${entityId}`, {
+            params: params
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching analytics for post ${entityId}:`, error);
+        throw error;
+    }
+};

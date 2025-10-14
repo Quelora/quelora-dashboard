@@ -21,7 +21,8 @@ import {
   Group as GroupIcon,
   AccountTree as ClientsIcon,
   Article as PostsIcon,
-  Delete 
+  Delete,
+  Analytics as PostStatsIcon
 } from '@mui/icons-material';
 
 const drawerWidth = 240;
@@ -52,6 +53,7 @@ const Sidebar = ({ handleLogout, open, handleDrawerToggle, isMobile }) => {
 
   const menuItems = [
     { text: t('sidebar.dashboard'), icon: <DashboardIcon />, path: '/dashboard' },
+    { text: t('sidebar.post_analytics'), icon: <PostStatsIcon />, path: '/post-stats' }, 
     { text: t('sidebar.my_account'), icon: <ProfileIcon />, path: '/profile' },
     { text: t('sidebar.clients'), icon: <ClientsIcon />, path: '/client' },
     { text: t('sidebar.posts'), icon: <PostsIcon />, path: '/posts' },
