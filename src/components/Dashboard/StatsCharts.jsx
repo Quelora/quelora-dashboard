@@ -17,15 +17,41 @@ import '../../assets/css/Chart.css';
 import cities from 'cities.json';
 import countryNameToCode from './countryCodes';
 
-const StatsCharts = ({ stats, geoData, onDateRangeChange, currentGeoAction, onGeoActionChange }) => {
+const StatsCharts = ({ stats, geoData, onDateRangeChange, currentGeoAction, onGeoActionChange, propDateFrom, propDateTo }) => {
     const { t } = useTranslation();
     const [lastUpdated, setLastUpdated] = useState(new Date());
     const [chartData, setChartData] = useState([]);
-    const [dateRange, setDateRange] = useState({ dateFrom: null, dateTo: null });
+    // ELIMINADO: const [dateRange, setDateRange] = useState({ dateFrom: propDateFrom, dateTo: propDateTo });
     const [timeBreakdown, setTimeBreakdown] = useState({});
     const [processedGeoData, setProcessedGeoData] = useState([]);
     const [isGeoChartMaximized, setIsGeoChartMaximized] = useState(false);
     
+    // Rango de fechas actual (directamente desde las props)
+    const dateRange = { dateFrom: propDateFrom, dateTo: propDateTo };
+
+    const getTodayRange = () => {
+        const today = new Date();
+        const dateFrom = new Date(today);
+        dateFrom.setHours(0, 0, 0, 0);
+        const dateTo = new Date(today);
+        dateTo.setHours(23, 59, 59, 999);
+        return { dateFrom, dateTo };
+    };
+
+    // EFECTO DE AUTO-CLICK/INICIALIZACIÓN
+    useEffect(() => {
+        if (!propDateFrom && !propDateTo && onDateRangeChange) {
+            const { dateFrom: todayFrom, dateTo: todayTo } = getTodayRange();
+            
+            const timer = setTimeout(() => {
+                onDateRangeChange(todayFrom, todayTo);
+            }, 50); 
+
+            return () => clearTimeout(timer);
+        }
+    }, [onDateRangeChange, propDateFrom, propDateTo]);
+
+
     const toggleGeoChartMaximize = () => {
         setIsGeoChartMaximized(prevState => !prevState);
         setTimeout(() => {
@@ -116,7 +142,7 @@ const StatsCharts = ({ stats, geoData, onDateRangeChange, currentGeoAction, onGe
             const todayLocal = new Date();
             
             const daysDiff = dateRange.dateFrom && dateRange.dateTo ?
-                (dateRange.dateTo - dateRange.dateFrom) / (1000 * 60 * 60 * 24) : 0;
+                (dateRange.dateTo.getTime() - dateRange.dateFrom.getTime()) / (1000 * 60 * 60 * 24) : 0;
             let formattedData = [];
             
             if (daysDiff <= 1) {
@@ -219,10 +245,10 @@ const StatsCharts = ({ stats, geoData, onDateRangeChange, currentGeoAction, onGe
             setChartData(formattedData);
             setLastUpdated(new Date());
         }
-    }, [stats, dateRange]);
+    }, [stats, dateRange.dateFrom, dateRange.dateTo]); // Depende directamente de dateRange
 
     const handleDateRangeChange = (dateFrom, dateTo) => {
-        setDateRange({ dateFrom, dateTo });
+        // Ya no es necesario setDateRange aquí, solo en el padre
         if (onDateRangeChange) onDateRangeChange(dateFrom, dateTo);
     };
 
@@ -233,7 +259,11 @@ const StatsCharts = ({ stats, geoData, onDateRangeChange, currentGeoAction, onGe
             <Grid container sx={{ padding: '16px' }}>
                 <Grid item xs={12} sx={{ width: '100%', gap: 2, display: 'flex', flexDirection: 'column' }}>
                     
-                    <DateRangeSelector onDateRangeChange={handleDateRangeChange} />
+                    <DateRangeSelector 
+                        onDateRangeChange={handleDateRangeChange} 
+                        dateFrom={propDateFrom} 
+                        dateTo={propDateTo} 
+                    />
                     
                     <Typography className="last-updated">
                         {t('dashboard.statistics.last_updated').replace('{time}', lastUpdated.toLocaleTimeString())}

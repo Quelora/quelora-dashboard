@@ -32,6 +32,7 @@ const Dashboard = () => {
     const [geoData, setGeoData] = useState({ data: [] });
     const [selectedCid, setSelectedCid] = useState('all');
     const [clientList, setClientList] = useState([]);
+    // Vuelve a inicializar con nulls para que StatsCharts pueda detectar la carga inicial
     const [dateRange, setDateRange] = useState({ dateFrom: null, dateTo: null });
     const [geoAction, setGeoAction] = useState('comment'); 
 
@@ -63,38 +64,60 @@ const Dashboard = () => {
         }
     };
 
-    // Efecto para cargar las estadísticas generales (con intervalo)
+    // Dependencias de useEffect dependen de dateRange.dateFrom/dateTo
     useEffect(() => {
         const cid = selectedCid === 'all' ? null : selectedCid;
         
         const executeLoadStats = () => {
-            loadStats(cid, dateRange.dateFrom, dateRange.dateTo);
+            // Solo carga si hay un rango de fechas definido (después del click emulado)
+            if (dateRange.dateFrom) {
+                loadStats(cid, dateRange.dateFrom, dateRange.dateTo);
+            }
         };
 
-        executeLoadStats();
+        // Si dateRange.dateFrom es null, no se ejecuta aquí, sino que espera el auto-click
+        if (dateRange.dateFrom) {
+            executeLoadStats();
+        }
 
-        const intervalId = setInterval(executeLoadStats, 10000);
+        // El intervalo solo se activa si las fechas están definidas
+        let intervalId;
+        if (dateRange.dateFrom) {
+            intervalId = setInterval(executeLoadStats, 10000);
+        }
 
-        return () => clearInterval(intervalId);
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
     }, [selectedCid, dateRange.dateFrom, dateRange.dateTo]);
     
-    // Nuevo efecto para cargar los datos geográficos (al cambiar fechas o acción)
+    // Lo mismo para geoStats
     useEffect(() => {
         const cid = selectedCid === 'all' ? null : selectedCid;
 
         const executeLoadGeoStats = (currentAction) => {
-            loadGeoStats(cid, dateRange.dateFrom, dateRange.dateTo, currentAction);
+            // Solo carga si hay un rango de fechas definido
+            if (dateRange.dateFrom) {
+                loadGeoStats(cid, dateRange.dateFrom, dateRange.dateTo, currentAction);
+            }
         };
 
-        executeLoadGeoStats(geoAction);
-
-        const geoIntervalId = setInterval(() => {
+        if (dateRange.dateFrom) {
             executeLoadGeoStats(geoAction);
-        }, 60000);
+        }
 
-        return () => clearInterval(geoIntervalId);
+        let geoIntervalId;
+        if (dateRange.dateFrom) {
+            geoIntervalId = setInterval(() => {
+                executeLoadGeoStats(geoAction);
+            }, 60000);
+        }
 
+        return () => {
+            if (geoIntervalId) clearInterval(geoIntervalId);
+        };
     }, [selectedCid, dateRange.dateFrom, dateRange.dateTo, geoAction]);
+
 
     useEffect(() => {
         if (isMobile) {
@@ -166,15 +189,15 @@ const Dashboard = () => {
                     minHeight: 0,
                     gap: 2
                 }}>
-                    {stats && (
-                        <StatsCharts 
-                            stats={stats} 
-                            geoData={geoData} 
-                            onDateRangeChange={handleDateRangeChange}
-                            currentGeoAction={geoAction} 
-                            onGeoActionChange={handleGeoActionChange}
-                        />
-                    )}
+                    <StatsCharts 
+                        stats={stats} 
+                        geoData={geoData} 
+                        onDateRangeChange={handleDateRangeChange}
+                        currentGeoAction={geoAction} 
+                        onGeoActionChange={handleGeoActionChange}
+                        propDateFrom={dateRange.dateFrom}
+                        propDateTo={dateRange.dateTo}
+                    />
                 </Box>
             </Box>
         </Box>

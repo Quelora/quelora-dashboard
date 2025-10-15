@@ -10,6 +10,28 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
+const isSameDay = (date1, date2) => {
+    return date1 && date2 && date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth() && date1.getDate() === date2.getDate();
+};
+
+const isTodayRange = (from, to) => {
+    if (!from || !to) return false;
+    
+    const today = new Date();
+    
+    if (!isSameDay(from, today) || !isSameDay(to, today)) {
+        return false;
+    }
+    
+    const startOfToday = new Date(today);
+    startOfToday.setHours(0, 0, 0, 0); 
+    
+    const endOfToday = new Date(today);
+    endOfToday.setHours(23, 59, 59, 999); 
+    
+    return from.getTime() === startOfToday.getTime() && to.getTime() === endOfToday.getTime();
+};
+
 const DateRangeSelector = ({ 
     onRangeChange, 
     onDateRangeChange, 
@@ -17,54 +39,68 @@ const DateRangeSelector = ({
     dateTo: propDateTo 
 }) => {
     const { t } = useTranslation();
-    // FIX: El estado inicial ya es seguro: null si el prop es undefined.
-    const [dateFrom, setDateFrom] = useState(propDateFrom || null);
-    const [dateTo, setDateTo] = useState(propDateTo || null);
-    const [activeButton, setActiveButton] = useState(null);
+    
+    const initialDateFrom = propDateFrom ?? null;
+    const initialDateTo = propDateTo ?? null;
 
-    // FUNCIÓN DE DISPARO UNIFICADA Y RETROCOMPATIBLE
+    const [dateFrom, setDateFrom] = useState(initialDateFrom);
+    const [dateTo, setDateTo] = useState(initialDateTo);
+    const [activeButton, setActiveButton] = useState(isTodayRange(initialDateFrom, initialDateTo) ? 'today' : null);
+
+    // Función de despacho unificada para manejar ambos patrones de callback
     const dispatchChange = (from, to) => {
         if (onRangeChange) {
             onRangeChange({ dateFrom: from, dateTo: to });
         } 
-        else if (onDateRangeChange) {
+        // Esta es la lógica usada en Dashboard.jsx
+        if (onDateRangeChange) {
             onDateRangeChange(from, to); 
         }
     };
     
-    // CORRECCIÓN CLAVE: Asegura que el valor de sincronización nunca sea 'undefined'.
     useEffect(() => {
-        // Usa el operador de coalescencia nula (??) o un OR para asegurar null en lugar de undefined.
-        setDateFrom(propDateFrom ?? null);
-        setDateTo(propDateTo ?? null);
-    }, [propDateFrom, propDateTo]);
+        const newDateFrom = propDateFrom ?? null;
+        const newDateTo = propDateTo ?? null;
+        
+        setDateFrom(newDateFrom);
+        setDateTo(newDateTo);
+        setActiveButton(isTodayRange(newDateFrom, newDateTo) ? 'today' : null);
+    }, [propDateFrom?.getTime(), propDateTo?.getTime()]);
 
 
     const handleQuickRangeSelect = (range) => {
         const today = new Date();
         let fromDate, toDate;
+        
+        const startOfDay = new Date(today);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(today);
+        endOfDay.setHours(23, 59, 59, 999);
 
-        // ... (Tu lógica de cálculo de rangos se mantiene igual)
         switch (range) {
             case 'today':
-                fromDate = new Date(today);
-                toDate = new Date(today);
+                fromDate = startOfDay;
+                toDate = endOfDay;
                 break;
             case 'yesterday':
                 const yesterday = new Date(today);
                 yesterday.setDate(yesterday.getDate() - 1);
-                fromDate = yesterday;
-                toDate = yesterday;
+                fromDate = new Date(yesterday);
+                fromDate.setHours(0, 0, 0, 0);
+                toDate = new Date(yesterday);
+                toDate.setHours(23, 59, 59, 999);
                 break;
             case 'lastWeek':
                 fromDate = new Date(today);
                 fromDate.setDate(fromDate.getDate() - 7);
-                toDate = new Date(today);
+                fromDate.setHours(0, 0, 0, 0);
+                toDate = endOfDay;
                 break;
             case 'lastMonth':
                 fromDate = new Date(today);
                 fromDate.setMonth(fromDate.getMonth() - 1);
-                toDate = new Date(today);
+                fromDate.setHours(0, 0, 0, 0);
+                toDate = endOfDay;
                 break;
             default:
                 return;
@@ -79,7 +115,6 @@ const DateRangeSelector = ({
 
     const handleDateFromChange = (newValue) => {
         setActiveButton(null); 
-        // El DatePicker de MUI X asegura que newValue es null o Date, no undefined.
         if (newValue && dateTo && newValue > dateTo) {
             setDateFrom(newValue);
             setDateTo(newValue);
@@ -90,7 +125,6 @@ const DateRangeSelector = ({
 
     const handleDateToChange = (newValue) => {
         setActiveButton(null); 
-        // El DatePicker de MUI X asegura que newValue es null o Date, no undefined.
         if (newValue && dateFrom && newValue < dateFrom) {
             setDateTo(newValue);
             setDateFrom(newValue);
@@ -100,8 +134,6 @@ const DateRangeSelector = ({
     };
 
     const handleCustomRangeSelect = () => {
-        // FIX: Se deben despachar los valores aunque sean null si el usuario así lo decide. 
-        // No obstante, mantenemos la verificación por el botón 'disabled'.
         if (dateFrom && dateTo) {
             setActiveButton('custom');
             dispatchChange(dateFrom, dateTo); 
@@ -168,7 +200,6 @@ const DateRangeSelector = ({
                         sx={{ width: { xs: '100%', sm: 'auto' } }}
                     >
                         <DatePicker
-                            // CORRECCIÓN: el valor siempre será Date o null
                             value={dateFrom}
                             onChange={handleDateFromChange}
                             slotProps={{ 
@@ -176,18 +207,12 @@ const DateRangeSelector = ({
                                     size: 'small',
                                     sx: { 
                                         width: { xs: '100%', sm: 160 },
-                                        // Estilos para evitar el warning 'MuiPickersSectionList'
-                                        '& .MuiPickersSectionList-root': { padding: '4px' },
-                                        '& .MuiPickersInputBase-sectionsContainer': { padding: '4px' },
-                                        // FIX: Si el componente es de MUI X v6 o superior, la clase 'css-...' es innecesaria y podría ser inestable.
-                                        // Es mejor confiar en las clases con nombre de MUI.
                                     },
                                     placeholder: t('common.rangedate.from')
                                 } 
                             }}
                         />
                         <DatePicker
-                            // CORRECCIÓN: el valor siempre será Date o null
                             value={dateTo}
                             onChange={handleDateToChange}
                             slotProps={{ 
@@ -195,8 +220,6 @@ const DateRangeSelector = ({
                                     size: 'small',
                                     sx: { 
                                         width: { xs: '100%', sm: 160 },
-                                        '& .MuiPickersSectionList-root': { padding: '4px' },
-                                        '& .MuiPickersInputBase-sectionsContainer': { padding: '4px' },
                                     },
                                     placeholder: t('common.rangedate.to')
                                 } 

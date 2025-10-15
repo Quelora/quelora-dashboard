@@ -20,9 +20,14 @@ const DEFAULT_PAGINATION_CONFIG = {
 
 const getDefaultDateRange = () => {
     const today = new Date();
-    const thirtyDaysAgo = new Date();
+    const thirtyDaysAgo = new Date(today); // Usar new Date(today) para clonar
     thirtyDaysAgo.setDate(today.getDate() - 30);
-    return { dateFrom: thirtyDaysAgo, dateTo: today };
+    thirtyDaysAgo.setHours(0, 0, 0, 0);
+
+    const dateTo = new Date(today);
+    dateTo.setHours(23, 59, 59, 999);
+    
+    return { dateFrom: thirtyDaysAgo, dateTo: dateTo };
 };
 
 const getClientsFromSession = () => {
@@ -62,7 +67,8 @@ const PostStatsPage = () => {
 
     const [postStats, setPostStats] = useState([]);
     const [pagination, setPagination] = useState(DEFAULT_PAGINATION_CONFIG);
-    const [dateRange, setDateRange] = useState(getDefaultDateRange());
+    // Vuelve a la inicialización original de 30 días para estabilidad
+    const [dateRange, setDateRange] = useState(getDefaultDateRange()); 
     const [loadingTable, setLoadingTable] = useState(true);
 
     const [selectedPostEntities, setSelectedPostEntities] = useState([]);
@@ -77,8 +83,10 @@ const PostStatsPage = () => {
     const debouncedEntities = useDebounce(selectedPostEntities, 300);
     const debouncedDateRange = useDebounce(dateRange, 300);
 
+
     const fetchAnalytics = useCallback(async (entityIds, currentRange) => {
-        if (!entityIds || entityIds.length === 0 || !currentCid) {
+        // Validación estricta de fechas y cliente
+        if (!entityIds || entityIds.length === 0 || !currentCid || !currentRange.dateFrom || !currentRange.dateTo) {
             setAnalyzedPostsData({});
             return;
         }
@@ -108,7 +116,8 @@ const PostStatsPage = () => {
     }, [currentCid]);
 
     const fetchStatsList = useCallback(async (config, currentRange) => {
-        if (!currentCid) {
+        // Validación estricta de fechas y cliente
+        if (!currentCid || !currentRange.dateFrom || !currentRange.dateTo) {
             setLoadingTable(false);
             return;
         }
@@ -161,6 +170,7 @@ const PostStatsPage = () => {
         setSelectedPostEntities(newSelection);
     }, [selectedPostEntities]);
 
+    // EFECTO PRINCIPAL DE CARGA DE DATOS DE LA TABLA
     useEffect(() => {
         fetchStatsList({ 
             page: pagination.currentPage, 
@@ -171,7 +181,8 @@ const PostStatsPage = () => {
         
         document.title = t('dashboard.postStats.page_title');
     }, [
-        dateRange,
+        dateRange.dateFrom,
+        dateRange.dateTo,
         pagination.currentPage, 
         pagination.limit, 
         pagination.sortBy, 
@@ -180,15 +191,19 @@ const PostStatsPage = () => {
         t
     ]);
 
+    // EFECTO PRINCIPAL DE CARGA DE ANALÍTICAS
     useEffect(() => {
-        if (debouncedEntities.length > 0 || Object.keys(analyzedPostsData).length > 0) {
+        // Ejecutar fetchAnalytics solo si hay entidades seleccionadas Y rangos de fecha válidos
+        if (dateRange.dateFrom && (debouncedEntities.length > 0 || Object.keys(analyzedPostsData).length > 0)) {
             fetchAnalytics(debouncedEntities, debouncedDateRange);
-        } else {
+        } else if (debouncedEntities.length === 0) {
+            // Limpiar si no hay posts seleccionados
             setAnalyzedPostsData({});
         }
-    }, [debouncedEntities, debouncedDateRange, fetchAnalytics]);
+    }, [debouncedEntities, debouncedDateRange, fetchAnalytics, dateRange.dateFrom]);
 
 
+    // Función para manejar el cambio de rango de fechas (compatible con onRangeChange)
     const handleDateRangeChange = useCallback((newDateRange) => {
         setDateRange(newDateRange);
         setPagination(prev => ({ ...prev, currentPage: 1 }));
