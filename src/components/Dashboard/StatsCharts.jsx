@@ -44,15 +44,10 @@ const StatsCharts = ({ stats, geoData, onDateRangeChange, currentGeoAction, onGe
             .replace(/\s+/g, ' ');
     };
 
-    /**
-     * Agrupa los datos geográficos que vienen por fecha/hora en un solo registro por ubicación
-     * sumando el campo 'total'. Esto asegura que haya una sola entrada por Ciudad/Región/País.
-     */
     const aggregateGeoData = (rawData) => {
         const aggregatedMap = {};
         
         rawData.forEach(item => {
-            // Clave de agrupación estricta por ubicación geográfica
             const key = `${item.country}-${item.region || 'Unknown'}-${item.city || 'Unknown'}`;
             const visualTotal = item.total || 0;
             
@@ -60,13 +55,11 @@ const StatsCharts = ({ stats, geoData, onDateRangeChange, currentGeoAction, onGe
                 aggregatedMap[key] = { 
                     ...item, 
                     total: 0,
-                    // Asegurar que lat/lng se toma del primer registro válido, o se mantiene en 0
                     latitude: parseFloat(item.latitude || item.lat) || 0,
                     longitude: parseFloat(item.longitude || item.lng) || 0,
                 };
             }
             
-            // Sumar el total de interacciones para esta ubicación
             aggregatedMap[key].total += visualTotal;
         });
         
@@ -76,10 +69,8 @@ const StatsCharts = ({ stats, geoData, onDateRangeChange, currentGeoAction, onGe
     useEffect(() => {
         if (geoData?.data) {
             
-            // Paso 1: Agregar los datos por ubicación (País-Región-Ciudad)
             const aggregatedByLocation = aggregateGeoData(geoData.data);
             
-            // Paso 2: Procesar, buscar coordenadas si faltan, y filtrar puntos nulos
             const processed = aggregatedByLocation.map(item => {
                 const countryCode = item.countryCode || countryNameToCode[item.country] || item.country;
                 const hasCoordinates = item.latitude && item.longitude;
@@ -122,27 +113,53 @@ const StatsCharts = ({ stats, geoData, onDateRangeChange, currentGeoAction, onGe
 
     useEffect(() => {
         if (stats?.statsByHour) {
+            const todayLocal = new Date();
+            
             const daysDiff = dateRange.dateFrom && dateRange.dateTo ?
                 (dateRange.dateTo - dateRange.dateFrom) / (1000 * 60 * 60 * 24) : 0;
             let formattedData = [];
+            
             if (daysDiff <= 1) {
                 const hourMap = {};
-                for (let i = 0; i < 24; i++) {
+                
+                const dateFromDayStart = dateRange.dateFrom ? new Date(dateRange.dateFrom) : todayLocal;
+                dateFromDayStart.setHours(0, 0, 0, 0);
+
+                const todayStart = new Date();
+                todayStart.setHours(0, 0, 0, 0);
+                
+                const isShowingToday = dateFromDayStart.toDateString() === todayStart.toDateString();
+                
+                let limitHour = 24; 
+                if (isShowingToday) {
+                    limitHour = todayLocal.getHours() + 1; 
+                }
+
+                const dateFromStr = dateFromDayStart.toISOString().split('T')[0];
+
+                for (let i = 0; i < limitHour; i++) {
                     const hour = i.toString().padStart(2, '0') + ':00';
                     hourMap[hour] = {
                         hour, likes: 0, shares: 0, comments: 0, replies: 0,
-                        fullDate: dateRange.dateFrom ?
-                            new Date(dateRange.dateFrom.getTime() + i * 60 * 60 * 1000).toISOString() : ''
+                        fullDate: dateFromDayStart ? 
+                            new Date(dateFromDayStart.getTime() + i * 60 * 60 * 1000).toISOString() : ''
                     };
                 }
+
                 stats.statsByHour.forEach(hour => {
-                    const hourStr = hour.dateHour.split(' ')[1].substring(0, 5) + ':00';
-                    hourMap[hourStr] = {
-                        hour: hourStr, likes: hour.likesAdded, shares: hour.sharesAdded,
-                        comments: hour.commentsAdded, replies: hour.repliesAdded, fullDate: hour.dateHour
-                    };
+                    const [date, time] = hour.dateHour.split(' ');
+                    const hourStr = time.substring(0, 5) + ':00';
+                    
+                    if (date === dateFromStr && hourMap[hourStr]) {
+                        hourMap[hourStr] = {
+                            hour: hourStr, likes: hour.likesAdded, shares: hour.sharesAdded,
+                            comments: hour.commentsAdded, replies: hour.repliesAdded, fullDate: hour.dateHour
+                        };
+                    }
                 });
-                formattedData = Object.values(hourMap);
+                
+                formattedData = Object.values(hourMap).sort((a, b) => a.hour.localeCompare(b.hour));
+            
             } else if (daysDiff <= 2) {
                 formattedData = stats.statsByHour.map(hour => {
                     const [date, time] = hour.dateHour.split(' ');
