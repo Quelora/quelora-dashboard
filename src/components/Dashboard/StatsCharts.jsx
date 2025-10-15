@@ -16,7 +16,8 @@ import GeoDistributionChart from './GeoDistributionChart';
 import '../../assets/css/Chart.css';
 import cities from 'cities.json';
 import countryNameToCode from './countryCodes';
-const StatsCharts = ({ stats, geoData, onDateRangeChange }) => {
+
+const StatsCharts = ({ stats, geoData, onDateRangeChange, currentGeoAction, onGeoActionChange }) => {
     const { t } = useTranslation();
     const [lastUpdated, setLastUpdated] = useState(new Date());
     const [chartData, setChartData] = useState([]);
@@ -24,12 +25,14 @@ const StatsCharts = ({ stats, geoData, onDateRangeChange }) => {
     const [timeBreakdown, setTimeBreakdown] = useState({});
     const [processedGeoData, setProcessedGeoData] = useState([]);
     const [isGeoChartMaximized, setIsGeoChartMaximized] = useState(false);
+    
     const toggleGeoChartMaximize = () => {
         setIsGeoChartMaximized(prevState => !prevState);
         setTimeout(() => {
             window.dispatchEvent(new Event('resize'));
         }, 150);
     };
+
     const normalizeString = (str) => {
         if (!str) return '';
         return str
@@ -40,44 +43,50 @@ const StatsCharts = ({ stats, geoData, onDateRangeChange }) => {
             .replace(/^(provincia de |province of )/i, '')
             .replace(/\s+/g, ' ');
     };
-    // Process geographic data
+
     useEffect(() => {
         if (geoData?.data) {
-            const cityMap = {};
-            geoData.data.forEach(item => {
-                const key = `${item.city}, ${item.region}, ${item.country}`;
-                if (!cityMap[key]) {
-                    cityMap[key] = {
-                        name: key, city: item.city, region: item.region, country: item.country,
-                        countryCode: item.countryCode, regionCode: item.regionCode, latitude: item.latitude,
-                        longitude: item.longitude, likes: 0, comments: 0, shares: 0, replies: 0, total: 0
-                    };
-                }
-                cityMap[key][item.action] += item.total;
-                cityMap[key].total += item.total;
-            });
-            const processed = Object.values(cityMap).map(item => {
+            
+            const processed = geoData.data.map(item => {
                 const countryCode = item.countryCode || countryNameToCode[item.country] || item.country;
                 const hasCoordinates = item.latitude && item.longitude;
-                if (hasCoordinates) return { ...item, lat: item.latitude, lng: item.longitude, exactMatch: true };
-                let matches = cities.filter(city =>
-                    normalizeString(city.name) === normalizeString(item.city) &&
-                    normalizeString(city.country) === normalizeString(countryCode)
-                );
-                if (matches.length === 0) {
-                    matches = cities.filter(city =>
+                const visualTotal = item.total || 0; 
+                
+                let lat = item.latitude;
+                let lng = item.longitude;
+
+                if (!hasCoordinates) {
+                    let matches = cities.filter(city =>
                         normalizeString(city.name) === normalizeString(item.city) &&
                         normalizeString(city.country) === normalizeString(countryCode)
                     );
+                    if (matches.length === 0) {
+                        matches = cities.filter(city =>
+                            normalizeString(city.name) === normalizeString(item.city) &&
+                            normalizeString(city.country) === normalizeString(countryCode)
+                        );
+                    }
+                    const cityInfo = matches[0] || null;
+                    lat = cityInfo ? cityInfo.lat : 0;
+                    lng = cityInfo ? cityInfo.lng : 0;
                 }
-                const cityInfo = matches[0] || null;
-                return { ...item, lat: cityInfo ? cityInfo.lat : 0, lng: cityInfo ? cityInfo.lng : 0, exactMatch: !!cityInfo };
-            }).filter(item => item.lat !== 0 && item.lng !== 0);
-            const top10 = processed.sort((a, b) => b.total - a.total).slice(0, 10);
+
+                return { 
+                    ...item, 
+                    total: visualTotal, 
+                    lat: parseFloat(lat) || 0, 
+                    lng: parseFloat(lng) || 0, 
+                };
+            }).filter(item => item.lat !== 0 && item.lng !== 0 && item.total > 0); 
+            
+            const top10 = processed.sort((a, b) => b.total - a.total);
             setProcessedGeoData(top10);
+            
+        } else {
+            setProcessedGeoData([]);
         }
     }, [geoData]);
-    // Process hourly stats
+
     useEffect(() => {
         if (stats?.statsByHour) {
             const daysDiff = dateRange.dateFrom && dateRange.dateTo ?
@@ -161,53 +170,42 @@ const StatsCharts = ({ stats, geoData, onDateRangeChange }) => {
             setLastUpdated(new Date());
         }
     }, [stats, dateRange]);
+
     const handleDateRangeChange = (dateFrom, dateTo) => {
         setDateRange({ dateFrom, dateTo });
         if (onDateRangeChange) onDateRangeChange(dateFrom, dateTo);
     };
+
     const colors = { likes: '#3a86ff', shares: '#8338ec', comments: '#06d6a0', replies: '#ffbe0b', default: '#8884d8' };
+    
     return (
         <Paper className="client-paper" sx={{ width: '100%', position: 'relative' }}>
             <Grid container sx={{ padding: '16px' }}>
                 <Grid item xs={12} sx={{ width: '100%', gap: 2, display: 'flex', flexDirection: 'column' }}>
                     
-<DateRangeSelector onDateRangeChange={handleDateRangeChange} />
+                    <DateRangeSelector onDateRangeChange={handleDateRangeChange} />
                     
-<Typography className="last-updated">
-                           {t('dashboard.statistics.last_updated').replace('{time}', lastUpdated.toLocaleTimeString())}
-                       
-</Typography>
+                    <Typography className="last-updated">
+                        {t('dashboard.statistics.last_updated').replace('{time}', lastUpdated.toLocaleTimeString())}
+                    </Typography>
+                    
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, '& > *': { flex: '1 1 0px', minWidth: { xs: 'calc(50% - 8px)', sm: 'calc(33% - 8px)', md: 'calc(20% - 8px)' } } }}>
-                        <StatsCard title="dashboard.statistics.total_users" value={stats?.totalUsers || 0} icon={
-<UsersIcon fontSize="small" />
-} sx={{ p: 1 }} />
-                        <StatsCard title="dashboard.statistics.total_posts" value={stats?.totalPosts || 0} icon={
-<PostsIcon fontSize="small" />
-} sx={{ p: 1 }} />
-                        <StatsCard title="dashboard.statistics.total_comments" value={stats?.totalComments || 0} icon={
-<CommentsIcon fontSize="small" />
-} sx={{ p: 1 }} />
-                        <StatsCard title="dashboard.statistics.total_likes" value={stats?.totalLikes || 0} icon={
-<LikesIcon fontSize="small" />
-} sx={{ p: 1 }} />
-                        <StatsCard title="dashboard.statistics.total_shares" value={stats?.totalShares || 0} icon={
-<SharesIcon fontSize="small" />
-} sx={{ p: 1 }} />
+                        <StatsCard title="dashboard.statistics.total_users" value={stats?.totalUsers || 0} icon={<UsersIcon fontSize="small" />} sx={{ p: 1 }} />
+                        <StatsCard title="dashboard.statistics.total_posts" value={stats?.totalPosts || 0} icon={<PostsIcon fontSize="small" />} sx={{ p: 1 }} />
+                        <StatsCard title="dashboard.statistics.total_comments" value={stats?.totalComments || 0} icon={<CommentsIcon fontSize="small" />} sx={{ p: 1 }} />
+                        <StatsCard title="dashboard.statistics.total_likes" value={stats?.totalLikes || 0} icon={<LikesIcon fontSize="small" />} sx={{ p: 1 }} />
+                        <StatsCard title="dashboard.statistics.total_shares" value={stats?.totalShares || 0} icon={<SharesIcon fontSize="small" />} sx={{ p: 1 }} />
                     </Box>
-{/* MODIFICACIÓN: Fila superior (50% y 50%) - Se usa flex: 1 y display: flex para garantizar igualdad */}
+
                     <Box sx={{ display: 'flex', gap: 3, mb: 3 }}>
-{/* Gráfico 1: ActivityOverTimeChart (50%) */}
                         <Box sx={{ display: isGeoChartMaximized ? 'none' : 'flex', flex: 1, minWidth: 300 }}>
-                            
-<ActivityOverTimeChart chartData={chartData} timeBreakdown={timeBreakdown} dateRange={dateRange} colors={colors} t={t} />
+                            <ActivityOverTimeChart chartData={chartData} timeBreakdown={timeBreakdown} dateRange={dateRange} colors={colors} t={t} />
                         </Box>
-{/* Gráfico 2: HourlyActivityChart (50%) */}
                         <Box sx={{ display: isGeoChartMaximized ? 'none' : 'flex', flex: 1, minWidth: 300 }}>
-                            
-<HourlyActivityChart chartData={chartData} timeBreakdown={timeBreakdown} dateRange={dateRange} colors={colors} t={t} />
+                            <HourlyActivityChart chartData={chartData} timeBreakdown={timeBreakdown} dateRange={dateRange} colors={colors} t={t} />
                         </Box>
                     </Box>
-{/* Fila inferior (GeoDistributionChart al 100%) */}
+
                     <Box sx={{ width: '100%', display: isGeoChartMaximized ? 'none' : 'block' }}>
                         <GeoDistributionChart
                             processedGeoData={processedGeoData}
@@ -215,10 +213,13 @@ const StatsCharts = ({ stats, geoData, onDateRangeChange }) => {
                             t={t}
                             isMaximized={isGeoChartMaximized}
                             toggleMaximize={toggleGeoChartMaximize}
+                            currentAction={currentGeoAction}
+                            onActionChange={onGeoActionChange}
                         />
                     </Box>
                 </Grid>
             </Grid>
+
             {isGeoChartMaximized && (
                 <Box sx={{
                     position: 'absolute',
@@ -233,6 +234,8 @@ const StatsCharts = ({ stats, geoData, onDateRangeChange }) => {
                         t={t}
                         isMaximized={true}
                         toggleMaximize={toggleGeoChartMaximize}
+                        currentAction={currentGeoAction} 
+                        onActionChange={onGeoActionChange}
                     />
                 </Box>
             )}

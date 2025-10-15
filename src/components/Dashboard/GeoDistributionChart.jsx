@@ -32,12 +32,13 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
         { key: 'like', label: t('dashboard.statistics.likes') },
         { key: 'share', label: t('dashboard.statistics.shares') },
         { key: 'reply', label: t('dashboard.statistics.replies') },
-        { key: 'hit', label: t('dashboard.statistics.views') },
     ]), [t]);
 
     const calculateAggregatedData = (data, type) => {
         const map = {};
         data.forEach(item => {
+            const visualTotal = item.total || 0; 
+            
             const key = type === 'country' ? (item.country || 'Unknown') :
                                             type === 'region' ? `${item.country}-${item.region || 'Unknown'}` :
                                             `${item.country}-${item.region || 'Unknown'}-${item.city || 'Unknown'}`;
@@ -47,21 +48,16 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
                     name: type === 'country' ? item.country : item.region || item.country,
                     country: item.country, region: item.region, city: item.city,
                     lat: parseFloat(item.lat || item.latitude), lng: parseFloat(item.lng || item.longitude),
-                    total: 0, likes: 0, comments: 0, shares: 0, replies: 0, hit: 0, type: type,
+                    total: 0, type: type,
                     color: STANDARD_COLOR
                 };
             }
-            // Agregamos la métrica seleccionada, que ya está pre-agregada como 'total'
-            map[key].total += item.total;
-            map[key].likes += item.likes;
-            map[key].comments += item.comments;
-            map[key].shares += item.shares;
-            map[key].replies += item.replies;
-            map[key].hit += item.hit;
+            map[key].total += visualTotal;
         });
         return Object.values(map).filter(d => d.lat !== 0 && d.lng !== 0);
     };
-
+    
+    // Se mantiene la dependencia de processedGeoData
     const countryData = useMemo(() => calculateAggregatedData(processedGeoData, 'country'), [processedGeoData]);
     const regionData = useMemo(() => calculateAggregatedData(processedGeoData, 'region'), [processedGeoData]);
     const cityData = useMemo(() => processedGeoData.map(city => ({ 
@@ -71,7 +67,7 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
         lat: parseFloat(city.lat || city.latitude), 
         lng: parseFloat(city.lng || city.longitude)
     })).filter(d => d.lat !== 0 && d.lng !== 0), [processedGeoData]);
-
+    
     const getVisibleData = (view = currentView, country = selectedCountry, region = selectedRegion) => {
         switch (view) {
             case 'country':
@@ -150,7 +146,7 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
             }, 50); 
             
             return () => clearTimeout(timeout);
-        }, [mapReady, initialFocusDone, shouldRefocus, currentView, selectedCountry, selectedRegion]); 
+        }, [mapReady, initialFocusDone, shouldRefocus, currentView, selectedCountry, selectedRegion, currentAction]); 
 
         return null;
     };
@@ -224,13 +220,14 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
         { fillOpacity: 0.7, weight: 1, color: STANDARD_COLOR }
     );
 
-    if (processedGeoData.length === 0) {
-          return (
-              <Box sx={{ height: 300, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                  <Typography variant="body1">{t('dashboard.postStats.noGeoData')}</Typography>
-              </Box>
-          );
-    }
+    // ❌ REMOVIDO: Se elimina el retorno temprano para que el componente Paper siempre se renderice.
+    // if (processedGeoData.length === 0) {
+    //       return (
+    //           <Box sx={{ height: 300, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+    //               <Typography variant="body1">{t('dashboard.postStats.noGeoData')}</Typography>
+    //           </Box>
+    //       );
+    // }
     
     return (
         <Box sx={{ height: '100%', width: '100%', backgroundColor: 'var(--white)' }}>
@@ -242,8 +239,8 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
                 backgroundColor: 'var(--white)', position: 'relative'
             }}>
                 
-                <Stack direction="row" justifyContent="space-between" alignItems="center" marginBottom={2}>
-                    <Typography variant="subtitle1" fontWeight={500}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" marginBottom={2} sx={{ flexWrap: 'wrap', gap: 1 }}>
+                    <Typography variant="subtitle1" fontWeight={500} sx={{ mr: 2 }}>
                         {t('dashboard.statistics.geo_distribution')}
                     </Typography>
                     
@@ -293,90 +290,98 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
                     </IconButton>
                 </Stack>
                 
-                <Box sx={{
-                    flex: 1,
-                    display: 'flex',
-                    flexDirection: 'row', 
-                    overflow: 'hidden',
-                    minHeight: 300,
-                }}>
-                    <Box sx={{ 
-                        flex: isMaximized ? 1 : '0 0 70%', 
-                        minHeight: 300, 
-                        borderRadius: '4px', 
-                        overflow: 'hidden' 
-                    }}>
-                        <MapContainer center={[0, 0]} zoom={2} minZoom={2} maxZoom={14} style={{ height: '100%', width: '100%' }} whenCreated={(map) => { mapRef.current = map; setMapReady(true); map.fitWorld(); }} worldCopyJump={true}>
-                            <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' noWrap={false} />
-                            <MapController />
-                            
-                            {currentVisibleData.map((item, index) => {
-                                const style = getHighlightStyle(item);
-                                const name = item.type === 'city' ? `${item.city || item.region}, ${item.country}` : item.name;
-                                const popupContent = `${name} - Total: ${item.total}`;
-                                return (
-                                    <Circle 
-                                        key={`${item.type}-${item.country}-${item.region || ''}-${item.city || ''}`} 
-                                        center={[parseFloat(item.lat), parseFloat(item.lng)]} 
-                                        radius={calculateRadius(item.total)} 
-                                        fillOpacity={style.fillOpacity} 
-                                        color={style.color} 
-                                        fillColor={STANDARD_COLOR} 
-                                        stroke 
-                                        weight={style.weight} 
-                                        eventHandlers={{ 
-                                            click: () => handleItemClick(item) 
-                                        }}
-                                    >
-                                        <Popup>{popupContent}</Popup>
-                                    </Circle>
-                                );
-                            })}
-                        </MapContainer>
+                {/* // ✅ ADICIONADO: Contenedor condicional para Mapa o Mensaje de No Data
+                */}
+                {processedGeoData.length === 0 ? (
+                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: 300 }}>
+                        <Typography variant="body1">{t('dashboard.postStats.noGeoData')}</Typography>
                     </Box>
-                    
+                ) : (
                     <Box sx={{
-                        mt: 0,
-                        ml: 2, 
-                        width: isMaximized ? 320 : '30%', 
-                        flexShrink: 0,
-                        height: '100%',
-                        overflowY: 'auto'
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'row', 
+                        overflow: 'hidden',
+                        minHeight: 300,
                     }}>
-                        
-                        <Typography variant="subtitle2" gutterBottom>
-                            {t(`dashboard.statistics.top_${currentView}s`)} ({currentVisibleData.length} {t('common.items')})
-                        </Typography>
-                        
-                        <Stack direction="column" spacing={1}>
-                            {currentVisibleData.sort((a, b) => b.total - a.total).slice(0, 10).map((item, index) => (
-                                <Box key={`${item.type}-${item.country}-${item.region || ''}-${item.city || ''}`} 
-                                    sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1, borderRadius: 1, bgcolor: highlightedItem && highlightedItem.name === item.name && highlightedItem.type === item.type ? 'action.selected' : 'background.paper', '&:hover': { bgcolor: 'action.hover', cursor: 'pointer' } }} 
-                                    onClick={() => handleItemClick(item)}
-                                >
-                                    <Box sx={{ display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
-                                        <Place fontSize="small" sx={{ mr: 1, color: STANDARD_COLOR, flexShrink: 0 }} />
-                                        
-                                        <Typography noWrap variant="caption">{item.type === 'city' ? `${item.city || item.region}, ${item.country}` : item.name}</Typography>
-                                    </Box>
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <Typography variant="caption" fontWeight="bold" sx={{ mr: 1 }}>{item.total.toLocaleString()}</Typography>
-                                        
-                                        <IconButton size="small" 
-                                            onClick={(e) => { 
-                                                e.stopPropagation(); 
-                                                handleItemClick(item); 
+                        <Box sx={{ 
+                            flex: isMaximized ? 1 : '0 0 70%', 
+                            minHeight: 300, 
+                            borderRadius: '4px', 
+                            overflow: 'hidden' 
+                        }}>
+                            <MapContainer center={[0, 0]} zoom={2} minZoom={2} maxZoom={14} style={{ height: '100%', width: '100%' }} whenCreated={(map) => { mapRef.current = map; setMapReady(true); map.fitWorld(); }} worldCopyJump={true}>
+                                <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' noWrap={false} />
+                                <MapController />
+                                
+                                {currentVisibleData.map((item, index) => {
+                                    const style = getHighlightStyle(item);
+                                    const name = item.type === 'city' ? `${item.city || item.region}, ${item.country}` : item.name;
+                                    const popupContent = `${name} - Total: ${item.total}`;
+                                    return (
+                                        <Circle 
+                                            key={`${item.type}-${item.country}-${item.region || ''}-${item.city || ''}`} 
+                                            center={[parseFloat(item.lat), parseFloat(item.lng)]} 
+                                            radius={calculateRadius(item.total)} 
+                                            fillOpacity={style.fillOpacity} 
+                                            color={style.color} 
+                                            fillColor={STANDARD_COLOR} 
+                                            stroke 
+                                            weight={style.weight} 
+                                            eventHandlers={{ 
+                                                click: () => handleItemClick(item) 
                                             }}
-                                            disabled={item.type === 'city'}
                                         >
-                                            <ZoomInMap fontSize="small" />
-                                        </IconButton>
+                                            <Popup>{popupContent}</Popup>
+                                        </Circle>
+                                    );
+                                })}
+                            </MapContainer>
+                        </Box>
+                        
+                        <Box sx={{
+                            mt: 0,
+                            ml: 2, 
+                            width: isMaximized ? 320 : '30%', 
+                            flexShrink: 0,
+                            height: '100%',
+                            overflowY: 'auto'
+                        }}>
+                            
+                            <Typography variant="subtitle2" gutterBottom>
+                                {t(`dashboard.statistics.top_${currentView}s`)} ({currentVisibleData.length} {t('common.items')})
+                            </Typography>
+                            
+                            <Stack direction="column" spacing={1}>
+                                {currentVisibleData.sort((a, b) => b.total - a.total).slice(0, 10).map((item, index) => (
+                                    <Box key={`${item.type}-${item.country}-${item.region || ''}-${item.city || ''}`} 
+                                        sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1, borderRadius: 1, bgcolor: highlightedItem && highlightedItem.name === item.name && highlightedItem.type === item.type ? 'action.selected' : 'background.paper', '&:hover': { bgcolor: 'action.hover', cursor: 'pointer' } }} 
+                                        onClick={() => handleItemClick(item)}
+                                    >
+                                        <Box sx={{ display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
+                                            <Place fontSize="small" sx={{ mr: 1, color: STANDARD_COLOR, flexShrink: 0 }} />
+                                            
+                                            <Typography noWrap variant="caption">{item.type === 'city' ? `${item.city || item.region}, ${item.country}` : item.name}</Typography>
+                                        </Box>
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            <Typography variant="caption" fontWeight="bold" sx={{ mr: 1 }}>{item.total.toLocaleString()}</Typography>
+                                            
+                                            <IconButton size="small" 
+                                                onClick={(e) => { 
+                                                    e.stopPropagation(); 
+                                                    handleItemClick(item); 
+                                                }}
+                                                disabled={item.type === 'city'}
+                                            >
+                                                <ZoomInMap fontSize="small" />
+                                            </IconButton>
+                                        </Box>
                                     </Box>
-                                </Box>
-                            ))}
-                        </Stack>
+                                ))}
+                            </Stack>
+                        </Box>
                     </Box>
-                </Box>
+                )}
             </Paper>
         </Box>
     );
