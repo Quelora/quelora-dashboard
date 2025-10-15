@@ -14,7 +14,7 @@ L.Icon.Default.mergeOptions({
 
 const STANDARD_COLOR = '#4285F4';
 
-const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggleMaximize }) => {
+const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggleMaximize, currentAction, onActionChange }) => {
     const mapRef = useRef(null);
     
     const [currentView, setCurrentView] = useState('country');
@@ -24,32 +24,40 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
     const [highlightedItem, setHighlightedItem] = useState(null);
     const [mapReady, setMapReady] = useState(false);
     const [initialFocusDone, setInitialFocusDone] = useState(false);
-    // [MODIFICACIÓN CLAVE]: Usamos un estado para forzar el ajuste de zoom/límites
     const [shouldRefocus, setShouldRefocus] = useState(false); 
-    // Mantenemos userInteracted para otras lógicas si es necesario, pero ya no controla el re-ajuste
     const [userInteracted, setUserInteracted] = useState(false); 
+
+    const actions = useMemo(() => ([
+        { key: 'comment', label: t('dashboard.statistics.comments') },
+        { key: 'like', label: t('dashboard.statistics.likes') },
+        { key: 'share', label: t('dashboard.statistics.shares') },
+        { key: 'reply', label: t('dashboard.statistics.replies') },
+        { key: 'hit', label: t('dashboard.statistics.views') },
+    ]), [t]);
 
     const calculateAggregatedData = (data, type) => {
         const map = {};
         data.forEach(item => {
             const key = type === 'country' ? (item.country || 'Unknown') :
-                                type === 'region' ? `${item.country}-${item.region || 'Unknown'}` :
-                                `${item.country}-${item.region || 'Unknown'}-${item.city || 'Unknown'}`;
+                                            type === 'region' ? `${item.country}-${item.region || 'Unknown'}` :
+                                            `${item.country}-${item.region || 'Unknown'}-${item.city || 'Unknown'}`;
             
             if (!map[key]) {
                 map[key] = {
                     name: type === 'country' ? item.country : item.region || item.country,
                     country: item.country, region: item.region, city: item.city,
                     lat: parseFloat(item.lat || item.latitude), lng: parseFloat(item.lng || item.longitude),
-                    total: 0, likes: 0, comments: 0, shares: 0, replies: 0, type: type,
+                    total: 0, likes: 0, comments: 0, shares: 0, replies: 0, hit: 0, type: type,
                     color: STANDARD_COLOR
                 };
             }
+            // Agregamos la métrica seleccionada, que ya está pre-agregada como 'total'
             map[key].total += item.total;
             map[key].likes += item.likes;
             map[key].comments += item.comments;
             map[key].shares += item.shares;
             map[key].replies += item.replies;
+            map[key].hit += item.hit;
         });
         return Object.values(map).filter(d => d.lat !== 0 && d.lng !== 0);
     };
@@ -123,7 +131,6 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
                  setInitialFocusDone(true);
             }
             
-            // La interacción manual simplemente marca un estado
             const handleUserInteraction = () => setUserInteracted(true);
             map.on('dragstart', handleUserInteraction);
             map.on('zoomstart', handleUserInteraction);
@@ -134,13 +141,10 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
             };
         }, [map, countryData, initialFocusDone]);
         
-        // [MODIFICACIÓN CLAVE] Este efecto SOLO se dispara cuando shouldRefocus es true
-        // Y al terminar el ajuste, setShouldRefocus(false)
         useEffect(() => {
             if (!mapReady || !initialFocusDone || !shouldRefocus) return;
 
             const timeout = setTimeout(() => {
-                // Forzamos el ajuste de límites y luego desactivamos la bandera
                 adjustMapBounds(getVisibleData(currentView, selectedCountry, selectedRegion));
                 setShouldRefocus(false); 
             }, 50); 
@@ -167,17 +171,15 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
             setCurrentView('region');
             setSelectedCountry(item.country);
             setSelectedRegion(null); 
-            setShouldRefocus(true); // Forzar re-ajuste de límites
+            setShouldRefocus(true);
         } else if (item.type === 'region') {
             setCurrentView('city');
             setSelectedCountry(item.country); 
             setSelectedRegion(item.region);
-            setShouldRefocus(true); // Forzar re-ajuste de límites
+            setShouldRefocus(true);
         } else if (item.type === 'city') {
             focusOnItem(item);
         }
-        // Nota: No se resetea userInteracted aquí, ya que no es necesario
-        // y el nuevo shouldRefocus dominará la lógica de re-ajuste.
     };
 
     const handleViewChange = (newView) => {
@@ -198,24 +200,24 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
         setCurrentView(newView);
         setSelectedCountry(nextCountry);
         setSelectedRegion(nextRegion);
-        setShouldRefocus(true); // Forzar re-ajuste de límites
+        setShouldRefocus(true);
     };
 
     const getRadiusScale = () => {
-        let baseRadius;
-        if (currentView === 'country') baseRadius = 500000;
-        else if (currentView === 'region') baseRadius = 200000;
-        else baseRadius = 8000; 
-        return baseRadius;
-    };
+        let baseRadius;
+        if (currentView === 'country') baseRadius = 500000;
+        else if (currentView === 'region') baseRadius = 200000;
+        else baseRadius = 8000; 
+        return baseRadius;
+    };
     const calculateRadius = (total) => {
-        if (maxTotal === 0) return 0;
-        const scale = getRadiusScale();
-        const baseMin = currentView === 'city' ? 500 : 50000; 
-        const totalRatio = Math.sqrt(total) / Math.sqrt(maxTotal); 
-        const proportionalRadius = baseMin + (totalRatio * (scale - baseMin)); 
-        return Math.max(1000, proportionalRadius); 
-    };
+        if (maxTotal === 0) return 0;
+        const scale = getRadiusScale();
+        const baseMin = currentView === 'city' ? 500 : 50000; 
+        const totalRatio = Math.sqrt(total) / Math.sqrt(maxTotal); 
+        const proportionalRadius = baseMin + (totalRatio * (scale - baseMin)); 
+        return Math.max(1000, proportionalRadius); 
+    };
 
     const getHighlightStyle = (item) => (highlightedItem && highlightedItem.name === item.name && highlightedItem.type === item.type ?
         { fillOpacity: 0.9, weight: 3, color: '#ff0000' } :
@@ -245,6 +247,18 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
                         {t('dashboard.statistics.geo_distribution')}
                     </Typography>
                     
+                    <ButtonGroup variant="outlined" size="small" aria-label="Action Selector" sx={{ mr: 2 }}>
+                        {actions.map((action) => (
+                            <Button
+                                key={action.key}
+                                onClick={() => onActionChange(action.key)}
+                                variant={currentAction === action.key ? 'contained' : 'outlined'}
+                            >
+                                {action.label}
+                            </Button>
+                        ))}
+                    </ButtonGroup>
+
                     <Box sx={{ display: 'flex', alignItems: 'center', mx: 2, flexGrow: 1, justifyContent: 'center' }}>
                         {selectedCountry && (
                             <Typography variant="caption" sx={{ mr: 1, p: 0.5, bgcolor: '#f0f0f0', borderRadius: 1 }}>

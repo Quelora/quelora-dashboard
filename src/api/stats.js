@@ -1,8 +1,7 @@
-// ./src/api/stats.js
 import api from './axiosConfig';
 
 export const fetchStats = async (cid = null, dateFrom = null, dateTo = null) => {
-  try {
+ try {
     const params = new URLSearchParams();
     
     if (cid) params.append('cid', cid);
@@ -45,14 +44,15 @@ export const fetchStats = async (cid = null, dateFrom = null, dateTo = null) => 
     }
     
     return response.data;
-  } catch (error) {
+ } catch (error) {
     console.error('Error fetching stats:', error);
     throw error;
-  }
+ }
 };
 
-export const fetchGeoStats = async (cid = null, dateFrom = null, dateTo = null) => {
-  try {
+// Se añade 'action' como parámetro
+export const fetchGeoStats = async (cid = null, dateFrom = null, dateTo = null, action = 'comment') => {
+ try {
     const params = new URLSearchParams();
     
     if (cid) params.append('cid', cid);
@@ -66,6 +66,9 @@ export const fetchGeoStats = async (cid = null, dateFrom = null, dateTo = null) 
       const isoDateTo = new Date(dateTo).toISOString();
       params.append('dateTo', isoDateTo);
     }
+
+    // Se añade el parámetro action
+    if (action) params.append('action', action);
 
     const response = await api.get('/stats/get/geo', {
       params: params
@@ -95,10 +98,10 @@ export const fetchGeoStats = async (cid = null, dateFrom = null, dateTo = null) 
     }
     
     return response.data;
-  } catch (error) {
+ } catch (error) {
     console.error('Error fetching stats:', error);
     throw error;
-  }
+ }
 };
 
 
