@@ -34,38 +34,58 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
         { key: 'reply', label: t('dashboard.statistics.replies') },
     ]), [t]);
 
+    /**
+     * Agrega los datos recibidos (que ya vienen agrupados por StatsCharts.jsx)
+     * en grupos mayores (país/región).
+     */
     const calculateAggregatedData = (data, type) => {
         const map = {};
         data.forEach(item => {
             const visualTotal = item.total || 0; 
             
-            const key = type === 'country' ? (item.country || 'Unknown') :
-                                            type === 'region' ? `${item.country}-${item.region || 'Unknown'}` :
-                                            `${item.country}-${item.region || 'Unknown'}-${item.city || 'Unknown'}`;
+            let key;
+            if (type === 'country') {
+                key = item.country || 'Unknown'; 
+            } else if (type === 'region') {
+                key = `${item.country}-${item.region || 'Unknown'}`; 
+            } else {
+                // Esta clave solo se usa internamente si se llama para 'city' y solo debe ser para unicidad en el map, 
+                // pero ya no debería haber duplicados aquí si StatsCharts hizo su trabajo.
+                key = `${item.country}-${item.region || 'Unknown'}-${item.city || 'Unknown'}`; 
+            }
             
             if (!map[key]) {
                 map[key] = {
                     name: type === 'country' ? item.country : item.region || item.country,
                     country: item.country, region: item.region, city: item.city,
-                    lat: parseFloat(item.lat || item.latitude), lng: parseFloat(item.lng || item.longitude),
+                    lat: parseFloat(item.lat || item.latitude), 
+                    lng: parseFloat(item.lng || item.longitude),
                     total: 0, type: type,
                     color: STANDARD_COLOR
                 };
             }
             map[key].total += visualTotal;
         });
-        return Object.values(map).filter(d => d.lat !== 0 && d.lng !== 0);
+        
+        return Object.values(map).filter(d => d.lat !== 0 && d.lng !== 0 && d.total > 0);
     };
     
-    // Se mantiene la dependencia de processedGeoData
+    // Calcula la data agrupada para la vista de País
     const countryData = useMemo(() => calculateAggregatedData(processedGeoData, 'country'), [processedGeoData]);
+    
+    // Calcula la data agrupada para la vista de Región
     const regionData = useMemo(() => calculateAggregatedData(processedGeoData, 'region'), [processedGeoData]);
-    const cityData = useMemo(() => processedGeoData.map(city => ({ 
+    
+    // Para la vista de Ciudad, usamos la data ya procesada del padre. 
+    // Agregamos una clave única garantizada para evitar errores de React.
+    const cityData = useMemo(() => processedGeoData.map((city, index) => ({ 
         ...city, 
         type: 'city', 
         name: `${city.city || city.region || 'N/A'}, ${city.country}`,
         lat: parseFloat(city.lat || city.latitude), 
-        lng: parseFloat(city.lng || city.longitude)
+        lng: parseFloat(city.lng || city.longitude),
+        // Clave única basada en la ubicación geográfica (lo más robusto posible)
+        uniqueMapKey: `city-${city.country}-${city.region || ''}-${city.city || ''}-${city.lat}-${city.lng}` 
     })).filter(d => d.lat !== 0 && d.lng !== 0), [processedGeoData]);
     
     const getVisibleData = (view = currentView, country = selectedCountry, region = selectedRegion) => {
@@ -219,15 +239,6 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
         { fillOpacity: 0.9, weight: 3, color: '#ff0000' } :
         { fillOpacity: 0.7, weight: 1, color: STANDARD_COLOR }
     );
-
-    // ❌ REMOVIDO: Se elimina el retorno temprano para que el componente Paper siempre se renderice.
-    // if (processedGeoData.length === 0) {
-    //       return (
-    //           <Box sx={{ height: 300, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-    //               <Typography variant="body1">{t('dashboard.postStats.noGeoData')}</Typography>
-    //           </Box>
-    //       );
-    // }
     
     return (
         <Box sx={{ height: '100%', width: '100%', backgroundColor: 'var(--white)' }}>
@@ -290,8 +301,6 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
                     </IconButton>
                 </Stack>
                 
-                {/* // ✅ ADICIONADO: Contenedor condicional para Mapa o Mensaje de No Data
-                */}
                 {processedGeoData.length === 0 ? (
                     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: 300 }}>
                         <Typography variant="body1">{t('dashboard.postStats.noGeoData')}</Typography>
@@ -318,9 +327,13 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
                                     const style = getHighlightStyle(item);
                                     const name = item.type === 'city' ? `${item.city || item.region}, ${item.country}` : item.name;
                                     const popupContent = `${name} - Total: ${item.total}`;
+                                    
+                                    // Usamos la clave única para el mapa que debería ser única a nivel de la burbuja/agregación
+                                    const mapKey = item.uniqueMapKey || `${item.type}-${item.country}-${item.region || ''}-${item.city || ''}`;
+
                                     return (
                                         <Circle 
-                                            key={`${item.type}-${item.country}-${item.region || ''}-${item.city || ''}`} 
+                                            key={mapKey} 
                                             center={[parseFloat(item.lat), parseFloat(item.lng)]} 
                                             radius={calculateRadius(item.total)} 
                                             fillOpacity={style.fillOpacity} 
@@ -354,7 +367,9 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
                             
                             <Stack direction="column" spacing={1}>
                                 {currentVisibleData.sort((a, b) => b.total - a.total).slice(0, 10).map((item, index) => (
-                                    <Box key={`${item.type}-${item.country}-${item.region || ''}-${item.city || ''}`} 
+                                    <Box 
+                                        // Usamos la clave más simple para la lista lateral
+                                        key={`${item.type}-${item.country}-${item.region || ''}-${item.city || ''}`} 
                                         sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1, borderRadius: 1, bgcolor: highlightedItem && highlightedItem.name === item.name && highlightedItem.type === item.type ? 'action.selected' : 'background.paper', '&:hover': { bgcolor: 'action.hover', cursor: 'pointer' } }} 
                                         onClick={() => handleItemClick(item)}
                                     >

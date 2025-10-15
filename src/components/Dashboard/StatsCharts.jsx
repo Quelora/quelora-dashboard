@@ -44,10 +44,43 @@ const StatsCharts = ({ stats, geoData, onDateRangeChange, currentGeoAction, onGe
             .replace(/\s+/g, ' ');
     };
 
+    /**
+     * Agrupa los datos geográficos que vienen por fecha/hora en un solo registro por ubicación
+     * sumando el campo 'total'. Esto asegura que haya una sola entrada por Ciudad/Región/País.
+     */
+    const aggregateGeoData = (rawData) => {
+        const aggregatedMap = {};
+        
+        rawData.forEach(item => {
+            // Clave de agrupación estricta por ubicación geográfica
+            const key = `${item.country}-${item.region || 'Unknown'}-${item.city || 'Unknown'}`;
+            const visualTotal = item.total || 0;
+            
+            if (!aggregatedMap[key]) {
+                aggregatedMap[key] = { 
+                    ...item, 
+                    total: 0,
+                    // Asegurar que lat/lng se toma del primer registro válido, o se mantiene en 0
+                    latitude: parseFloat(item.latitude || item.lat) || 0,
+                    longitude: parseFloat(item.longitude || item.lng) || 0,
+                };
+            }
+            
+            // Sumar el total de interacciones para esta ubicación
+            aggregatedMap[key].total += visualTotal;
+        });
+        
+        return Object.values(aggregatedMap);
+    };
+
     useEffect(() => {
         if (geoData?.data) {
             
-            const processed = geoData.data.map(item => {
+            // Paso 1: Agregar los datos por ubicación (País-Región-Ciudad)
+            const aggregatedByLocation = aggregateGeoData(geoData.data);
+            
+            // Paso 2: Procesar, buscar coordenadas si faltan, y filtrar puntos nulos
+            const processed = aggregatedByLocation.map(item => {
                 const countryCode = item.countryCode || countryNameToCode[item.country] || item.country;
                 const hasCoordinates = item.latitude && item.longitude;
                 const visualTotal = item.total || 0; 
