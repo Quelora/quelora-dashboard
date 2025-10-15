@@ -3,7 +3,7 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { MapContainer, TileLayer, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { ZoomInMap, Place, Fullscreen, FullscreenExit } from '@mui/icons-material';
+import { ZoomInMap, Place } from '@mui/icons-material';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -14,7 +14,7 @@ L.Icon.Default.mergeOptions({
 
 const STANDARD_COLOR = '#4285F4';
 
-const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggleMaximize, currentAction, onActionChange }) => {
+const GeoDistributionChart = ({ processedGeoData, colors, t, currentAction, onActionChange }) => {
     const mapRef = useRef(null);
     
     const [currentView, setCurrentView] = useState('country');
@@ -23,10 +23,9 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
 
     const [highlightedItem, setHighlightedItem] = useState(null);
     const [mapReady, setMapReady] = useState(false);
-    const [initialFocusDone, setInitialFocusDone] = useState(false);
-    const [shouldRefocus, setShouldRefocus] = useState(false); 
-    const [userInteracted, setUserInteracted] = useState(false); 
-
+    const [initialFocusDone, setInitialFocusDone] = useState(false); // Necesario para el enfoque inicial
+    const [shouldRefocus, setShouldRefocus] = useState(false); // Necesario para forzar ajuste en cambio de vista
+    
     const actions = useMemo(() => ([
         { key: 'comment', label: t('dashboard.statistics.comments') },
         { key: 'like', label: t('dashboard.statistics.likes') },
@@ -34,10 +33,6 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
         { key: 'reply', label: t('dashboard.statistics.replies') },
     ]), [t]);
 
-    /**
-     * Agrega los datos recibidos (que ya vienen agrupados por StatsCharts.jsx)
-     * en grupos mayores (país/región).
-     */
     const calculateAggregatedData = (data, type) => {
         const map = {};
         data.forEach(item => {
@@ -49,8 +44,6 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
             } else if (type === 'region') {
                 key = `${item.country}-${item.region || 'Unknown'}`; 
             } else {
-                // Esta clave solo se usa internamente si se llama para 'city' y solo debe ser para unicidad en el map, 
-                // pero ya no debería haber duplicados aquí si StatsCharts hizo su trabajo.
                 key = `${item.country}-${item.region || 'Unknown'}-${item.city || 'Unknown'}`; 
             }
             
@@ -70,21 +63,16 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
         return Object.values(map).filter(d => d.lat !== 0 && d.lng !== 0 && d.total > 0);
     };
     
-    // Calcula la data agrupada para la vista de País
     const countryData = useMemo(() => calculateAggregatedData(processedGeoData, 'country'), [processedGeoData]);
     
-    // Calcula la data agrupada para la vista de Región
     const regionData = useMemo(() => calculateAggregatedData(processedGeoData, 'region'), [processedGeoData]);
     
-    // Para la vista de Ciudad, usamos la data ya procesada del padre. 
-    // Agregamos una clave única garantizada para evitar errores de React.
-    const cityData = useMemo(() => processedGeoData.map((city, index) => ({ 
+    const cityData = useMemo(() => processedGeoData.map((city) => ({ 
         ...city, 
         type: 'city', 
         name: `${city.city || city.region || 'N/A'}, ${city.country}`,
         lat: parseFloat(city.lat || city.latitude), 
         lng: parseFloat(city.lng || city.longitude),
-        // Clave única basada en la ubicación geográfica (lo más robusto posible)
         uniqueMapKey: `city-${city.country}-${city.region || ''}-${city.city || ''}-${city.lat}-${city.lng}` 
     })).filter(d => d.lat !== 0 && d.lng !== 0), [processedGeoData]);
     
@@ -142,23 +130,17 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
             mapRef.current = map;
             setMapReady(true);
             
+            // Solo hacemos el enfoque inicial una vez.
             if (!initialFocusDone && countryData.length > 0) {
                  map.fitWorld({ padding: [20, 20] });
                  setInitialFocusDone(true);
             }
             
-            const handleUserInteraction = () => setUserInteracted(true);
-            map.on('dragstart', handleUserInteraction);
-            map.on('zoomstart', handleUserInteraction);
-            
-            return () => {
-                map.off('dragstart', handleUserInteraction);
-                map.off('zoomstart', handleUserInteraction);
-            };
-        }, [map, countryData, initialFocusDone]);
+        }, [map, countryData, initialFocusDone]); 
         
+        // Este efecto se encarga de reajustar los límites solo cuando la vista geográfica cambia (country, region, city)
         useEffect(() => {
-            if (!mapReady || !initialFocusDone || !shouldRefocus) return;
+            if (!mapReady || !shouldRefocus) return;
 
             const timeout = setTimeout(() => {
                 adjustMapBounds(getVisibleData(currentView, selectedCountry, selectedRegion));
@@ -166,7 +148,7 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
             }, 50); 
             
             return () => clearTimeout(timeout);
-        }, [mapReady, initialFocusDone, shouldRefocus, currentView, selectedCountry, selectedRegion, currentAction]); 
+        }, [mapReady, shouldRefocus, currentView, selectedCountry, selectedRegion, currentAction]); 
 
         return null;
     };
@@ -187,12 +169,12 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
             setCurrentView('region');
             setSelectedCountry(item.country);
             setSelectedRegion(null); 
-            setShouldRefocus(true);
+            setShouldRefocus(true); // Forzar reajuste de límites
         } else if (item.type === 'region') {
             setCurrentView('city');
             setSelectedCountry(item.country); 
             setSelectedRegion(item.region);
-            setShouldRefocus(true);
+            setShouldRefocus(true); // Forzar reajuste de límites
         } else if (item.type === 'city') {
             focusOnItem(item);
         }
@@ -207,6 +189,7 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
         if (newView === 'country') {
             nextCountry = null;
             nextRegion = null;
+            // Al volver a la vista de país global, ajustamos el mapa al mundo
             if (mapRef.current) mapRef.current.flyTo([0, 0], 2, { duration: 0.8 });
         } else if (newView === 'region') {
             nextRegion = null;
@@ -216,7 +199,10 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
         setCurrentView(newView);
         setSelectedCountry(nextCountry);
         setSelectedRegion(nextRegion);
-        setShouldRefocus(true);
+        // Solo forzamos el reajuste si no volvemos a la vista de país, ya que esa vista ya está manejada arriba
+        if (newView !== 'country') {
+             setShouldRefocus(true);
+        }
     };
 
     const getRadiusScale = () => {
@@ -280,7 +266,7 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
                         )}
                     </Box>
                     
-                    <ButtonGroup variant="contained" size="small" aria-label="Geographic View Selector">
+                    <ButtonGroup size="small" aria-label="Geographic View Selector">
                         <Button onClick={() => handleViewChange('country')} variant={currentView === 'country' ? 'contained' : 'outlined'} sx={{ minWidth: 80 }}>
                             {t('dashboard.statistics.country')}
                         </Button>
@@ -291,14 +277,6 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
                             {t('dashboard.statistics.city')}
                         </Button>
                     </ButtonGroup>
-                    
-                    <IconButton
-                        onClick={toggleMaximize}
-                        sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1001, backgroundColor: 'rgba(255, 255, 255, 0.7)', '&:hover': { backgroundColor: 'rgba(255, 255, 255, 1)' } }}
-                        aria-label={isMaximized ? 'minimize chart' : 'maximize chart'}
-                    >
-                        {isMaximized ? <FullscreenExit /> : <Fullscreen />}
-                    </IconButton>
                 </Stack>
                 
                 {processedGeoData.length === 0 ? (
@@ -314,21 +292,20 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
                         minHeight: 300,
                     }}>
                         <Box sx={{ 
-                            flex: isMaximized ? 1 : '0 0 70%', 
+                            flex: '0 0 70%', 
                             minHeight: 300, 
                             borderRadius: '4px', 
                             overflow: 'hidden' 
                         }}>
-                            <MapContainer center={[0, 0]} zoom={2} minZoom={2} maxZoom={14} style={{ height: '100%', width: '100%' }} whenCreated={(map) => { mapRef.current = map; setMapReady(true); map.fitWorld(); }} worldCopyJump={true}>
+                            <MapContainer center={[0, 0]} zoom={2} minZoom={2} maxZoom={14} style={{ height: '100%', width: '100%' }} worldCopyJump={true}>
                                 <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' noWrap={false} />
                                 <MapController />
                                 
-                                {currentVisibleData.map((item, index) => {
+                                {currentVisibleData.map((item) => {
                                     const style = getHighlightStyle(item);
                                     const name = item.type === 'city' ? `${item.city || item.region}, ${item.country}` : item.name;
                                     const popupContent = `${name} - Total: ${item.total}`;
                                     
-                                    // Usamos la clave única para el mapa que debería ser única a nivel de la burbuja/agregación
                                     const mapKey = item.uniqueMapKey || `${item.type}-${item.country}-${item.region || ''}-${item.city || ''}`;
 
                                     return (
@@ -355,7 +332,7 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
                         <Box sx={{
                             mt: 0,
                             ml: 2, 
-                            width: isMaximized ? 320 : '30%', 
+                            width: '30%', 
                             flexShrink: 0,
                             height: '100%',
                             overflowY: 'auto'
@@ -366,9 +343,8 @@ const GeoDistributionChart = ({ processedGeoData, colors, t, isMaximized, toggle
                             </Typography>
                             
                             <Stack direction="column" spacing={1}>
-                                {currentVisibleData.sort((a, b) => b.total - a.total).slice(0, 10).map((item, index) => (
+                                {currentVisibleData.sort((a, b) => b.total - a.total).slice(0, 10).map((item) => (
                                     <Box 
-                                        // Usamos la clave más simple para la lista lateral
                                         key={`${item.type}-${item.country}-${item.region || ''}-${item.city || ''}`} 
                                         sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1, borderRadius: 1, bgcolor: highlightedItem && highlightedItem.name === item.name && highlightedItem.type === item.type ? 'action.selected' : 'background.paper', '&:hover': { bgcolor: 'action.hover', cursor: 'pointer' } }} 
                                         onClick={() => handleItemClick(item)}

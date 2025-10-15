@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Paper, Typography, Stack, ButtonGroup, Button, IconButton, CircularProgress } from '@mui/material';
+import { Box, Paper, Typography, Stack, ButtonGroup, Button } from '@mui/material';
 import { MapContainer, TileLayer, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Fullscreen, FullscreenExit, Place } from '@mui/icons-material';
+import { Place } from '@mui/icons-material';
 import {
     Table,
     TableBody,
@@ -86,7 +86,6 @@ const PostGeoView = ({ aggregatedGeoData, loading }) => {
     
     const [highlightedItem, setHighlightedItem] = useState(null);
     const [mapReady, setMapReady] = useState(false);
-    const [isMaximized, setIsMaximized] = useState(false);
     const [initialFocusDone, setInitialFocusDone] = useState(false);
 
     const { countryData, regionData, cityData } = useGeoDataAggregator(aggregatedGeoData);
@@ -146,6 +145,7 @@ const PostGeoView = ({ aggregatedGeoData, loading }) => {
             mapRef.current = map;
             setMapReady(true);
             
+            // Realizar el enfoque inicial solo una vez
             if (!initialFocusDone && countryData.length > 0) {
                  map.fitWorld({ padding: [20, 20] });
                  setInitialFocusDone(true);
@@ -153,11 +153,15 @@ const PostGeoView = ({ aggregatedGeoData, loading }) => {
             
         }, [map, countryData, initialFocusDone]); 
         
+        // Ajustar los límites solo cuando cambian los parámetros de vista (país/región)
         useEffect(() => {
             if (mapReady && initialFocusDone) {
                 const timeout = setTimeout(() => {
                     const dataToAdjust = getVisibleData(currentView, selectedCountry, selectedRegion);
-                    adjustMapBounds(dataToAdjust);
+                    // Solo ajustamos los límites si hemos seleccionado un país/región específico, o si volvemos a la vista de país global (que se maneja en handleViewChange)
+                    if (selectedCountry || currentView !== 'country') { 
+                       adjustMapBounds(dataToAdjust);
+                    }
                 }, 50); 
                 return () => clearTimeout(timeout);
             }
@@ -166,14 +170,6 @@ const PostGeoView = ({ aggregatedGeoData, loading }) => {
         return null;
     };
     
-    const toggleMaximize = () => {
-        setIsMaximized(prev => !prev);
-        setTimeout(() => {
-            window.dispatchEvent(new Event('resize'));
-            if (mapRef.current) mapRef.current.invalidateSize();
-        }, 150);
-    };
-
     const focusOnItem = (item) => {
         setHighlightedItem(item);
         if (mapRef.current) {
@@ -221,9 +217,7 @@ const PostGeoView = ({ aggregatedGeoData, loading }) => {
 
     const calculateRadius = (total) => {
         if (maxTotal === 0) return 0;
-        // AJUSTE: Reducción del radio base para 'city' (80000 -> 8000 metros)
         const scale = currentView === 'country' ? 500000 : (currentView === 'region' ? 200000 : 8000); 
-        // AJUSTE: Reducción del radio mínimo para 'city' (10000 -> 500 metros)
         const baseMin = currentView === 'city' ? 500 : 50000;
         const totalRatio = Math.sqrt(total) / Math.sqrt(maxTotal);
         const proportionalRadius = baseMin + (totalRatio * (scale - baseMin)); 
@@ -235,14 +229,6 @@ const PostGeoView = ({ aggregatedGeoData, loading }) => {
         { fillOpacity: 0.7, weight: 1, color: STANDARD_COLOR }
     );
     
-    if (loading) {
-        return (
-            <Box sx={{ height: 600, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                <CircularProgress />
-            </Box>
-        );
-    }
-    
     if (aggregatedGeoData.length === 0) {
           return (
               <Box sx={{ height: 600, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
@@ -252,7 +238,7 @@ const PostGeoView = ({ aggregatedGeoData, loading }) => {
     }
 
     return (
-        <Paper elevation={0} sx={{ p: 2, border: '1px solid #dadce0', borderRadius: '8px', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)', height: isMaximized ? '720px' : '600px', position: 'relative' }}>
+        <Paper elevation={0} sx={{ p: 2, border: '1px solid #dadce0', borderRadius: '8px', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)', height: '600px', position: 'relative' }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center" marginBottom={2}>
                 <Typography variant="h6" fontWeight={500}>
                     {t('dashboard.postStats.geoMapTitle')}
@@ -283,17 +269,9 @@ const PostGeoView = ({ aggregatedGeoData, loading }) => {
                         {t('dashboard.statistics.city')}
                     </Button>
                 </ButtonGroup>
-                
-                <IconButton
-                    onClick={toggleMaximize}
-                    sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1001, backgroundColor: 'rgba(255, 255, 255, 0.7)', '&:hover': { backgroundColor: 'rgba(255, 255, 255, 1)' } }}
-                    aria-label={isMaximized ? 'minimize map' : 'maximize map'}
-                >
-                    {isMaximized ? <FullscreenExit /> : <Fullscreen />}
-                </IconButton>
             </Stack>
             
-            <Box sx={{ display: 'flex', height: isMaximized ? 'calc(100% - 60px)' : 'calc(100% - 60px)' }}>
+            <Box sx={{ display: 'flex', height: 'calc(100% - 60px)' }}>
                 <Box sx={{ flex: '0 0 70%', minHeight: '100%', borderRadius: '4px', overflow: 'hidden' }}>
                     <MapContainer center={[0, 0]} zoom={2} minZoom={2} maxZoom={14} style={{ height: '100%', width: '100%' }} worldCopyJump={true}>
                         <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" attribution='&copy; <a href="https://www.openstreetmap.com/copyright">OpenStreetMap</a> contributors' noWrap={false} />
