@@ -1,0 +1,18 @@
+{
+  "activityOverTime": "Atividade ao Longo do Tempo",
+  "avgToxicity": "Toxicidade Média",
+  "comments": "Comentários",
+  "commentsAdded": "Comentários Adicionados",
+  "likesGiven": "Gostos Dados",
+  "likesReceived": "Gostos Recebidos",
+  "page_title": "Análise do Perfil",
+  "postsViewed": "Publicações Vistas",
+  "replies": "Respostas",
+  "repliesAdded": "Respostas Adicionadas",
+  "repliesReceived": "Respostas Recebidas",
+  "sharesGiven": "Partilhas Dadas",
+  "subtitle": "Métricas agregadas de interação do perfil do utilizador.",
+  "title": "Análise do Perfil do Utilizador",
+  "topUsers": "Principais Utilizadores",
+  "user": "Utilizador"
+}

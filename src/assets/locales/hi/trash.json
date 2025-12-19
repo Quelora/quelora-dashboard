@@ -1,0 +1,18 @@
+{
+  "actions": "कार्रवाइयाँ",
+  "cancel": "रद्द करें",
+  "category": "श्रेणी",
+  "confirmRestoreText": "क्या आप वाकई इस आइटम को पुनर्स्थापित करना चाहते हैं?",
+  "confirmRestoreTitle": "पुनर्स्थापना की पुष्टि करें",
+  "deletedDate": "विलोपन तिथि",
+  "description": "विवरण",
+  "errorFetching": "ट्रैश आइटम लोड करने में त्रुटि",
+  "noDescription": "कोई विवरण नहीं",
+  "restore": "पुनर्स्थापित करें",
+  "restoreErrorText": "आइटम को पुनर्स्थापित करने में एक त्रुटि हुई।",
+  "restoreErrorTitle": "पुनर्स्थापना विफल",
+  "restoreSuccessText": "आइटम सफलतापूर्वक पुनर्स्थापित किया गया।",
+  "restoreSuccessTitle": "आइटम पुनर्स्थापित",
+  "retry": "पुनः प्रयास करें",
+  "title": "रीसायकल बिन"
+}

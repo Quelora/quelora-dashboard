@@ -1,0 +1,11 @@
+{
+  "cpu": "وحدة المعالجة المركزية (CPU): {{load}}",
+  "cpuTooltip": "الحمل (1د، 5د، 15د): {{load1}}, {{load5}}, {{load15}} | النوى: {{cores}}",
+  "memoryTooltip": "النظام - مستخدم: {{used}} / الإجمالي: {{total}}",
+  "nodeVersion": "إصدار Node.js v{{version}}",
+  "processMemory": "العملية: {{memory}}",
+  "processMemoryTooltip": "ذاكرة العملية (RSS)",
+  "ram": "ذاكرة الوصول العشوائي (RAM): {{percent}}%",
+  "title": "التطبيق (APP)",
+  "uptime": "مدة التشغيل: {{uptime}}"
+}

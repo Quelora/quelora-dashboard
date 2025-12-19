@@ -1,0 +1,18 @@
+{
+  "allProviders": "すべてのプロバイダー",
+  "allTasks": "すべてのタスク",
+  "completionTokens": "完了トークン",
+  "estimatedCost": "推定コスト (USD)",
+  "filterByProvider": "プロバイダーでフィルタリング",
+  "filterByTask": "タスクでフィルタリング",
+  "page_title": "モデレーション分析",
+  "promptTokens": "プロンプトトークン",
+  "provider": "プロバイダー",
+  "subtitle": "AI サービスに関連するトークンの使用状況とコスト。",
+  "task": "タスク",
+  "title": "モデレーション分析",
+  "tokensByProvider": "プロバイダー別トークン",
+  "tokensByTask": "タスク別トークン",
+  "tokensOverTime": "トークン使用量（経時的）",
+  "totalTokens": "合計トークン"
+}

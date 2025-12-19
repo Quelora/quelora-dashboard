@@ -1,0 +1,18 @@
+{
+  "actions": "פעולות",
+  "cancel": "בטל",
+  "category": "קטגוריה",
+  "confirmRestoreText": "האם אתה בטוח שברצונך לשחזר פריט זה?",
+  "confirmRestoreTitle": "אשר שחזור",
+  "deletedDate": "תאריך מחיקה",
+  "description": "תיאור",
+  "errorFetching": "שגיאה בגלישת פריטי פח",
+  "noDescription": "ללא תיאור",
+  "restore": "שחזר",
+  "restoreErrorText": "אירעה שגיאה בשחזור הפריט.",
+  "restoreErrorTitle": "השחזור נכשל",
+  "restoreSuccessText": "הפריט שוחזר בהצלחה.",
+  "restoreSuccessTitle": "הפריט שוחזר",
+  "retry": "נסה שוב",
+  "title": "פח מחזור"
+}

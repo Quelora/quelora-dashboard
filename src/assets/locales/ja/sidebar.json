@@ -1,0 +1,22 @@
+{
+  "advertiserProfiles": "広告主プロフィール",
+  "advertising": "広告",
+  "analytics": "分析",
+  "campaigns": "キャンペーン",
+  "clients": "クライアント",
+  "content": "コンテンツ",
+  "general_analytics": "一般分析",
+  "logout": "ログアウト",
+  "moderation_analytics": "モデレーション分析",
+  "my_account": "マイアカウント",
+  "placementPricing": "クライアント料金",
+  "placements": "プレースメント",
+  "post_analytics": "投稿分析",
+  "posts": "投稿",
+  "profile_analytics": "プロフィール分析",
+  "reports": "レポート",
+  "settings": "設定とクライアント",
+  "surveys": "アンケート",
+  "trash": "ゴミ箱",
+  "users": "ユーザー"
+}

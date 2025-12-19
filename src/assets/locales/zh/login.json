@@ -1,0 +1,16 @@
+{
+  "back": "返回登录",
+  "code_2fa": "6 位数代码",
+  "error": "无效的凭据",
+  "error_2fa": "2FA 代码无效。",
+  "forgot_password": "忘记密码。",
+  "loading": "正在加载...",
+  "page_title": "登录",
+  "password": "密码",
+  "prompt_2fa": "输入您认证应用中的 6 位数代码。",
+  "submit": "登录",
+  "title": "登录",
+  "title_2fa": "两步验证",
+  "username": "用户名",
+  "verify": "验证"
+}

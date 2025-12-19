@@ -1,0 +1,11 @@
+{
+  "connections": "接続数: {{current}}",
+  "connectionsTooltip": "アクティブ: {{active}} | 利用可能: {{available}}",
+  "memory": "メモリ: {{memory}}",
+  "memoryTooltip": "DB常駐メモリ (v{{version}})",
+  "queries": "クエリ数: {{queries}}",
+  "queriesTooltip": "読み取り操作",
+  "storage": "ストレージ: {{storage}}",
+  "storageTooltip": "データ: {{data}} | インデックス: {{indexes}}",
+  "title": "DB"
+}

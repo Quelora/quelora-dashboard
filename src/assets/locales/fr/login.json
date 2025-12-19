@@ -1,0 +1,16 @@
+{
+  "back": "Retour à la connexion",
+  "code_2fa": "Code à 6 chiffres",
+  "error": "Identifiants non valides",
+  "error_2fa": "Code 2FA non valide.",
+  "forgot_password": "Mot de passe oublié.",
+  "loading": "Chargement...",
+  "page_title": "Connexion",
+  "password": "Mot de passe",
+  "prompt_2fa": "Entrez le code à 6 chiffres de votre application d'authentification.",
+  "submit": "Se connecter",
+  "title": "Connexion",
+  "title_2fa": "Vérification en deux étapes",
+  "username": "Nom d'utilisateur",
+  "verify": "Vérifier"
+}

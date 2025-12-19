@@ -1,0 +1,18 @@
+{
+  "activityOverTime": "活动随时间变化",
+  "avgToxicity": "平均毒性",
+  "comments": "评论",
+  "commentsAdded": "已添加评论",
+  "likesGiven": "已给出赞",
+  "likesReceived": "已收到赞",
+  "page_title": "个人资料分析",
+  "postsViewed": "已查看发布",
+  "replies": "回复",
+  "repliesAdded": "已添加回复",
+  "repliesReceived": "已收到回复",
+  "sharesGiven": "已给出分享",
+  "subtitle": "用户个人资料互动的聚合指标。",
+  "title": "用户个人资料分析",
+  "topUsers": "热门用户",
+  "user": "用户"
+}

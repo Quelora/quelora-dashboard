@@ -1,0 +1,18 @@
+{
+  "allProviders": "Tous les fournisseurs",
+  "allTasks": "Toutes les tâches",
+  "completionTokens": "Jetons d'achèvement",
+  "estimatedCost": "Coût estimé (USD)",
+  "filterByProvider": "Filtrer par fournisseur",
+  "filterByTask": "Filtrer par tâche",
+  "page_title": "Analyses de modération",
+  "promptTokens": "Jetons d'invite",
+  "provider": "Fournisseur",
+  "subtitle": "Utilisation des jetons et coûts associés aux services d'IA.",
+  "task": "Tâche",
+  "title": "Analyses de modération",
+  "tokensByProvider": "Jetons par fournisseur",
+  "tokensByTask": "Jetons par tâche",
+  "tokensOverTime": "Utilisation des jetons (au fil du temps)",
+  "totalTokens": "Total des jetons"
+}

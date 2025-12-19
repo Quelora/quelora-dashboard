@@ -1,0 +1,11 @@
+{
+  "cpu": "ЦП: {{load}}",
+  "cpuTooltip": "Нагрузка (1м, 5м, 15м): {{load1}}, {{load5}}, {{load15}} | Ядра: {{cores}}",
+  "memoryTooltip": "Система - Использовано: {{used}} / Всего: {{total}}",
+  "nodeVersion": "Node.js v{{version}}",
+  "processMemory": "Процесс: {{memory}}",
+  "processMemoryTooltip": "Память процесса (RSS)",
+  "ram": "ОЗУ: {{percent}}%",
+  "title": "ПРИЛОЖЕНИЕ",
+  "uptime": "Время работы: {{uptime}}"
+}

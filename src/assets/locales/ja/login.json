@@ -1,0 +1,16 @@
+{
+  "back": "ログインに戻る",
+  "code_2fa": "6桁のコード",
+  "error": "無効な認証情報",
+  "error_2fa": "2FA コードが無効です。",
+  "forgot_password": "パスワードを忘れた場合。",
+  "loading": "ロード中...",
+  "page_title": "ログイン",
+  "password": "パスワード",
+  "prompt_2fa": "認証アプリから 6 桁のコードを入力してください。",
+  "submit": "サインイン",
+  "title": "ログイン",
+  "title_2fa": "2要素認証",
+  "username": "ユーザー名",
+  "verify": "確認"
+}

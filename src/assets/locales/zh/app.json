@@ -1,0 +1,11 @@
+{
+  "cpu": "CPU：{{load}}",
+  "cpuTooltip": "负载 (1分, 5分, 15分)：{{load1}}, {{load5}}, {{load15}} | 核心：{{cores}}",
+  "memoryTooltip": "系统 - 已用：{{used}} / 总计：{{total}}",
+  "nodeVersion": "Node.js v{{version}}",
+  "processMemory": "进程：{{memory}}",
+  "processMemoryTooltip": "进程内存 (RSS)",
+  "ram": "内存：{{percent}}%",
+  "title": "应用程序 (APP)",
+  "uptime": "运行时长：{{uptime}}"
+}

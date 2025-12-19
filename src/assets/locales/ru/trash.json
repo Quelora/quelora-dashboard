@@ -1,0 +1,18 @@
+{
+  "actions": "Действия",
+  "cancel": "Отмена",
+  "category": "Категория",
+  "confirmRestoreText": "Вы уверены, что хотите восстановить этот элемент?",
+  "confirmRestoreTitle": "Подтвердить восстановление",
+  "deletedDate": "Дата удаления",
+  "description": "Описание",
+  "errorFetching": "Ошибка получения элементов корзины",
+  "noDescription": "Нет описания",
+  "restore": "Восстановить",
+  "restoreErrorText": "Произошла ошибка при восстановлении элемента.",
+  "restoreErrorTitle": "Сбой восстановления",
+  "restoreSuccessText": "Элемент был успешно восстановлен.",
+  "restoreSuccessTitle": "Элемент восстановлен",
+  "retry": "Повторить",
+  "title": "Корзина"
+}

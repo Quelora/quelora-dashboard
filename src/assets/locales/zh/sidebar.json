@@ -1,0 +1,22 @@
+{
+  "advertiserProfiles": "广告商个人资料",
+  "advertising": "广告",
+  "analytics": "分析",
+  "campaigns": "活动",
+  "clients": "客户",
+  "content": "内容",
+  "general_analytics": "一般分析",
+  "logout": "退出登录",
+  "moderation_analytics": "内容审核分析",
+  "my_account": "我的账户",
+  "placementPricing": "客户定价",
+  "placements": "位置",
+  "post_analytics": "发布分析",
+  "posts": "发布",
+  "profile_analytics": "个人资料分析",
+  "reports": "报告",
+  "settings": "设置和客户",
+  "surveys": "调查",
+  "trash": "回收站",
+  "users": "用户"
+}

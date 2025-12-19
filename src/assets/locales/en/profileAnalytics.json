@@ -1,0 +1,21 @@
+{
+  "activity": "Actividad",
+  "impact": "Impacto",
+  "reputation": "Historial de Reputación",
+  "current_score": "Puntaje de Confianza Actual",
+  "event_type": "Evento / Razón",
+  "delta": "Cambio",
+  "source": "Fuente",
+  "date": "Fecha",
+  "view_reputation": "Ver Historial",
+  "commentsAdded": "Comentarios Creados",
+  "repliesAdded": "Respuestas Creadas",
+  "likesGiven": "Likes Dados",
+  "likesReceived": "Likes Recibidos",
+  "repliesReceived": "Respuestas Recibidas",
+  "avgToxicity": "Toxicidad Prom.",
+  "user": "Usuario",
+  "title": "Analítica de Perfiles",
+  "subtitle": "Métricas de engagement y comportamiento.",
+  "activityOverTime": "Actividad en el Tiempo"
+}

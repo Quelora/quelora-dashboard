@@ -1,0 +1,11 @@
+{
+  "clients": "clienti",
+  "clientsTooltip": "Clienti connessi",
+  "keys": "chiavi",
+  "keysTooltip": "Chiavi memorizzate",
+  "memoryTooltip": "Memoria utilizzata da Redis",
+  "ops": "ops/sec",
+  "opsTooltip": "Operazioni al secondo",
+  "title": "CACHE",
+  "uptimeTooltip": "Uptime del server Redis"
+}

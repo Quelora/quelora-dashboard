@@ -1,0 +1,13 @@
+{
+  "add_new_cid": "添加新客户",
+  "cid_description": "客户描述",
+  "cid_generated": "客户生成成功",
+  "cid_updated": "客户描述更新成功",
+  "description_required": "描述是必需的",
+  "edit_cid_description": "编辑客户描述",
+  "manage_cids": "管理客户",
+  "manage_cids_description": "查看和管理您账户的客户",
+  "new_description": "新描述",
+  "no_description": "无描述",
+  "title": "账户管理"
+}

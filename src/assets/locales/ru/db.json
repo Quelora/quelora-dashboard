@@ -1,0 +1,11 @@
+{
+  "connections": "Соединения: {{current}}",
+  "connectionsTooltip": "Активных: {{active}} | Доступно: {{available}}",
+  "memory": "Память: {{memory}}",
+  "memoryTooltip": "Резидентная память БД (v{{version}})",
+  "queries": "Запросы: {{queries}}",
+  "queriesTooltip": "Операции чтения",
+  "storage": "Хранилище: {{storage}}",
+  "storageTooltip": "Данные: {{data}} | Индексы: {{indexes}}",
+  "title": "БД"
+}

@@ -1,0 +1,17 @@
+{
+  "back": "Back to login",
+  "code_2fa": "6-digit Code",
+  "error": "Invalid credentials",
+  "error_locked": "Too many login attempts. Your account may be locked if you continue.",
+  "error_2fa": "Invalid 2FA code.",
+  "forgot_password": "Recover password.",
+  "loading": "Loading...",
+  "page_title": "Login",
+  "password": "Password",
+  "prompt_2fa": "Enter the 6-digit code from your authentication app.",
+  "submit": "Sign In",
+  "title": "Login",
+  "title_2fa": "Two-factor Verification",
+  "username": "Username",
+  "verify": "Verify"
+}

@@ -1,0 +1,18 @@
+{
+  "actions": "Actions",
+  "cancel": "Cancel",
+  "category": "Category",
+  "confirmRestoreText": "Are you sure you want to restore this item?",
+  "confirmRestoreTitle": "Confirm Restore",
+  "deletedDate": "Date Deleted",
+  "description": "Description",
+  "errorFetching": "Error loading trash items",
+  "noDescription": "No description",
+  "restore": "Restore",
+  "restoreErrorText": "There was an error restoring the item.",
+  "restoreErrorTitle": "Restore Failed",
+  "restoreSuccessText": "The item was restored successfully.",
+  "restoreSuccessTitle": "Item Restored",
+  "retry": "Retry",
+  "title": "Recycle Bin"
+}

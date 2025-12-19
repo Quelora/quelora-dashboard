@@ -1,0 +1,18 @@
+{
+  "allProviders": "सभी प्रदाता",
+  "allTasks": "सभी कार्य",
+  "completionTokens": "पूर्णता टोकन",
+  "estimatedCost": "अनुमानित लागत (USD)",
+  "filterByProvider": "प्रदाता द्वारा फ़िल्टर करें",
+  "filterByTask": "कार्य द्वारा फ़िल्टर करें",
+  "page_title": "मॉडरेशन एनालिटिक्स",
+  "promptTokens": "प्रॉम्प्ट टोकन",
+  "provider": "प्रदाता",
+  "subtitle": "AI सेवाओं से जुड़ा टोकन उपयोग और लागत।",
+  "task": "कार्य",
+  "title": "मॉडरेशन एनालिटिक्स",
+  "tokensByProvider": "प्रदाता द्वारा टोकन",
+  "tokensByTask": "कार्य द्वारा टोकन",
+  "tokensOverTime": "टोकन उपयोग (समय के साथ)",
+  "totalTokens": "कुल टोकन"
+}

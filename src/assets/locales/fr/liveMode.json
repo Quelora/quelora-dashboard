@@ -1,0 +1,8 @@
+{
+  "invalidMaxClients": "Le max. de clients doit être compris entre {{min}} et {{max}}.",
+  "isLiveActive": "Activer le flux en direct",
+  "maxClients": "Clients concurrents maximum",
+  "startTime": "Heure de début prévue",
+  "tabTitle": "Mode en direct",
+  "title": "Paramètres du mode en direct"
+}

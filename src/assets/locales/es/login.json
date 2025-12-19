@@ -1,0 +1,16 @@
+{
+  "back": "Volver al inicio de sesión",
+  "code_2fa": "Código de 6 dígitos",
+  "error": "Credenciales inválidas",
+  "error_2fa": "Código 2FA inválido.",
+  "forgot_password": "Recuperar contraseña.",
+  "loading": "Cargando...",
+  "page_title": "Iniciar sesión",
+  "password": "Contraseña",
+  "prompt_2fa": "Introduce el código de 6 dígitos de tu aplicación de autenticación.",
+  "submit": "Ingresar",
+  "title": "Iniciar sesión",
+  "title_2fa": "Verificación de dos pasos",
+  "username": "Nombre de usuario",
+  "verify": "Verificar"
+}

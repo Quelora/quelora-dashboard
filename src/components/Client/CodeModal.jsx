@@ -1,0 +1,112 @@
+// ./src/components/Client/CodeModal.jsx
+import { useTranslation } from 'react-i18next';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { 
+    Dialog, 
+    DialogTitle, 
+    DialogContent, 
+    DialogActions, 
+    Snackbar,
+    Alert
+} from '@mui/material';
+
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import CopyIcon from '@mui/icons-material/ContentCopy';
+import DownloadIcon from '@mui/icons-material/Download';
+import { useState } from 'react';
+
+const CodeModal = ({ open, currentClientCode, setOpen, showToast, client }) => {
+    const { t } = useTranslation();
+    const cid = client?.cid || 'unknown';
+    
+    const [snackbar, setSnackbar] = useState({open: false, message: '', severity: 'success'});
+
+    const handleCopyCode = () => {
+        navigator.clipboard.writeText(currentClientCode);
+        setSnackbar({open: true, message: t('client.copy_success'), severity: 'success'});
+    };
+
+    const handleDownloadCode = () => {
+        const blob = new Blob([currentClientCode], {type: 'text/javascript'});
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `quelora-config-${cid}.js`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setSnackbar({open: true, message: t('client.download_success'), severity: 'success'});
+    };
+    
+    const handleSnackbarClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSnackbar({...snackbar, open: false});
+    };
+
+
+    return (
+        <>
+            <Dialog
+                open={open}
+                onClose={() => setOpen(false)}
+                maxWidth={false}
+                PaperProps={{className: 'client-dialog client-code-dialog'}}
+            >
+                <DialogTitle className="client-dialog-title">
+                    {t('client.code_modal_title')}: {client?.cid}
+                </DialogTitle>
+                <DialogContent>
+                    <SyntaxHighlighter language="javascript" className="client-code-block">
+                        {currentClientCode}
+                    </SyntaxHighlighter>
+                    <Box className="client-code-actions">
+                        <Button
+                            variant="outlined"
+                            startIcon={<CopyIcon/>}
+                            onClick={handleCopyCode}
+                            className="client-copy-button"
+                        >
+                            {t('client.copy')}
+                        </Button>
+                        <Button
+                            variant="contained"
+                            startIcon={<DownloadIcon/>}
+                            onClick={handleDownloadCode}
+                            className="client-download-button"
+                        >
+                            {t('client.download')}
+                        </Button>
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button 
+                        onClick={() => setOpen(false)}
+                        className="client-close-button"
+                    >
+                        {t('client.close')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{vertical: 'top', horizontal: 'center'}}
+            >
+                <Alert 
+                    onClose={handleSnackbarClose} 
+                    severity={snackbar.severity} 
+                    sx={{width: '100%'}}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
+        </>
+    );
+};
+
+export default CodeModal;

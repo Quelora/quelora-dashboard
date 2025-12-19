@@ -1,0 +1,11 @@
+{
+  "connections": "Conexiones: {{current}}",
+  "connectionsTooltip": "Activas: {{active}} | Disponibles: {{available}}",
+  "memory": "Mem: {{memory}}",
+  "memoryTooltip": "Memoria Residente de BD (v{{version}})",
+  "queries": "Consultas: {{queries}}",
+  "queriesTooltip": "Operaciones de lectura",
+  "storage": "Almac.: {{storage}}",
+  "storageTooltip": "Datos: {{data}} | Índices: {{indexes}}",
+  "title": "BD"
+}

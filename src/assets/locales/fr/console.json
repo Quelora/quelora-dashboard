@@ -1,0 +1,13 @@
+{
+  "allLevels": "Tous les niveaux",
+  "clear": "Effacer",
+  "filter": "Filtrer",
+  "level": "Niveau",
+  "message": "Message",
+  "noLogs": "Aucun journal disponible",
+  "pause": "Pause",
+  "resume": "Reprendre",
+  "timestamp": "Horodatage",
+  "title": "Journaux de la console",
+  "toggle": "Basculer la console"
+}

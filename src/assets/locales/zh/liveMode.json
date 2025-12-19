@@ -1,0 +1,8 @@
+{
+  "invalidMaxClients": "最大客户端数必须在 {{min}} 和 {{max}} 之间。",
+  "isLiveActive": "启用直播流",
+  "maxClients": "最大并发客户端数",
+  "startTime": "计划开始时间",
+  "tabTitle": "直播模式",
+  "title": "直播模式设置"
+}

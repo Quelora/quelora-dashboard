@@ -1,0 +1,18 @@
+{
+  "allProviders": "Todos los Proveedores",
+  "allTasks": "Todas las Tareas",
+  "completionTokens": "Tokens de Completado",
+  "estimatedCost": "Costo Estimado (USD)",
+  "filterByProvider": "Filtrar por proveedor",
+  "filterByTask": "Filtrar por tarea",
+  "page_title": "Analíticas de Moderación",
+  "promptTokens": "Tokens de Prompt",
+  "provider": "Proveedor",
+  "subtitle": "Uso de tokens y costos asociados con servicios de IA.",
+  "task": "Tarea",
+  "title": "Analíticas de Moderación",
+  "tokensByProvider": "Tokens por Proveedor",
+  "tokensByTask": "Tokens por Tarea",
+  "tokensOverTime": "Uso de Tokens (A lo largo del Tiempo)",
+  "totalTokens": "Tokens Totales"
+}

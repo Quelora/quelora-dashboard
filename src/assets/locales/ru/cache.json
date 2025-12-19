@@ -1,0 +1,11 @@
+{
+  "clients": "клиенты",
+  "clientsTooltip": "Подключенные клиенты",
+  "keys": "ключи",
+  "keysTooltip": "Сохраненные ключи",
+  "memoryTooltip": "Память, используемая Redis",
+  "ops": "оп/сек",
+  "opsTooltip": "Операций в секунду",
+  "title": "КЭШ",
+  "uptimeTooltip": "Время работы сервера Redis"
+}

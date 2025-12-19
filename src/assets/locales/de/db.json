@@ -1,0 +1,11 @@
+{
+  "connections": "Verbindungen: {{current}}",
+  "connectionsTooltip": "Aktiv: {{active}} | Verfügbar: {{available}}",
+  "memory": "Speicher: {{memory}}",
+  "memoryTooltip": "DB Resident Memory (v{{version}})",
+  "queries": "Abfragen: {{queries}}",
+  "queriesTooltip": "Leseoperationen",
+  "storage": "Speicher: {{storage}}",
+  "storageTooltip": "Daten: {{data}} | Indizes: {{indexes}}",
+  "title": "DB"
+}

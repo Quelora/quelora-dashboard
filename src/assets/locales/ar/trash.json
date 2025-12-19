@@ -1,0 +1,18 @@
+{
+  "actions": "الإجراءات",
+  "cancel": "إلغاء",
+  "category": "الفئة",
+  "confirmRestoreText": "هل أنت متأكد أنك تريد استعادة هذا العنصر؟",
+  "confirmRestoreTitle": "تأكيد الاستعادة",
+  "deletedDate": "تاريخ الحذف",
+  "description": "الوصف",
+  "errorFetching": "خطأ في جلب عناصر سلة المهملات",
+  "noDescription": "بدون وصف",
+  "restore": "استعادة",
+  "restoreErrorText": "حدث خطأ أثناء استعادة العنصر.",
+  "restoreErrorTitle": "فشل الاستعادة",
+  "restoreSuccessText": "تمت استعادة العنصر بنجاح.",
+  "restoreSuccessTitle": "تمت استعادة العنصر",
+  "retry": "إعادة المحاولة",
+  "title": "سلة المحذوفات"
+}

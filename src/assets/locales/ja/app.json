@@ -1,0 +1,11 @@
+{
+  "cpu": "CPU: {{load}}",
+  "cpuTooltip": "負荷 (1分, 5分, 15分): {{load1}}, {{load5}}, {{load15}} | コア: {{cores}}",
+  "memoryTooltip": "システム - 使用済み: {{used}} / 合計: {{total}}",
+  "nodeVersion": "Node.js v{{version}}",
+  "processMemory": "プロセス: {{memory}}",
+  "processMemoryTooltip": "プロセスメモリ (RSS)",
+  "ram": "RAM: {{percent}}%",
+  "title": "アプリ (APP)",
+  "uptime": "稼働時間: {{uptime}}"
+}

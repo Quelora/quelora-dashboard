@@ -1,0 +1,16 @@
+{
+  "back": "Torna al login",
+  "code_2fa": "Codice a 6 cifre",
+  "error": "Credenziali non valide",
+  "error_2fa": "Codice 2FA non valido.",
+  "forgot_password": "Password dimenticata?",
+  "loading": "Caricamento...",
+  "page_title": "Login",
+  "password": "Password",
+  "prompt_2fa": "Inserisci il codice a 6 cifre dalla tua app di autenticazione.",
+  "submit": "Accedi",
+  "title": "Login",
+  "title_2fa": "Verifica a due fattori",
+  "username": "Nome utente",
+  "verify": "Verifica"
+}

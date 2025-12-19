@@ -1,0 +1,18 @@
+{
+  "activityOverTime": "経時的なアクティビティ",
+  "avgToxicity": "平均毒性",
+  "comments": "コメント",
+  "commentsAdded": "追加されたコメント",
+  "likesGiven": "与えられたいいね",
+  "likesReceived": "受け取ったいいね",
+  "page_title": "プロフィール分析",
+  "postsViewed": "閲覧された投稿",
+  "replies": "返信",
+  "repliesAdded": "追加された返信",
+  "repliesReceived": "受け取った返信",
+  "sharesGiven": "与えられた共有",
+  "subtitle": "ユーザープロフィールのインタラクション集計メトリクス。",
+  "title": "ユーザープロフィール分析",
+  "topUsers": "トップユーザー",
+  "user": "ユーザー"
+}

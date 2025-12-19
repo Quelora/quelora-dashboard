@@ -1,0 +1,8 @@
+{
+  "invalidMaxClients": "Máx. Clientes debe estar entre {{min}} y {{max}}.",
+  "isLiveActive": "Habilitar Transmisión En Vivo",
+  "maxClients": "Máximos Clientes Concurrentes",
+  "startTime": "Hora de Inicio Programada",
+  "tabTitle": "Modo En Vivo",
+  "title": "Configuración del Modo En Vivo"
+}

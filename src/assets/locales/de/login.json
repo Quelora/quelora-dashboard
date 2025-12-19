@@ -1,0 +1,16 @@
+{
+  "back": "Zurück zum Login",
+  "code_2fa": "6-stelliger Code",
+  "error": "Ungültige Anmeldeinformationen",
+  "error_2fa": "Ungültiger 2FA-Code.",
+  "forgot_password": "Passwort vergessen.",
+  "loading": "Wird geladen...",
+  "page_title": "Login",
+  "password": "Passwort",
+  "prompt_2fa": "Geben Sie den 6-stelligen Code aus Ihrer Authentifizierungs-App ein.",
+  "submit": "Anmelden",
+  "title": "Login",
+  "title_2fa": "Zwei-Faktor-Verifizierung",
+  "username": "Benutzername",
+  "verify": "Verifizieren"
+}

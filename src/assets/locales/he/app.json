@@ -1,0 +1,11 @@
+{
+  "cpu": "מעבד (CPU): {{load}}",
+  "cpuTooltip": "עומס (1ד, 5ד, 15ד): {{load1}}, {{load5}}, {{load15}} | ליבות: {{cores}}",
+  "memoryTooltip": "מערכת - בשימוש: {{used}} / סך הכל: {{total}}",
+  "nodeVersion": "גרסת Node.js v{{version}}",
+  "processMemory": "תהליך: {{memory}}",
+  "processMemoryTooltip": "זיכרון תהליך (RSS)",
+  "ram": "זיכרון RAM: {{percent}}%",
+  "title": "אפליקציה (APP)",
+  "uptime": "זמן פעולה: {{uptime}}"
+}

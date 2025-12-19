@@ -1,0 +1,13 @@
+{
+  "allLevels": "Tutti i Livelli",
+  "clear": "Pulisci",
+  "filter": "Filtro",
+  "level": "Livello",
+  "message": "Messaggio",
+  "noLogs": "Nessun log disponibile",
+  "pause": "Pausa",
+  "resume": "Riprendi",
+  "timestamp": "Timestamp",
+  "title": "Log Console",
+  "toggle": "Attiva/Disattiva Console"
+}
