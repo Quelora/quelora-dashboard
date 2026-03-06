@@ -25,7 +25,7 @@ export const getReports = async (cid, params = {}) => {
 
 /**
  * Marca un reporte de comentario como resuelto.
- * @param {string} reportId - El ID del documento ReportedComment.
+ * @param {string} reportId - El ID del documento Reported.
  * @param {string} [reason] - Razón opcional de la resolución.
  */
 export const resolveReport = async (reportId, reason = null) => {

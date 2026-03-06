@@ -9,7 +9,6 @@ import {
     TableRow,
     TextField,
     MenuItem,
-    Button,
     IconButton,
     Chip,
     FormControl,
@@ -29,7 +28,9 @@ import {
     VisibilityOff as VisibilityOffIcon,
     Block as BlockIcon,
     Delete as DeleteIcon,
-    RestoreFromTrash as RestoreIcon
+    RestoreFromTrash as RestoreIcon,
+    Person as PersonIcon,
+    Comment as CommentIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -41,7 +42,7 @@ import { banUser, unbanUser } from '../api/users';
 import React from 'react';
 
 const ReportTableHeaders = [
-    { id: 'comment', labelKey: 'reports.comment', numeric: false, sortable: false, minWidth: 300 },
+    { id: 'entity', labelKey: 'reports.comment', numeric: false, sortable: false, minWidth: 300 },
     { id: 'post', labelKey: 'reports.post', numeric: false, sortable: false, minWidth: 200 },
     { id: 'report_count', labelKey: 'reports.reports', numeric: true, sortable: true, minWidth: 100 },
     { id: 'types', labelKey: 'reports.types.title', numeric: false, sortable: false, minWidth: 150 },
@@ -57,6 +58,10 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     '[data-theme="dark"] &:nth-of-type(odd)': { backgroundColor: 'rgba(255, 255, 255, 0.05)' },
 }));
 
+/**
+ * Component to manage and resolve polymorphic user reports.
+ * @returns {JSX.Element} The Reports Page component.
+ */
 const ReportsPage = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -99,6 +104,11 @@ const ReportsPage = () => {
         }
     }, [setSelectedCid, t, selectedCid]);
 
+    /**
+     * Generates a summary chip array of report types.
+     * @param {Array<Object>} reportsArray - The array of report entries.
+     * @returns {Array<JSX.Element>} An array of Chip components.
+     */
     const getReportTypesSummary = (reportsArray) => {
         const counts = reportsArray.reduce((acc, report) => {
             acc[report.report_type] = (acc[report.report_type] || 0) + 1;
@@ -112,6 +122,11 @@ const ReportsPage = () => {
             ));
     };
 
+    /**
+     * Handles the logical resolution of a report.
+     * @param {string} reportId - The unique identifier of the report.
+     * @returns {Promise<void>}
+     */
     const handleResolve = async (reportId) => {
         const { value: reason, isConfirmed } = await Swal.fire({
             title: t('reports.confirmResolveTitle'),
@@ -144,6 +159,13 @@ const ReportsPage = () => {
         }
     };
 
+    /**
+     * Toggles the ban status of a specific user.
+     * @param {string} authorId - The unique author identifier.
+     * @param {string} authorName - The display name of the author.
+     * @param {boolean} isBanned - The current ban status.
+     * @returns {Promise<void>}
+     */
     const handleBan = async (authorId, authorName, isBanned) => {
         const action = isBanned ? 'unban' : 'ban';
         const result = await Swal.fire({
@@ -175,6 +197,12 @@ const ReportsPage = () => {
         }
     };
 
+    /**
+     * Hides a specific comment from public view.
+     * @param {string} commentId - The unique comment identifier.
+     * @param {string} commentText - The content of the comment.
+     * @returns {Promise<void>}
+     */
     const handleHideComment = async (commentId, commentText) => {
         const result = await Swal.fire({
             title: t('reports.confirmHideTitle'),
@@ -203,6 +231,12 @@ const ReportsPage = () => {
         }
     };
 
+    /**
+     * Restores visibility to a previously hidden comment.
+     * @param {string} commentId - The unique comment identifier.
+     * @param {string} commentText - The content of the comment.
+     * @returns {Promise<void>}
+     */
     const handleUnhideComment = async (commentId, commentText) => {
         const result = await Swal.fire({
             title: t('reports.confirmUnhideTitle'),
@@ -212,7 +246,6 @@ const ReportsPage = () => {
             confirmButtonText: t('reports.unhide'),
             cancelButtonText: t('common.cancel')
         });
-
     
         if (!result.isConfirmed) return;
     
@@ -231,47 +264,71 @@ const ReportsPage = () => {
         }
     };
 
+    /**
+     * Renders an individual report row, managing polymorphic conditions dynamically.
+     * @param {Object} report - The hydrated report document.
+     * @returns {JSX.Element} The rendered table row.
+     */
     const renderReportRow = (report) => {
-        const { comment, post, report_count, created_at, _id } = report;
-        const authorName = comment?.profile?.name || t('comments.unknownAuthor');
-        const commentTextTruncated = comment ? (comment.text.length > 100 ? `${comment.text.substring(0, 100)}...` : comment.text) : "";
-        const isCommentVisible = comment?.visible !== false;
-        const isUserBanned = comment?.profile?.isBanned === true;
+        const { target_type, comment, post, reported_profile_doc, report_count, created_at, _id } = report;
+        
+        const authorName = reported_profile_doc?.name || t('comments.unknownAuthor');
+        const authorId = reported_profile_doc?.author;
+        const isUserBanned = reported_profile_doc?.isBanned === true;
+        
+        const isCommentReport = target_type === 'comment';
+        const isProfileReport = target_type === 'profile';
+        
+        const isCommentVisible = isCommentReport && comment?.visible !== false;
+        const commentTextTruncated = isCommentReport && comment ? (comment.text.length > 100 ? `${comment.text.substring(0, 100)}...` : comment.text) : "";
 
         return (
             <StyledTableRow key={_id} hover>
                 <TableCell>
-                    {comment ? (
-                        <Box>
-                            <Stack direction="row" spacing={0.5} alignItems="center">
-                                {!isCommentVisible && (
-                                    <Tooltip title={t('reports.hidden')}>
-                                        <Chip
-                                            icon={<VisibilityOffIcon />}
-                                            label={t('reports.hidden')}
-                                            color="warning"
-                                            size="small"
-                                            variant="outlined"
-                                            sx={{ height: 20, fontSize: '0.7rem', '.MuiChip-icon': { fontSize: '0.8rem' } }}
-                                        />
-                                    </Tooltip>
-                                )}
-                                {isUserBanned && (
-                                    <Tooltip title={t('users.banned')}>
-                                        <Chip
-                                            icon={<BlockIcon />}
-                                            label={t('users.banned')}
-                                            color="error"
-                                            size="small"
-                                            variant="outlined"
-                                            sx={{ height: 20, fontSize: '0.7rem', '.MuiChip-icon': { fontSize: '0.8rem' } }}
-                                        />
-                                    </Tooltip>
-                                )}
-                                <Typography variant="body2" sx={{fontWeight: 500}}>
-                                    {comment.profile?.name || t('comments.unknownAuthor')}
-                                </Typography>
-                            </Stack>
+                    <Box>
+                        <Stack direction="row" spacing={0.5} alignItems="center" sx={{ mb: 0.5 }}>
+                            {isCommentReport ? (
+                                <Tooltip title="Comment Report">
+                                    <CommentIcon fontSize="small" color="action" />
+                                </Tooltip>
+                            ) : (
+                                <Tooltip title="Profile Report">
+                                    <PersonIcon fontSize="small" color="action" />
+                                </Tooltip>
+                            )}
+
+                            {!isCommentVisible && isCommentReport && comment && (
+                                <Tooltip title={t('reports.hidden')}>
+                                    <Chip
+                                        icon={<VisibilityOffIcon />}
+                                        label={t('reports.hidden')}
+                                        color="warning"
+                                        size="small"
+                                        variant="outlined"
+                                        sx={{ height: 20, fontSize: '0.7rem', '.MuiChip-icon': { fontSize: '0.8rem' } }}
+                                    />
+                                </Tooltip>
+                            )}
+                            
+                            {isUserBanned && (
+                                <Tooltip title={t('users.banned')}>
+                                    <Chip
+                                        icon={<BlockIcon />}
+                                        label={t('users.banned')}
+                                        color="error"
+                                        size="small"
+                                        variant="outlined"
+                                        sx={{ height: 20, fontSize: '0.7rem', '.MuiChip-icon': { fontSize: '0.8rem' } }}
+                                    />
+                                </Tooltip>
+                            )}
+                            
+                            <Typography variant="body2" sx={{fontWeight: 500}}>
+                                {authorName}
+                            </Typography>
+                        </Stack>
+
+                        {isCommentReport && comment ? (
                             <Typography 
                                 variant="caption" 
                                 color="text.secondary" 
@@ -282,27 +339,42 @@ const ReportsPage = () => {
                             >
                                 "{comment.text}"
                             </Typography>
-                        </Box>
+                        ) : isCommentReport && !comment ? (
+                             <Chip label={t('reports.commentDeleted')} size="small" color="error" variant="outlined" />
+                        ) : isProfileReport && reported_profile_doc ? (
+                            <Typography variant="caption" color="text.secondary">
+                                {reported_profile_doc.email || `@${reported_profile_doc.author}`}
+                            </Typography>
+                        ) : null}
+                    </Box>
+                </TableCell>
+                
+                <TableCell>
+                    {isCommentReport ? (
+                        <Typography variant="caption" noWrap>
+                            {post?.title || t('reports.postNotFound')}
+                        </Typography>
                     ) : (
-                        <Chip label={t('reports.commentDeleted')} size="small" color="error" variant="outlined" />
+                        <Typography variant="caption" color="text.disabled">
+                            —
+                        </Typography>
                     )}
                 </TableCell>
-                <TableCell>
-                    <Typography variant="caption" noWrap>
-                        {post?.title || t('reports.postNotFound')}
-                    </Typography>
-                </TableCell>
+                
                 <TableCell align="center">
                     <Chip label={report_count} color="error" size="small" />
                 </TableCell>
+                
                 <TableCell>
                     <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.5}}>
                         {getReportTypesSummary(report.reports)}
                     </Box>
                 </TableCell>
+                
                 <TableCell>
                     {new Date(created_at).toLocaleDateString()}
                 </TableCell>
+                
                 <TableCell>
                     <Stack direction="row" spacing={0.5}>
                         <Tooltip title={t('reports.resolve')}>
@@ -310,15 +382,18 @@ const ReportsPage = () => {
                                 <CheckCircleIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
-                        <Tooltip title={t('reports.viewComment')}>
-                            <IconButton size="small" onClick={() => navigate(`/post/${report.entity_id}/comments`)}>
-                                <VisibilityIcon fontSize="small" />
-                            </IconButton>
-                        </Tooltip>
+
+                        {isCommentReport && comment && (
+                            <Tooltip title={t('reports.viewComment')}>
+                                <IconButton size="small" onClick={() => navigate(`/post/${report.context_id}/comments`)}>
+                                    <VisibilityIcon fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                        )}
                         
-                        {comment && isCommentVisible && (
+                        {authorId && (
                             <Tooltip title={isUserBanned ? t('users.unban') : t('users.ban', { user: authorName })}>
-                                <IconButton size="small" onClick={() => handleBan(comment.author, authorName, isUserBanned)}>
+                                <IconButton size="small" onClick={() => handleBan(authorId, authorName, isUserBanned)}>
                                     {isUserBanned ? (
                                         <CheckCircleIcon fontSize="small" color="success" />
                                     ) : (
@@ -328,7 +403,7 @@ const ReportsPage = () => {
                             </Tooltip>
                         )}
                         
-                        {comment && isCommentVisible && (
+                        {isCommentReport && comment && isCommentVisible && (
                             <Tooltip title={t('reports.hide')}>
                                 <IconButton size="small" color="warning" onClick={() => handleHideComment(comment._id, commentTextTruncated)}>
                                     <DeleteIcon fontSize="small" />
@@ -336,7 +411,7 @@ const ReportsPage = () => {
                             </Tooltip>
                         )}
                         
-                        {comment && !isCommentVisible && (
+                        {isCommentReport && comment && !isCommentVisible && (
                             <Tooltip title={t('reports.unhide')}>
                                 <IconButton size="small" color="info" onClick={() => handleUnhideComment(comment._id, commentTextTruncated)}>
                                     <RestoreIcon fontSize="small" />

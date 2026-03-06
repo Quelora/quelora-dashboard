@@ -5,15 +5,13 @@ COPY package.json .
 COPY ./ . 
 
 RUN npm install
-RUN npm run build # Este comando crea la carpeta 'build' o 'dist' con los archivos estáticos
+RUN npm run build
 
 FROM nginx:alpine
 RUN rm -rf /etc/nginx/conf.d/default.conf
 
-# [CORRECCIÓN 3] Copia la configuración de Nginx (asumiendo que está en una subcarpeta 'nginx')
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
-# COPIA EL RESULTADO DE LA COMPILACIÓN AL SERVIDOR NGINX
 COPY --from=builder /app/build /usr/share/nginx/html
 
 EXPOSE 80
