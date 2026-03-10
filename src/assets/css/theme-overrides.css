@@ -242,3 +242,37 @@
 [data-theme="dark"] a{
     color:aliceblue;
 }
+
+/* Forzado de Layout Vertical para Configuración de Red */
+.network-config-stack {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+}
+
+.network-field-vertical {
+    margin-bottom: var(--spacing-md) !important;
+    width: 100% !important;
+}
+
+/* Forzar que el campo de texto ocupe todo el ancho y se alinee con el adorno */
+.network-field-vertical .MuiInputBase-root {
+    width: 100% !important;
+}
+
+.network-list-scrollable {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--surface-color);
+    margin-top: 8px;
+}
+
+.MuiGrid-direction-xs-row{
+    width: stretch!important;
+}
+
+.interaction-grid{
+    flex-wrap: nowrap!important;
+}

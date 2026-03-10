@@ -1,116 +1,90 @@
+// ./src/api/auth.js
 import api from './axiosConfig';
-import { getEncryptedClient, getDecryptedClient } from '../utils/crypto';
+import { getEncryptedClient, getDecryptedClient, encryptJSON, generateKeyFromString } from '../utils/crypto';
 
+/**
+ * Authenticates a user with username and password.
+ *
+ * @async
+ * @param {string} username - The user's username.
+ * @param {string} password - The user's password.
+ * @returns {Promise<Object>} Login result including token, clients, user and role.
+ * @throws {Error} On invalid credentials, locked account, or connection failure.
+ */
 export const login = async (username, password) => {
     try {
-        const response = await api.post('/auth/generate-token', {username, password});
-        
+        const response = await api.post('/auth/generate-token', { username, password });
+
         if (response.data.requires2FA) {
             return {
                 requires2FA: true,
-                tempToken: response.data.tempToken
+                tempToken:   response.data.tempToken,
             };
         }
-        
+
         return {
             requires2FA: false,
-            token: response.data.token,
-            clients: response.data.clients || [],
-            user: response.data.user || [],
-            expiresIn: response.data.expiresIn || '2h',
-            role: response.data.role
+            token:       response.data.token,
+            clients:     response.data.clients || [],
+            user:        response.data.user    || [],
+            expiresIn:   response.data.expiresIn || '2h',
+            role:        response.data.role,
         };
-
     } catch (error) {
-        if (error.response?.status === 429) {
-            throw new Error("LOCKED_ACCOUNT");
-        }
-        if (error.response?.status === 401) {
-            throw new Error("Invalid credentials");
-        }
-        throw new Error("Connection error");
+        if (error.response?.status === 429) throw new Error('LOCKED_ACCOUNT');
+        if (error.response?.status === 401) throw new Error('Invalid credentials');
+        throw new Error('Connection error');
     }
 };
 
-export const verifyTwoFactor = async (totpToken, tempToken) => {
+/**
+ * Completes a two-factor authentication flow using a TOTP code and a pre-auth token.
+ *
+ * @async
+ * @param {string} totpToken - The 6-digit TOTP code.
+ * @param {string} tempToken - The temporary token received from the initial login step.
+ * @returns {Promise<Object>} Login result including token, clients, user and role.
+ * @throws {Error} On invalid TOTP code or connection failure.
+ */
+export const verify2FA = async (totpToken, tempToken) => {
     try {
-        const response = await api.post('/auth/verify-2fa', 
-            { totpToken },
-            {
-                headers: {
-                    'Authorization': `Bearer ${tempToken}`
-                }
-            }
-        );
-        
+        const response = await api.post('/auth/verify-2fa', { totpToken, tempToken });
         return {
-            requires2FA: false,
-            token: response.data.token,
-            clients: response.data.clients || [],
-            user: response.data.user || [],
-            expiresIn: response.data.expiresIn || '2h',
-            role: response.data.role
+            token:       response.data.token,
+            clients:     response.data.clients || [],
+            user:        response.data.user    || [],
+            expiresIn:   response.data.expiresIn || '2h',
+            role:        response.data.role,
         };
-
     } catch (error) {
-        if (error.response?.status === 400) {
-            throw new Error("Código 2FA inválido");
-        }
-        if (error.response?.status === 401) {
-            throw new Error("Código 2FA expirado. Por favor intente iniciar sesión de nuevo.");
-        }
-        throw new Error("Connection error");
+        throw new Error('Invalid 2FA code or session expired');
     }
 };
 
-export const renewToken = async (expiredToken) => {
-    try {
-        const response = await api.post('/auth/renew-token', {expiredToken});
-        sessionStorage.setItem('token', response.data.token);
-        sessionStorage.setItem('tokenExpiration', Date.now() + 7200000);
-        return response.data;
-    } catch (error) {
-        console.error('Token renewal failed:', error);
-        throw error;
-    }
-};
+/**
+ * Transforms a plain-text client object into an encrypted session object.
+ *
+ * @param {Object} client - The decrypted client configuration.
+ * @returns {Object} The encrypted client object for session storage.
+ */
+const toSessionClient = (client) => ({
+    ...getEncryptedClient(client)
+});
 
-export const checkTokenExpiration = async () => {
-    const expiration = sessionStorage.getItem('tokenExpiration');
-    if (!expiration) return;
-
-    const timeLeft = parseInt(expiration) - Date.now();
-    const token = sessionStorage.getItem('token');
-
-    if (timeLeft < 600000 && timeLeft > 0) {
-        try {
-            await renewToken(token);
-        } catch (error) {
-            console.error('Failed to renew token:', error);
-        }
-    } else if (timeLeft <= 0) {
-        sessionStorage.removeItem('token');
-        sessionStorage.removeItem('tokenExpiration');
-        sessionStorage.removeItem('clients');
-        sessionStorage.removeItem('user');
-        window.location.href = '/login';
-    }
-};
-
+/**
+ * Loads and decrypts the client configurations stored in sessionStorage.
+ *
+ * @returns {Array<Object>} An array of fully decrypted client configurations.
+ */
 export const loadClientsFromSession = () => {
     try {
         const clientsDataRaw = sessionStorage.getItem('clients');
-        if (!clientsDataRaw) {
-            return [];
-        }
+        if (!clientsDataRaw) return [];
 
         const clientsData = JSON.parse(clientsDataRaw);
+        if (!Array.isArray(clientsData)) return [];
 
-        if (!Array.isArray(clientsData)) {
-            return [];
-        }
-
-        const decryptedClients = clientsData
+        return clientsData
             .map((client) => {
                 if (!client.cid || !client.description) {
                     console.warn('Invalid client data structure in session, skipping:', client);
@@ -123,66 +97,106 @@ export const loadClientsFromSession = () => {
                     return null;
                 }
             })
-            .filter((client) => client !== null);
-
-        return decryptedClients;
+            .filter(Boolean);
     } catch (e) {
         console.error('Error processing clients from session:', e);
         return [];
     }
 };
 
-export const saveClientConfig = async (clientData, currentClients) => {
-    const isNewClient = !clientData.cid;
+/**
+ * Creates or updates a client configuration on the backend, then syncs the
+ * result into the active session storage array.
+ *
+ * @async
+ * @param {string|null} cid - The client identifier, or null if creating a new client.
+ * @param {Object} clientData - The new or updated configuration object.
+ * @returns {Promise<Object>} Contains the newly updated client and the full updated list.
+ * @throws {string} The error message from the API response if the request fails.
+ */
+export const saveClientConfig = async (cid, clientData) => {
+    try {
+        const encryptedPayload = getEncryptedClient({ ...clientData, cid: cid || 'TEMP-CID' });
+        const endpoint = cid ? '/client/update-cid' : '/client/generate-cid';
+        const method = cid ? 'put' : 'post';
 
-    let dataToSend;
-    if (isNewClient) {
-        dataToSend = clientData;
-    } else {
-        dataToSend = getEncryptedClient(clientData);
+        if (!cid) {
+            delete encryptedPayload.cid;
+        }
+
+        const response = await api[method](endpoint, encryptedPayload);
+
+        const currentClients = loadClientsFromSession();
+        const isNewClient = !cid;
+        
+        const newClientRaw = response.data.client;
+        const newClientDecrypted = getDecryptedClient(newClientRaw);
+
+        let updatedClientList;
+        if (isNewClient) {
+            updatedClientList = [...currentClients, newClientDecrypted];
+        } else {
+            updatedClientList = currentClients.map(c =>
+                c.cid === newClientDecrypted.cid ? newClientDecrypted : c
+            );
+        }
+
+        sessionStorage.setItem('clients', JSON.stringify(updatedClientList.map(toSessionClient)));
+
+        return { newClient: newClientDecrypted, updatedClientList };
+    } catch (error) {
+        throw error.response?.data?.error || 'Error saving client configuration';
     }
-
-    const response = await api.post('/client/upsert', {
-        cid: dataToSend.cid,
-        description: dataToSend.description,
-        apiUrl: dataToSend.apiUrl,
-        siteUrl: dataToSend.siteUrl,
-        config: dataToSend.config,
-        vapid: dataToSend.vapid,
-        postConfig: dataToSend.postConfig,
-        email: dataToSend.email
-    });
-
-    const newClientRaw = response.data.client;
-    const newClientDecrypted = getDecryptedClient(newClientRaw);
-    
-    let updatedClientList;
-    if (isNewClient) {
-        updatedClientList = [...currentClients, newClientDecrypted];
-    } else {
-        updatedClientList = currentClients.map(c => 
-            c.cid === newClientDecrypted.cid ? newClientDecrypted : c
-        );
-    }
-    
-    const encryptedClients = updatedClientList.map(getEncryptedClient);
-    sessionStorage.setItem('clients', JSON.stringify(encryptedClients));
-
-    return { newClient: newClientDecrypted, updatedClientList };
 };
 
+/**
+ * Deletes a client by CID via the API and removes it from sessionStorage.
+ *
+ * @async
+ * @param {string} cid - The client identifier to delete.
+ * @returns {Promise<Object>} The API response data.
+ * @throws {string} The error message from the API response if the request fails.
+ */
 export const deleteClient = async (cid) => {
     try {
         const response = await api.delete(`/client/delete/${cid}`);
-        
-        let currentClients = loadClientsFromSession();
+
+        const currentClients = loadClientsFromSession();
         const updatedClients = currentClients.filter(c => c.cid !== cid);
 
-        const encryptedClients = updatedClients.map(getEncryptedClient);
-        sessionStorage.setItem('clients', JSON.stringify(encryptedClients));
+        sessionStorage.setItem('clients', JSON.stringify(updatedClients.map(toSessionClient)));
 
         return response.data;
     } catch (error) {
-        throw error.response?.data?.message || "Error deleting client";
+        throw error.response?.data?.message || error.response?.data?.error || 'Error deleting client';
+    }
+};
+
+/**
+ * Directly updates the resilience configuration of a specific client within
+ * the encrypted session storage payload, preserving the rest of the array.
+ *
+ * @param {string} cid - The client identifier to update.
+ * @param {Object} resilienceData - The plain-text resilience configuration.
+ */
+export const updateClientResilienceInSession = (cid, resilienceData) => {
+    try {
+        const raw = sessionStorage.getItem('clients');
+        if (!raw) return;
+
+        const clients = JSON.parse(raw);
+        if (!Array.isArray(clients)) return;
+
+        const key = generateKeyFromString(cid);
+        
+        const updated = clients.map(c =>
+            c.cid === cid 
+                ? { ...c, resilience: resilienceData ? encryptJSON(resilienceData, key) : null } 
+                : c
+        );
+
+        sessionStorage.setItem('clients', JSON.stringify(updated));
+    } catch (e) {
+        console.error('Failed to update resilience in session:', e);
     }
 };

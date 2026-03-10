@@ -141,5 +141,8 @@
     "hint_color": "Enter Hex Color (e.g., #FFD700)",
     "hint_value": "Enter value"
   },
-  "select_client_hint": "Select a client to configure Gamification."
+  "select_client_hint": "Select a client to configure Gamification.",
+  "reputation": {
+    "weight_helper": "Define points added/subtracted per action."
+  }
 }

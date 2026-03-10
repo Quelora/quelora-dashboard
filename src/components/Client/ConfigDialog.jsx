@@ -13,7 +13,8 @@ import {
     Grid,
     Typography,
     FormControlLabel,
-    Checkbox
+    Checkbox,
+    Box
 } from '@mui/material';
 import LoginConfig from './LoginConfig';
 import CommentsConfig from './CommentsConfig';
@@ -21,10 +22,28 @@ import OtherConfig from './OtherConfig';
 import CorsConfig from './CorsConfig';
 import EntityConfig from './EntityConfig';
 import CaptchaConfig from './CaptchaConfig';
+import NetworkConfig from './NetworkConfig';
+
 import Swal from 'sweetalert2';
-import { getTestPost } from '../../api/posts';
 import CustomTextField from '../Common/CustomTextField';
 
+/**
+ * Main dialog component for creating or editing a Client's configuration.
+ * Orchestrates the different configuration modules via a tabbed interface.
+ *
+ * @param {Object} props - Component properties.
+ * @param {boolean} props.open - Controls the visibility of the dialog.
+ * @param {Object|null} props.editingClient - The client being edited, or null if creating a new one.
+ * @param {Object} props.config - The current configuration state object.
+ * @param {Function} props.setConfig - State setter for the configuration.
+ * @param {boolean} props.isFormSubmitted - Flag indicating if the save attempt has been triggered.
+ * @param {boolean} props.loading - Flag indicating if an asynchronous operation is in progress.
+ * @param {Function} props.handleGenerateOrUpdateCID - Callback to persist the client.
+ * @param {Function} props.setOpenConfigDialog - State setter for dialog visibility.
+ * @param {Function} props.setEditingClient - State setter for the active client being edited.
+ * @param {Function} props.resetConfig - Callback to reset the form to its default state.
+ * @param {string} props.cid - The current Client ID.
+ */
 const ConfigDialog = ({
     open,
     editingClient,
@@ -42,7 +61,7 @@ const ConfigDialog = ({
     const [configTab, setConfigTab] = useState(0);
     const MAX_DESCRIPTION_LENGTH = 50;
     const MAX_API_URL_LENGTH = 300;
-    const MAX_SITE_URL_LENGTH = 300; // Constante agregada para Site URL
+    const MAX_SITE_URL_LENGTH = 300;
 
     const handleConfigTabChange = (event, newValue) => {
         setConfigTab(newValue);
@@ -51,303 +70,149 @@ const ConfigDialog = ({
     const handleDescriptionChange = (e) => {
         const value = e.target.value;
         if (value.length <= MAX_DESCRIPTION_LENGTH) {
-            setConfig((prev) => ({...prev, description: value}));
+            setConfig({ ...config, description: value });
         }
     };
 
     const handleApiUrlChange = (e) => {
         const value = e.target.value;
         if (value.length <= MAX_API_URL_LENGTH) {
-            setConfig((prev) => ({...prev, apiUrl: value}));
+            setConfig({ ...config, apiUrl: value });
         }
     };
 
-    // Manejador agregado para Site URL
     const handleSiteUrlChange = (e) => {
         const value = e.target.value;
         if (value.length <= MAX_SITE_URL_LENGTH) {
-            setConfig((prev) => ({...prev, siteUrl: value}));
+            setConfig({ ...config, siteUrl: value });
         }
     };
 
-    const isValidUrl = (url) => {
-        try {
-            new URL(url);
-            return true;
-        } catch (e) {
-            return false;
-        }
-    };
-
-    const testDiscoveryUrl = async () => {
-        setOpenConfigDialog(false);
-
-        const {value: referenceId, isDismissed} = await Swal.fire({
-            title: t('client.test_discovery_url'),
-            text: t('client.enter_reference_id'),
-            input: 'text',
-            inputPlaceholder: '12345',
-            showCancelButton: true,
-            allowOutsideClick: false,
-            inputValidator: (value) => {
-                if (!value && !isDismissed) {
-                    return t('client.reference_id_required');
+    const handleLanguageChange = (e) => {
+        const { checked } = e.target;
+        setConfig(prev => ({
+            ...prev,
+            config: {
+                ...prev.config,
+                language: {
+                    ...prev.config.language,
+                    enabled: checked
                 }
             }
-        });
-
-        if (isDismissed || !referenceId) {
-            setOpenConfigDialog(true);
-            return;
-        }
-
-        try {
-            const rawUrl = config.config.discoveryDataUrl;
-            const urlWithReplacedReference = rawUrl.replace(/\{\{?reference\}?\}/g, referenceId);
-            const urlWithReference = new URL(urlWithReplacedReference);
-            
-            setOpenConfigDialog(false);
-            Swal.fire({
-                title: t('client.testing_url'),
-                text: urlWithReference.toString(),
-                icon: 'info',
-                showConfirmButton: false,
-                showCancelButton: true,
-                cancelButtonText: t('client.cancel'),
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                allowEnterKey: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            const response = await getTestPost(urlWithReference.toString());
-            const {data} = response;
-
-            await Swal.fire({
-                title: t('client.test_results'),
-                html: `
-                    <div style="text-align: left;">
-                        <p><strong>${t('client.url_tested')}:</strong> ${urlWithReference}</p>
-                        <p><strong>${t('client.title')}:</strong> ${data.title}</p>
-                        <p><strong>${t('client.description')}:</strong> ${data.description}</p>
-                        <p><strong>${t('client.canonical')}:</strong> ${data.canonical}</p>
-                    </div>
-                `,
-                icon: 'success',
-                confirmButtonText: t('client.close')
-            });
-
-        } catch (error) {
-            await Swal.fire({
-                title: t('client.test_failed'),
-                text: error.message,
-                icon: 'error',
-                confirmButtonText: t('client.close')
-            });
-        } finally {
-            setOpenConfigDialog(true);
-        }
+        }));
     };
-    
-    const isDescriptionInvalid = !config.description || config.description.trim().length < 3 || config.description.length > MAX_DESCRIPTION_LENGTH;
-    const isApiUrlInvalid = !isValidUrl(config.apiUrl);
-    // Validación agregada para Site URL
-    const isSiteUrlInvalid = !config.siteUrl || !isValidUrl(config.siteUrl);
-    
-    const isDiscoveryUrlInvalid = config.config.modeDiscovery && !isValidUrl(config.config.discoveryDataUrl);
+
+    const isApiUrlInvalid = config.apiUrl && !/^(https?:\/\/)?(localhost|[\w-]+(\.[\w-]+)+|(\d{1,3}\.){3}\d{1,3}|\[[a-f0-9:]+\])(:\d+)?(\/.*)?$/i.test(config.apiUrl);
+    const isSiteUrlInvalid = config.siteUrl && !/^(https?:\/\/)?(localhost|[\w-]+(\.[\w-]+)+|(\d{1,3}\.){3}\d{1,3}|\[[a-f0-9:]+\])(:\d+)?(\/.*)?$/i.test(config.siteUrl);
 
     return (
-        <Dialog
-            open={open}
-            onClose={() => {
-                setOpenConfigDialog(false);
-                setEditingClient(null);
-                resetConfig();
-            }}
-            maxWidth="lg"
-            fullWidth
-            PaperProps={{
-                className: 'client-dialog client-config-dialog',
-                elevation: 3
-            }}
+        <Dialog 
+            open={open} 
+            onClose={() => {}} 
+            maxWidth="md" 
+            fullWidth 
+            className="client-dialog"
+            disableEscapeKeyDown
         >
             <DialogTitle className="client-dialog-title">
-                {editingClient ? t('client.edit_cid') : t('client.add_newCID')} {cid}
+                {editingClient ? t('client.edit_cid') : t('client.add_new_cid')}
+                {editingClient && (
+                    <Typography variant="subtitle2" color="textSecondary" component="div">
+                        CID: {cid}
+                    </Typography>
+                )}
             </DialogTitle>
             <DialogContent className="client-dialog-content">
-                <Grid container direction="column" spacing={2}>
-                    <Grid>
-                        <Tabs
-                            value={configTab}
-                            onChange={handleConfigTabChange}
-                            className="client-config-tabs"
-                            variant="fullWidth"
+                <Grid container spacing={2} sx={{ mt: 1 }}>
+                    <Grid item xs={12}>
+                        <Tabs 
+                            value={configTab} 
+                            onChange={handleConfigTabChange} 
+                            indicatorColor="primary" 
+                            textColor="primary" 
+                            variant="scrollable" 
+                            scrollButtons="auto"
+                            className="client-tabs"
                         >
-                            <Tab label={t('client.general')}/>
-                            <Tab label={t('client.entity_config')}/>
-                            <Tab label={t('client.login_config')}/>
-                            <Tab label={t('client.comments_config')}/>
-                            <Tab label={t('client.captcha_config')}/>
-                            <Tab label={t('client.other_config')}/>
-                            <Tab label={t('client.cors_config')}/>
+                            <Tab label={t('client.general')} />
+                            <Tab label={t('client.login_config')} />
+                            <Tab label={t('client.comments_config')} />
+                            <Tab label={t('client.entity_config')} />
+                            <Tab label={t('client.captcha_config')} />
+                            <Tab label={t('client.other_config')} />
+                            <Tab label={t('client.cors_config')} />
+                            <Tab label={t('client.network_config')} />
                         </Tabs>
                     </Grid>
-                    <Grid>
+
+                    <Grid item xs={12} sx={{ mt: 2 }}>
                         {configTab === 0 && (
-                            <Grid container direction="column" spacing={2}>
-                                <Grid>
-                                    <CustomTextField
-                                        label={t('client.description')}
-                                        fullWidth
-                                        variant="outlined"
-                                        value={config.description || ''}
-                                        onChange={handleDescriptionChange}
-                                        error={isFormSubmitted && isDescriptionInvalid}
-                                        helperText={
-                                            isFormSubmitted && isDescriptionInvalid
-                                                ? (!config.description || config.description.trim().length < 3
-                                                ? t('client.description_required_min_length')
-                                                : t('client.description_max_length_exceeded', {max: MAX_DESCRIPTION_LENGTH}))
-                                                : ''
-                                        }
-                                        inputProps={{
-                                            maxLength: MAX_DESCRIPTION_LENGTH,
-                                        }}
-                                    />
-                                    <Typography
-                                        variant="caption"
-                                        color={config.description?.length > MAX_DESCRIPTION_LENGTH ? 'error' : 'textSecondary'}
-                                        align="right"
-                                        display="block"
-                                    >
-                                        {config.description?.length || 0}/{MAX_DESCRIPTION_LENGTH}
-                                    </Typography>
-                                </Grid>
-                                <Grid>
-                                    <CustomTextField
-                                        label={t('client.api_url')}
-                                        fullWidth
-                                        variant="outlined"
-                                        value={config.apiUrl || ''}
-                                        onChange={handleApiUrlChange}
-                                        error={isFormSubmitted && (isApiUrlInvalid || config.apiUrl?.length > MAX_API_URL_LENGTH)}
-                                        helperText={
-                                            isFormSubmitted && (isApiUrlInvalid || config.apiUrl?.length > MAX_API_URL_LENGTH)
-                                                ? (!isValidUrl(config.apiUrl)
-                                                ? t('client.api_url_required')
-                                                : t('client.api_url_max_length_exceeded', {max: MAX_API_URL_LENGTH}))
-                                                : ''
-                                        }
-                                        required
-                                        inputProps={{
-                                            maxLength: MAX_API_URL_LENGTH,
-                                        }}
-                                    />
-                                    <Typography
-                                        variant="caption"
-                                        color={config.apiUrl?.length > MAX_API_URL_LENGTH ? 'error' : 'textSecondary'}
-                                        align="right"
-                                        display="block"
-                                    >
-                                        {config.apiUrl?.length || 0}/{MAX_API_URL_LENGTH}
-                                    </Typography>
-                                </Grid>
-                                {/* INICIO: Campo Site URL agregado */}
-                                <Grid>
-                                    <CustomTextField
-                                        label={t('client.site_url_label') || "Site URL"}
-                                        fullWidth
-                                        variant="outlined"
-                                        value={config.siteUrl || ''}
-                                        onChange={handleSiteUrlChange}
-                                        error={isFormSubmitted && (isSiteUrlInvalid || config.siteUrl?.length > MAX_SITE_URL_LENGTH)}
-                                        helperText={
-                                            isFormSubmitted && (isSiteUrlInvalid || config.siteUrl?.length > MAX_SITE_URL_LENGTH)
-                                                ? (!isValidUrl(config.siteUrl)
-                                                ? (t('client.site_url_required_valid') || "Valid Site URL is required")
-                                                : t('client.site_url_max_length_exceeded', {max: MAX_SITE_URL_LENGTH} || "Max length exceeded"))
-                                                : (t('client.site_url_helper') || "")
-                                        }
-                                        required
-                                        inputProps={{
-                                            maxLength: MAX_SITE_URL_LENGTH,
-                                        }}
-                                    />
-                                    <Typography
-                                        variant="caption"
-                                        color={config.siteUrl?.length > MAX_SITE_URL_LENGTH ? 'error' : 'textSecondary'}
-                                        align="right"
-                                        display="block"
-                                    >
-                                        {config.siteUrl?.length || 0}/{MAX_SITE_URL_LENGTH}
-                                    </Typography>
-                                </Grid>
-                                {/* FIN: Campo Site URL agregado */}
-                                <Grid>
+                            <Box>
+                                <CustomTextField
+                                    label={t('client.description')}
+                                    fullWidth
+                                    margin="normal"
+                                    value={config.description || ''}
+                                    onChange={handleDescriptionChange}
+                                    error={isFormSubmitted && !config.description?.trim()}
+                                    helperText={
+                                        isFormSubmitted && !config.description?.trim()
+                                            ? t('client.description_required')
+                                            : `${config.description?.length || 0}/${MAX_DESCRIPTION_LENGTH}`
+                                    }
+                                />
+
+                                <CustomTextField
+                                    label={t('client.api_url')}
+                                    fullWidth
+                                    margin="normal"
+                                    value={config.apiUrl || ''}
+                                    onChange={handleApiUrlChange}
+                                    error={isFormSubmitted && (!config.apiUrl?.trim() || isApiUrlInvalid)}
+                                    helperText={
+                                        isFormSubmitted && !config.apiUrl?.trim() ? t('client.api_url_required') :
+                                            isFormSubmitted && isApiUrlInvalid ? t('client.api_url_required_valid') :
+                                                `${config.apiUrl?.length || 0}/${MAX_API_URL_LENGTH}`
+                                    }
+                                />
+                                
+                                <CustomTextField
+                                    label={t('client.site_url_label')}
+                                    fullWidth
+                                    margin="normal"
+                                    value={config.siteUrl || ''}
+                                    onChange={handleSiteUrlChange}
+                                    error={isFormSubmitted && (!config.siteUrl?.trim() || isSiteUrlInvalid)}
+                                    helperText={
+                                        isFormSubmitted && !config.siteUrl?.trim() ? t('client.site_url_required_valid') :
+                                            isFormSubmitted && isSiteUrlInvalid ? t('client.site_url_required_valid') :
+                                                t('client.site_url_helper')
+                                    }
+                                />
+
+                                <Box sx={{ mt: 2 }}>
                                     <FormControlLabel
                                         control={
                                             <Checkbox
-                                                checked={config.config.modeDiscovery || false}
-                                                onChange={(e) => setConfig(prev => ({
-                                                    ...prev,
-                                                    config: {
-                                                        ...prev.config,
-                                                        modeDiscovery: e.target.checked
-                                                    }
-                                                }))}
+                                                checked={config.config.language?.enabled || false}
+                                                onChange={handleLanguageChange}
+                                                name="languageEnabled"
+                                                color="primary"
                                             />
                                         }
-                                        label={t('client.discovery_mode')}
+                                        label={t('client.language_config')}
                                     />
-                                    <Typography variant="caption" color="textSecondary">
-                                        {t('client.discovery_mode_help')}
-                                    </Typography>
-                                </Grid>
-                                {(config.config.modeDiscovery || false) && (
-                                    <Grid>
-                                        <CustomTextField
-                                            label={t('client.discovery_data_url')}
-                                            fullWidth
-                                            variant="outlined"
-                                            value={config.config.discoveryDataUrl || ''}
-                                            onChange={(e) => setConfig(prev => ({
-                                                ...prev,
-                                                config: {
-                                                    ...prev.config,
-                                                    discoveryDataUrl: e.target.value
-                                                }
-                                            }))}
-                                            error={isFormSubmitted && isDiscoveryUrlInvalid}
-                                            helperText={
-                                                isFormSubmitted && isDiscoveryUrlInvalid
-                                                    ? t('client.api_url_required_valid')
-                                                    : t('client.discovery_data_url_help')
-                                            }
-                                            required={config.config.modeDiscovery}
-                                        />
-                                        <Button
-                                            variant="outlined"
-                                            color="primary"
-                                            onClick={testDiscoveryUrl}
-                                            disabled={!config.config.discoveryDataUrl || !isValidUrl(config.config.discoveryDataUrl)}
-                                            style={{marginTop: '8px'}}
-                                        >
-                                            {t('client.test_discovery_url')}
-                                        </Button>
-                                    </Grid>
-                                )}
-                            </Grid>
+                                </Box>
+                            </Box>
                         )}
                         {configTab === 1 && (
-                            <EntityConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
-                        )}
-                        {configTab === 2 && (
                             <LoginConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
                         )}
-                        {configTab === 3 && (
+                        {configTab === 2 && (
                             <CommentsConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
+                        )}
+                        {configTab === 3 && (
+                            <EntityConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
                         )}
                         {configTab === 4 && (
                             <CaptchaConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
@@ -357,6 +222,9 @@ const ConfigDialog = ({
                         )}
                         {configTab === 6 && (
                             <CorsConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
+                        )}
+                        {configTab === 7 && (
+                            <NetworkConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
                         )}
                     </Grid>
                 </Grid>
