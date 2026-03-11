@@ -6,6 +6,7 @@ import {
     Button, Box, Grid, Tabs, Tab, Alert, Typography,
     Switch, FormControlLabel, Select, MenuItem,
     FormControl, InputLabel, Chip, Divider, CircularProgress,
+    FormHelperText
 } from '@mui/material';
 import {
     Save as SaveIcon,
@@ -67,9 +68,9 @@ function buildInitialData(clientResilience) {
  * so no additional HTTP request is needed to open the form.
  *
  * Covers three sections via tabs:
- *   0 — General: enabled toggle, mode, forceMode, key info and generation
- *   1 — Triggers: numeric thresholds that activate fallback behaviour
- *   2 — Weights: peer-scoring weights (must sum to 1.0)
+ * 0 — General: enabled toggle, mode, forceMode, key info and generation
+ * 1 — Triggers: numeric thresholds that activate fallback behaviour
+ * 2 — Weights: peer-scoring weights (must sum to 1.0)
  *
  * @param {Object}   props
  * @param {boolean}  props.open      - Controls dialog visibility.
@@ -118,6 +119,7 @@ const ResilienceConfigModal = ({ open, onClose, onSave, client, showToast }) => 
      * Persists the editable resilience configuration to the server.
      * Key material fields (keyId, publicKey, updatedAt) are stripped from the
      * payload — they are managed exclusively by the generate-keys endpoint.
+     * The algorithm is preserved in state but excluded from the save payload.
      *
      * @async
      * @returns {Promise<void>}
@@ -260,7 +262,7 @@ const ResilienceConfigModal = ({ open, onClose, onSave, client, showToast }) => 
                                     />
                                 </Grid>
 
-                                <Grid size={{ xs: 12, sm: 6 }}>
+                                <Grid size={12}>
                                     <FormControl fullWidth size="small" disabled={!data.enabled}>
                                         <InputLabel>{t('client.resilience_mode')}</InputLabel>
                                         <Select
@@ -272,18 +274,10 @@ const ResilienceConfigModal = ({ open, onClose, onSave, client, showToast }) => 
                                                 <MenuItem key={m} value={m}>{m}</MenuItem>
                                             ))}
                                         </Select>
+                                        <FormHelperText>
+                                            {t(`client.resilience_mode_desc_${data.mode.toLowerCase()}`)}
+                                        </FormHelperText>
                                     </FormControl>
-                                </Grid>
-
-                                <Grid size={{ xs: 12, sm: 6 }}>
-                                    <CustomTextField
-                                        label={t('client.resilience_algorithm')}
-                                        value={data.algorithm}
-                                        disabled
-                                        fullWidth
-                                        size="small"
-                                        helperText={t('client.resilience_algorithm_help')}
-                                    />
                                 </Grid>
                             </Grid>
 

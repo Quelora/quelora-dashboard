@@ -245,5 +245,9 @@
     "confirm": "Confirmar",
     "send": "Enviar",
     "generate": "Generar"
-  }
+  },
+  "resilience_mode_desc_hybrid": "Acceso directo al servidor reservado para usuarios registrados. Usuarios anónimos priorizan la red P2P (servidor como fallback). Señalización WebRTC vía servidor y SSE.",
+  "resilience_mode_desc_passive": "El servidor bloquea la creación de nuevas sesiones. La señalización WebRTC actual (Servidor + SSE) y la topología P2P para anónimos continúan operando.",
+  "resilience_mode_desc_server_only": "Modo estricto cliente-servidor. Resiliencia y topología P2P completamente deshabilitadas. El servidor gestiona todo el tráfico y puede aplicar medidas de restricción.",
+  "resilience_mode_desc_p2p_only": "El servidor provee datos solo a usuarios registrados; los anónimos dependen enteramente de la red P2P. Señalización centralizada deshabilitada (fuerza uso de NOSTR/Torrent)."
 }

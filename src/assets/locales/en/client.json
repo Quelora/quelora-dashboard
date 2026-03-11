@@ -337,5 +337,9 @@
     "spam_report": "Spam Report",
     "upvote": "Upvote"
   },
-  "email_recipient_required": "Recipient email is required"
+  "email_recipient_required": "Recipient email is required",
+  "resilience_mode_desc_hybrid": "Direct server access reserved for registered users. Anonymous users prioritize P2P, using the server only as a fallback. WebRTC signaling operates via server and SSE channels.",
+  "resilience_mode_desc_passive": "The server rejects new user sessions. Existing WebRTC signaling (Server + SSE) and P2P topology for anonymous users remain active.",
+  "resilience_mode_desc_server_only": "Strict client-server mode. Resilience and P2P topology are completely disabled. The server exclusively handles traffic and may enforce restriction policies.",
+  "resilience_mode_desc_p2p_only": "Server provides fresh data only to registered users; anonymous users rely entirely on peers. Centralized signaling is disabled, enforcing decentralized protocols (NOSTR/Torrent)."
 }
