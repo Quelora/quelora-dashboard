@@ -26,7 +26,7 @@ export const login = async (username, password) => {
             requires2FA: false,
             token:       response.data.token,
             clients:     response.data.clients || [],
-            user:        response.data.user    || [],
+            user:         response.data.user    || [],
             expiresIn:   response.data.expiresIn || '2h',
             role:        response.data.role,
         };
@@ -52,7 +52,7 @@ export const verify2FA = async (totpToken, tempToken) => {
         return {
             token:       response.data.token,
             clients:     response.data.clients || [],
-            user:        response.data.user    || [],
+            user:         response.data.user    || [],
             expiresIn:   response.data.expiresIn || '2h',
             role:        response.data.role,
         };
@@ -200,3 +200,6 @@ export const updateClientResilienceInSession = (cid, resilienceData) => {
         console.error('Failed to update resilience in session:', e);
     }
 };
+
+// Alias de exportación para compatibilidad con componentes que usan verifyTwoFactor
+export const verifyTwoFactor = verify2FA;

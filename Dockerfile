@@ -10,7 +10,7 @@ FROM nginx:alpine
 
 RUN rm -rf /etc/nginx/conf.d/default.conf
 
-COPY nginx.conf /etc/nginx/conf.d
+COPY ./packages/quelora-dashboard/nginx.conf  /etc/nginx/conf.d
 
 COPY --from=builder /usr/src/app/build /usr/share/nginx/html
 
