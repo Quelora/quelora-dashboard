@@ -17,6 +17,12 @@
   "auth_providers": {
     "label": "ספקי אימות"
   },
+  "auth_widget_config": "הגדרות יישומון אימות",
+  "auth_widget_enabled": "הפעל יישומון אימות",
+  "auth_widget_selector": "בורר DOM של היישומון",
+  "auth_widget_selector_required": "נדרש בורר כאשר האפשרות מופעלת",
+  "auth_widget_selector_help": "לדוגמה: #my-nav-actions",
+  "auth_widget_position": "מיקום היישומון",
   "backend_geo_license_key": "מפתח רישיון",
   "backend_geo_settings": "הגדרות מסד נתונים מקומי",
   "cancel": "ביטול",

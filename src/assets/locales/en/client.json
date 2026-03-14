@@ -337,6 +337,12 @@
     "spam_report": "Spam Report",
     "upvote": "Upvote"
   },
+  "auth_widget_config": "Auth Widget",
+  "auth_widget_enabled": "Enable Auth Widget",
+  "auth_widget_selector": "Widget DOM Selector",
+  "auth_widget_selector_required": "Selector is required when enabled",
+  "auth_widget_selector_help": "e.g. #my-nav-actions",
+  "auth_widget_position": "Widget Position",
   "email_recipient_required": "Recipient email is required",
   "resilience_mode_desc_hybrid": "Direct server access reserved for registered users. Anonymous users prioritize P2P, using the server only as a fallback. WebRTC signaling operates via server and SSE channels.",
   "resilience_mode_desc_passive": "The server rejects new user sessions. Existing WebRTC signaling (Server + SSE) and P2P topology for anonymous users remain active.",

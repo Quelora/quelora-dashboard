@@ -17,6 +17,12 @@
   "auth_providers": {
     "label": "Proveedores de Autenticación"
   },
+  "auth_widget_config": "Configuración del Widget",
+  "auth_widget_enabled": "Habilitar Widget de Autenticación",
+  "auth_widget_selector": "Selector DOM del Widget",
+  "auth_widget_selector_required": "El selector es obligatorio si está habilitado",
+  "auth_widget_selector_help": "ej. #my-nav-actions",
+  "auth_widget_position": "Posición del Widget",
   "comment_approved": "Comentario aprobado",
   "requires_authentication": "Autenticación requerida",
   "email_recipient": "jondoe@gmail.com",

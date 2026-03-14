@@ -17,6 +17,12 @@
   "auth_providers": {
     "label": "مزودو المصادقة"
   },
+  "auth_widget_config": "تكوين أداة المصادقة",
+  "auth_widget_enabled": "تفعيل أداة المصادقة",
+  "auth_widget_selector": "محدد DOM للأداة",
+  "auth_widget_selector_required": "المحدد مطلوب عند التفعيل",
+  "auth_widget_selector_help": "على سبيل المثال: #my-nav-actions",
+  "auth_widget_position": "موقع الأداة",
   "backend_geo_license_key": "مفتاح الترخيص",
   "backend_geo_settings": "إعدادات قاعدة البيانات المحلية",
   "cancel": "إلغاء",

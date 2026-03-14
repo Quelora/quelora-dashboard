@@ -17,6 +17,12 @@
   "auth_providers": {
     "label": "Provedores de Autenticação"
   },
+  "auth_widget_config": "Configuração do Widget de Autenticação",
+  "auth_widget_enabled": "Ativar Widget de Autenticação",
+  "auth_widget_selector": "Seletor DOM do Widget",
+  "auth_widget_selector_required": "O seletor é obrigatório quando ativado",
+  "auth_widget_selector_help": "ex: #my-nav-actions",
+  "auth_widget_position": "Posição do Widget",
   "backend_geo_license_key": "Chave de Licença",
   "backend_geo_settings": "Configurações do DB Local",
   "cancel": "Cancelar",

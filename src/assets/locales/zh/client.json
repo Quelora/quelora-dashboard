@@ -17,6 +17,12 @@
   "auth_providers": {
     "label": "身份验证提供商"
   },
+  "auth_widget_config": "身份验证小部件配置",
+  "auth_widget_enabled": "启用身份验证小部件",
+  "auth_widget_selector": "小部件 DOM 选择器",
+  "auth_widget_selector_required": "启用时必须填写选择器",
+  "auth_widget_selector_help": "例如：#my-nav-actions",
+  "auth_widget_position": "小部件位置",
   "backend_geo_license_key": "许可证密钥",
   "backend_geo_settings": "本地数据库设置",
   "cancel": "取消",

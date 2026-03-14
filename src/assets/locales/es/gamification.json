@@ -1,8 +1,11 @@
 {
-  "title": "Ludificación & Economía",
+  "common": {
+    "close": "Cerrar"
+  },
+  "title": "Gamificación y Economía",
   "config": {
     "tab_title": "Panel de Economía",
-    "enable_module": "Habilitar Ludificación",
+    "enable_module": "Habilitar Gamificación",
     "currency_settings": "Configuración de Moneda",
     "currency_name": "Nombre de la Moneda (Plural)",
     "currency_singular": "Nombre de la Moneda (Singular)",
@@ -17,29 +20,31 @@
     "burned_label": "Quemado",
     "currency_name_help": "Ej: Monedas, Puntos",
     "currency_singular_help": "Ej: Moneda, Punto",
-    "currency_symbol_help": "Ej: 💎, 🪙, $"
+    "currency_symbol_help": "Ej: 💎, 🪙, $",
+    "total_xp": "XP Total"
   },
   "rules": {
     "tab_title": "Reglas",
     "action": "Acción",
-    "xp_reward": "Recompensa XP",
-    "coin_reward": "Recompensa Monedas",
+    "xp_reward": "Recompensa de XP",
+    "coin_reward": "Recompensa de Monedas",
+    "reputation_reward": "Recompensa de Reputación",
     "daily_limit": "Límite Diario",
     "active": "Activo",
     "categories": {
       "CONTENT": "Creación de Contenido",
-      "SOCIAL": "Interacción & Social",
-      "LOYALTY": "Retención & Lealtad",
-      "QUALITY": "Calidad & Moderación",
-      "MODULES": "Módulos & Extras"
+      "SOCIAL": "Interacción y Social",
+      "LOYALTY": "Retención y Lealtad",
+      "QUALITY": "Calidad y Moderación",
+      "MODULES": "Módulos y Extras"
     },
     "actions": {
       "COMMENT_CREATED": "Comentario Creado",
       "REPLY_CREATED": "Respuesta Creada",
       "POST_CREATED": "Publicación Creada",
-      "MEDIA_UPLOADED": "Media Subida",
-      "LIKE_RECEIVED": "Like Recibido",
-      "LIKE_GIVEN": "Like Otorgado",
+      "MEDIA_UPLOADED": "Multimedia Subido",
+      "LIKE_RECEIVED": "Me gusta Recibido",
+      "LIKE_GIVEN": "Me gusta Otorgado",
       "POST_SHARED": "Publicación Compartida",
       "USER_MENTIONED": "Usuario Mencionado",
       "DAILY_LOGIN": "Inicio de Sesión Diario",
@@ -61,7 +66,8 @@
     "min_points": "Puntos Mínimos",
     "order": "Orden",
     "delete_confirm": "¿Estás seguro de que deseas eliminar este nivel?",
-    "avatar_frame": "Marco de Avatar"
+    "avatar_frame": "Marco de Avatar",
+    "adjust_frame": "Ajustar Marco de Avatar (Mín 120px)"
   },
   "quests": {
     "tab_title": "Misiones",
@@ -81,11 +87,11 @@
   "users": {
     "tab_title": "Usuarios",
     "title": "Gestión de Usuarios",
-    "search_placeholder": "Buscar Usuario...",
+    "search_placeholder": "Buscar usuario...",
     "btn_edit_profile": "Editar Perfil",
-    "btn_adjust_balance": "Ajustar Balance",
-    "dialog_balance_title": "Ajustar Balance",
-    "dialog_balance_help": "Agregar o deducir puntos del monedero del usuario.",
+    "btn_adjust_balance": "Ajustar Saldo",
+    "dialog_balance_title": "Ajustar Saldo",
+    "dialog_balance_help": "Agregar o deducir puntos de la cartera del usuario.",
     "dialog_level_title": "Editar Nivel",
     "dialog_level_help": "Forzar manualmente un nivel específico.",
     "amount_label": "Cantidad (+/-)",
@@ -93,7 +99,7 @@
     "reason_label": "Descripción / Motivo",
     "execute_btn": "Ejecutar",
     "testNotitication": "Enviar Notificación de Prueba",
-    "dispatchedToQueues": "Enviado a las colas",
+    "dispatchedToQueues": "Enviado a las colas de procesamiento",
     "notifications": {
       "dialog_title": "Enviar Notificación",
       "type_custom": "Mensaje Personalizado",
@@ -112,7 +118,7 @@
     "date": "Fecha",
     "user": "Usuario",
     "type": "Tipo",
-    "source": "Fuente",
+    "source": "Origen",
     "xp": "XP",
     "coins": "Monedas",
     "search_hint": "Busca un usuario para ver su historial",
@@ -136,9 +142,16 @@
     "shape_circular": "Circular (Por defecto)",
     "shape_squared": "Cuadrado",
     "upload_frame_hint": "Subir Marco (PNG/GIF)",
-    "hint_char_limit": "Ingresa el número de caracteres (ej: 50)",
+    "hint_char_limit": "Ingresa el límite de caracteres (ej: 50)",
     "hint_color": "Ingresa el color Hex (ej: #FFD700)",
-    "hint_value": "Ingresa el valor"
+    "hint_value": "Ingresa el valor",
+    "import_pack_title": "Importar .gpack",
+    "import_btn": "Importar Paquete",
+    "import_pack_hint": "Sube un archivo .gpack (tar.gz). Debe contener un manifest.json en la raíz y un directorio assets/ con miniaturas en assets/thumbs/.",
+    "import_pack_drop": "Haz clic para seleccionar un archivo .gpack",
+    "upload_frame_asset": "Recurso Completo",
+    "upload_frame_thumb": "Miniatura (46×46)",
+    "thumb_hint": "Para marcos animados (APNG/GIF), prepara la miniatura con resize-thumbs.py antes de subirla."
   },
-  "select_client_hint": "Selecciona un cliente para configurar la Ludificación."
+  "select_client_hint": "Selecciona un cliente para configurar la Gamificación."
 }

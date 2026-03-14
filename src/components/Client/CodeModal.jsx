@@ -25,21 +25,21 @@ import DownloadIcon from '@mui/icons-material/Download';
  *
  * @param {Object} client - The fully decrypted client object.
  * @returns {string} The compiled JavaScript integration snippet, or an empty string
- *   if the client object is absent.
+ * if the client object is absent.
  */
 export function compileIntegrationSnippet(client) {
     if (!client) return '';
 
-    const clientConfig   = client.config     || {};
-    const postConfig     = client.postConfig  || {};
-    const vapidConfig    = client.vapid       || {};
-    const captchaConfig  = clientConfig.captcha || {};
-    const providerDetails = clientConfig.login?.providerDetails || {};
+    const clientConfig     = client.config     || {};
+    const postConfig       = client.postConfig  || {};
+    const vapidConfig      = client.vapid       || {};
+    const captchaConfig    = clientConfig.captcha || {};
+    const authWidgetConfig = clientConfig.authWidget || {};
+    const providerDetails  = clientConfig.login?.providerDetails || {};
 
     const geolocation = {
         enabled:  clientConfig.geolocation?.enabled  ?? false,
         provider: clientConfig.geolocation?.provider || 'ipapi',
-       /*  apiKey:   clientConfig.geolocation?.frontend?.apiKey || clientConfig.geolocation?.apiKey || '', */
     };
 
     const login = {
@@ -74,6 +74,12 @@ export function compileIntegrationSnippet(client) {
         siteKey:  captchaConfig.siteKey  || '',
     };
 
+    const authWidget = {
+        enabled: authWidgetConfig.enabled ?? false,
+        selector: authWidgetConfig.selector || '',
+        position: authWidgetConfig.position || 'inside',
+    };
+
     const entityConfig = clientConfig.entityConfig || {
         selector: 'article',
         entityIdAttribute: 'href',
@@ -94,6 +100,7 @@ export function compileIntegrationSnippet(client) {
         audio,
         vapid,
         captcha,
+        authWidget,
         entityConfig,
         nostrRelays,
         trackerUrls,

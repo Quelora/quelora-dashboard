@@ -17,6 +17,12 @@
   "auth_providers": {
     "label": "प्रमाणीकरण प्रदाता"
   },
+  "auth_widget_config": "प्रमाणीकरण विजेट कॉन्फ़िगरेशन",
+  "auth_widget_enabled": "प्रमाणीकरण विजेट सक्षम करें",
+  "auth_widget_selector": "विजेट DOM चयनकर्ता",
+  "auth_widget_selector_required": "सक्षम होने पर चयनकर्ता आवश्यक है",
+  "auth_widget_selector_help": "जैसे: #my-nav-actions",
+  "auth_widget_position": "विजेट की स्थिति",
   "backend_geo_license_key": "लाइसेंस कुंजी",
   "backend_geo_settings": "स्थानीय DB सेटिंग्स",
   "cancel": "रद्द करें",

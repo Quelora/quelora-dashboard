@@ -23,8 +23,8 @@ import CorsConfig from './CorsConfig';
 import EntityConfig from './EntityConfig';
 import CaptchaConfig from './CaptchaConfig';
 import NetworkConfig from './NetworkConfig';
+import AuthWidgetConfig from './AuthWidgetConfig';
 
-import Swal from 'sweetalert2';
 import CustomTextField from '../Common/CustomTextField';
 
 /**
@@ -136,6 +136,7 @@ const ConfigDialog = ({
                         >
                             <Tab label={t('client.general')} />
                             <Tab label={t('client.login_config')} />
+                            <Tab label={t('client.auth_widget_config') || 'Auth Widget'} />
                             <Tab label={t('client.comments_config')} />
                             <Tab label={t('client.entity_config')} />
                             <Tab label={t('client.captcha_config')} />
@@ -209,21 +210,24 @@ const ConfigDialog = ({
                             <LoginConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
                         )}
                         {configTab === 2 && (
-                            <CommentsConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
+                            <AuthWidgetConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
                         )}
                         {configTab === 3 && (
-                            <EntityConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
+                            <CommentsConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
                         )}
                         {configTab === 4 && (
-                            <CaptchaConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
+                            <EntityConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
                         )}
                         {configTab === 5 && (
-                            <OtherConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
+                            <CaptchaConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
                         )}
                         {configTab === 6 && (
-                            <CorsConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
+                            <OtherConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
                         )}
                         {configTab === 7 && (
+                            <CorsConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
+                        )}
+                        {configTab === 8 && (
                             <NetworkConfig config={config} setConfig={setConfig} isFormSubmitted={isFormSubmitted}/>
                         )}
                     </Grid>

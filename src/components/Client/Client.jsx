@@ -17,10 +17,10 @@ import ResilienceConfigModal from './ResilienceConfigModal';
  * Client component — top-level manager for client configurations.
  *
  * Responsibilities:
- *  - Load and display the list of registered clients from session storage.
- *  - Orchestrate all configuration modals (general, VAPID, email, reputation, resilience).
- *  - Handle CRUD operations: create, update, and delete clients.
- *  - Expose the integration code snippet for each client.
+ * - Load and display the list of registered clients from session storage.
+ * - Orchestrate all configuration modals (general, VAPID, email, reputation, resilience).
+ * - Handle CRUD operations: create, update, and delete clients.
+ * - Expose the integration code snippet for each client.
  *
  * @component
  * @returns {JSX.Element} The rendered client management interface.
@@ -63,6 +63,7 @@ const Client = () => {
             language:    { enabled: false, provider: '',                  apiKey: '' },
             cors:        { enabled: false, allowedOrigins: [] },
             captcha:     { enabled: false, provider: 'turnstile', siteKey: '', secretKey: '', credentialsJson: '{}' },
+            authWidget:  { enabled: false, selector: '', position: 'inside' },
             modeDiscovery:    false,
             discoveryDataUrl: '',
             entityConfig: {
@@ -286,6 +287,10 @@ const Client = () => {
         }
         if (!config.config.login?.jwtSecret || !config.config.login.jwtSecret.trim()) {
             showErrorAlert(t('client.jwt_secret_required'));
+            return false;
+        }
+        if (config.config.authWidget?.enabled && (!config.config.authWidget.selector || !config.config.authWidget.selector.trim())) {
+            showErrorAlert(t('client.auth_widget_selector_required') || 'Auth Widget selector is required when enabled');
             return false;
         }
 

@@ -17,6 +17,12 @@
   "auth_providers": {
     "label": "Провайдеры аутентификации"
   },
+  "auth_widget_config": "Конфигурация виджета аутентификации",
+  "auth_widget_enabled": "Включить виджет аутентификации",
+  "auth_widget_selector": "DOM-селектор виджета",
+  "auth_widget_selector_required": "Селектор обязателен при включении",
+  "auth_widget_selector_help": "например, #my-nav-actions",
+  "auth_widget_position": "Позиция виджета",
   "backend_geo_license_key": "Лицензионный ключ",
   "backend_geo_settings": "Настройки локальной БД",
   "cancel": "Отмена",

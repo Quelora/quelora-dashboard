@@ -17,6 +17,12 @@
   "auth_providers": {
     "label": "認証プロバイダー"
   },
+  "auth_widget_config": "認証ウィジェット設定",
+  "auth_widget_enabled": "認証ウィジェットを有効にする",
+  "auth_widget_selector": "ウィジェットDOMセレクター",
+  "auth_widget_selector_required": "有効な場合はセレクターが必要です",
+  "auth_widget_selector_help": "例: #my-nav-actions",
+  "auth_widget_position": "ウィジェットの位置",
   "backend_geo_license_key": "ライセンスキー",
   "backend_geo_settings": "ローカルDB設定",
   "cancel": "キャンセル",
