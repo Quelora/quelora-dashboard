@@ -19,13 +19,28 @@ import {
     Avatar,
     Tabs,
     Tab,
-    Grid // Añadido Grid para eliminar item prop
+    Grid
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { vapid, searchAuthors, generateVapidKeys } from '../../api/vapid';
 import CustomTextField from '../Common/CustomTextField';
 import React from 'react';
 
+/**
+ * Modal component for configuring VAPID keys and testing push notifications.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {boolean} props.open - Indicates if the modal is currently visible.
+ * @param {Function} props.onClose - Callback to close the modal.
+ * @param {Object} props.initialData - Initial configuration data containing VAPID settings.
+ * @param {Function} props.onSave - Callback triggered to save the VAPID configuration.
+ * @param {string} props.cid - The Client ID.
+ * @param {Function} props.showToast - Function to display toast notifications.
+ * @param {boolean} props.loading - Indicates if a save operation is in progress.
+ * @param {boolean} props.isFormSubmitted - Indicates if the form has been submitted for validation purposes.
+ * @returns {JSX.Element} The rendered modal component.
+ */
 const VapidConfigModal = ({
     open,
     onClose,
@@ -66,9 +81,20 @@ const VapidConfigModal = ({
         body: 500
     };
 
+    /**
+     * Validates if the provided string is a valid email format.
+     *
+     * @param {string} email - The email address to validate.
+     * @returns {boolean} True if the email is valid, false otherwise.
+     */
     const isValidEmail = (email) =>
         /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 
+    /**
+     * Checks whether the basic VAPID configuration fields are correctly filled.
+     *
+     * @returns {boolean} True if the configuration is complete, false otherwise.
+     */
     const isVapidComplete = () =>
         vapidConfig.publicKey &&
         vapidConfig.publicKey.length >= 10 &&
@@ -77,16 +103,19 @@ const VapidConfigModal = ({
         vapidConfig.email &&
         isValidEmail(vapidConfig.email);
 
+    const vapidInitialStr = JSON.stringify(initialData?.vapid || {});
+
     useEffect(() => {
-        if (open && initialData?.vapid) {
+        if (open) {
+            const parsedVapid = JSON.parse(vapidInitialStr);
             setVapidConfig({
-                publicKey: initialData.vapid.publicKey || '',
-                privateKey: initialData.vapid.privateKey || '',
-                email: initialData.vapid.email || '',
-                iconBase64: initialData.vapid.iconBase64 || ''
+                publicKey: parsedVapid.publicKey || '',
+                privateKey: parsedVapid.privateKey || '',
+                email: parsedVapid.email || '',
+                iconBase64: parsedVapid.iconBase64 || ''
             });
         }
-    }, [open, initialData]);
+    }, [open, vapidInitialStr]);
 
     useEffect(() => {
         if (!searchValue || searchValue.length < 2) {
@@ -106,6 +135,12 @@ const VapidConfigModal = ({
         return () => clearTimeout(debounceSearch);
     }, [searchValue, showToast]);
 
+    /**
+     * Requests new VAPID keys from the backend and updates the local state.
+     *
+     * @async
+     * @returns {Promise<void>}
+     */
     const handleGenerateKeys = async () => {
         if (vapidConfig.publicKey || vapidConfig.privateKey) {
             const result = await Swal.fire({
@@ -139,11 +174,23 @@ const VapidConfigModal = ({
         }
     };
 
+    /**
+     * Handles the tab change event between Configuration and Testing modes.
+     *
+     * @param {React.SyntheticEvent} event - The triggered event.
+     * @param {number} newValue - The index of the selected tab.
+     */
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
         setIsTestSubmitted(false);
     };
 
+    /**
+     * Curried function to handle text changes for VAPID configuration fields.
+     *
+     * @param {string} field - The key of the field being updated.
+     * @returns {Function} Event handler function.
+     */
     const handleVapidChange = (field) => (event) => {
         const value = event.target.value.slice(0, maxLengths[field]);
         setVapidConfig((prev) => ({
@@ -152,6 +199,12 @@ const VapidConfigModal = ({
         }));
     };
 
+    /**
+     * Curried function to handle text changes for Test Message fields.
+     *
+     * @param {string} field - The key of the field being updated.
+     * @returns {Function} Event handler function.
+     */
     const handleTestMessageChange = (field) => (event) => {
         const value = event.target.value.slice(0, maxLengths[field]);
         setTestMessage((prev) => ({
@@ -160,6 +213,11 @@ const VapidConfigModal = ({
         }));
     };
 
+    /**
+     * Processes image uploads and converts them to base64 format.
+     *
+     * @param {React.ChangeEvent<HTMLInputElement>} event - The file input event.
+     */
     const handleImageChange = (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -192,10 +250,22 @@ const VapidConfigModal = ({
         reader.readAsDataURL(file);
     };
 
+    /**
+     * Updates the autocomplete search query value.
+     *
+     * @param {React.SyntheticEvent} event - The input event.
+     * @param {string} value - The updated search string.
+     */
     const handleAuthorSearch = (event, value) => {
         setSearchValue(value);
     };
 
+    /**
+     * Triggers the dispatch of a test push notification to a designated author.
+     *
+     * @async
+     * @returns {Promise<void>}
+     */
     const handleSendTestMessage = async () => {
         setIsTestSubmitted(true);
         const isMessageIncomplete = !testMessage.author || !testMessage.title || !testMessage.body;
@@ -222,6 +292,9 @@ const VapidConfigModal = ({
         }
     };
 
+    /**
+     * Toggles the visibility state of the private key text field.
+     */
     const toggleShowPrivateKey = () => {
         setShowPrivateKey((prev) => !prev);
     };

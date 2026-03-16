@@ -26,7 +26,7 @@ export const login = async (username, password) => {
             requires2FA: false,
             token:       response.data.token,
             clients:     response.data.clients || [],
-            user:         response.data.user    || [],
+            user:        response.data.user    || [],
             expiresIn:   response.data.expiresIn || '2h',
             role:        response.data.role,
         };
@@ -52,7 +52,7 @@ export const verify2FA = async (totpToken, tempToken) => {
         return {
             token:       response.data.token,
             clients:     response.data.clients || [],
-            user:         response.data.user    || [],
+            user:        response.data.user    || [],
             expiresIn:   response.data.expiresIn || '2h',
             role:        response.data.role,
         };
@@ -116,15 +116,11 @@ export const loadClientsFromSession = () => {
  */
 export const saveClientConfig = async (cid, clientData) => {
     try {
-        const encryptedPayload = getEncryptedClient({ ...clientData, cid: cid || 'TEMP-CID' });
+        const payload = cid ? getEncryptedClient({ ...clientData, cid }) : { ...clientData };
         const endpoint = cid ? '/client/update-cid' : '/client/generate-cid';
         const method = cid ? 'put' : 'post';
 
-        if (!cid) {
-            delete encryptedPayload.cid;
-        }
-
-        const response = await api[method](endpoint, encryptedPayload);
+        const response = await api[method](endpoint, payload);
 
         const currentClients = loadClientsFromSession();
         const isNewClient = !cid;

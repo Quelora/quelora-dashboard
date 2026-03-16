@@ -1,689 +1,97 @@
-import { useState, useEffect } from 'react';
+// src/components/Client/Client.jsx
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Swal from 'sweetalert2';
 import { Box, Snackbar, Alert } from '@mui/material';
-import { saveClientConfig, deleteClient, loadClientsFromSession, updateClientResilienceInSession } from '../../api/auth';
-import ClientList from './ClientList';
+import useClient from '../../hooks/useClient';
 import ClientHeader from './ClientHeader';
+import ClientList from './ClientList';
 import ConfigDialog from './ConfigDialog';
 import CodeModal from './CodeModal';
 import VapidConfigModal from './VapidConfigModal';
 import EmailConfigModal from './EmailConfigModal';
-import PostModal from '../Post/PostModal';
 import ReputationConfigModal from './ReputationConfigModal';
 import ResilienceConfigModal from './ResilienceConfigModal';
+import NetworkConfigModal from './NetworkConfigModal';
+import PostModal from '../Post/PostModal';
 
 /**
- * Client component — top-level manager for client configurations.
+ * Client component — pure orchestration layer for the client management page.
  *
- * Responsibilities:
- * - Load and display the list of registered clients from session storage.
- * - Orchestrate all configuration modals (general, VAPID, email, reputation, resilience).
- * - Handle CRUD operations: create, update, and delete clients.
- * - Expose the integration code snippet for each client.
+ * All state management and business logic lives in the `useClient` hook,
+ * following the architectural pattern established by useGamification,
+ * useCampaignModal, and similar hooks in this codebase.
+ *
+ * Notable wiring:
+ * - `configDialogMode` from the hook is forwarded to ConfigDialog as
+ *   `initialMode`, allowing ClientCard's "Edit Basic" and "Edit Advanced"
+ *   buttons to deep-link to the correct dialog section.
  *
  * @component
- * @returns {JSX.Element} The rendered client management interface.
+ * @returns {JSX.Element}
  */
 const Client = () => {
     const { t } = useTranslation();
 
-    const [clients, setClients] = useState([]);
-    const [openConfigDialog, setOpenConfigDialog] = useState(false);
-    const [openGeneralConfigModal, setOpenGeneralConfigModal] = useState(false);
-    const [openVapidConfigModal, setOpenVapidConfigModal] = useState(false);
-    const [openEmailConfigModal, setOpenEmailConfigModal] = useState(false);
-    const [openReputationConfigModal, setOpenReputationConfigModal] = useState(false);
-    const [editingReputationClient, setEditingReputationClient] = useState(null);
-    const [openResilienceConfigModal, setOpenResilienceConfigModal] = useState(false);
-    const [editingResilienceClient, setEditingResilienceClient] = useState(null);
-    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+    const {
+        clients,
+        config,
+        setConfig,
+        editingClient,
+        setEditingClient,
+        loading,
+        isFormSubmitted,
+        snackbar,
+        anchorEl,
+        setAnchorEl,
+        configDialogMode,
 
-    /** @type {ClientConfig} Default configuration shape used when creating a new client. */
-    const defaultConfig = {
-        description: '',
-        apiUrl: 'https://api.quelora.org',
-        siteUrl: 'https://www.quelora.org',
-        config: {
-            login: {
-                baseUrl: 'https://api.quelora.org/login',
-                providers: [],
-                providerDetails: {
-                    Google:   { clientId: '', clientSecret: '' },
-                    Facebook: { clientId: '', clientSecret: '' },
-                    X:        { clientId: '', clientSecret: '' },
-                    Apple:    { clientId: '', clientSecret: '' },
-                    Quelora:  { enabled: false },
-                },
-            },
-            moderation:  { enabled: false, provider: 'OpenAI',          apiKey: '', configJson: '', prompt: '' },
-            toxicity:    { enabled: false, provider: 'Perspective',      apiKey: '', configJson: '' },
-            translation: { enabled: false, provider: 'Google Translate', apiKey: '', configJson: '' },
-            geolocation: { enabled: false, provider: 'DLA',              apiKey: '' },
-            language:    { enabled: false, provider: '',                  apiKey: '' },
-            cors:        { enabled: false, allowedOrigins: [] },
-            captcha:     { enabled: false, provider: 'turnstile', siteKey: '', secretKey: '', credentialsJson: '{}' },
-            authWidget:  { enabled: false, selector: '', position: 'inside' },
-            modeDiscovery:    false,
-            discoveryDataUrl: '',
-            entityConfig: {
-                selector:          'article',
-                entityIdAttribute: 'href',
-                interactionPlacement: { position: 'after', relativeTo: '.article-actions' },
-            },
-        },
-        vapid:      { publicKey: '', privateKey: '', email: '', iconBase64: '' },
-        email:      { smtp_host: '', smtp_port: '', smtp_user: '', smtp_pass: '', requires_auth: true },
-        turn:       { server: '', port: 3478, protocol: 'udp', transport: 'relay', realm: '', ttl: 300, staticAuthSecret: '' },
-        nostr:      { url: '', authSecret: '', relays: [] },
-        p2p:        { trackerUrls: [], rtcServers: [] },
-        postConfig: {
-            interaction: { allow_comments: true, allow_likes: true, allow_shares: true, allow_replies: true },
-            moderation:  { enable_toxicity_filter: true, enable_content_moderation: false, moderation_prompt: '', banned_words: [] },
-            limits:      { comment_text: 200, reply_text: 200 },
-            editing:     { allow_edits: true, allow_delete: true, edit_time_limit: 5 },
-            audio:       { enable_mic_transcription: false, save_comment_audio: false, max_recording_seconds: 60, bitrate: 16000 },
-        },
-    };
+        openConfigDialog,          setOpenConfigDialog,
+        openGeneralConfigModal,    setOpenGeneralConfigModal,
+        openVapidConfigModal,      setOpenVapidConfigModal,
+        openEmailConfigModal,      setOpenEmailConfigModal,
+        openReputationConfigModal, setOpenReputationConfigModal,
+        openResilienceConfigModal, setOpenResilienceConfigModal,
+        openNetworkConfigModal,    setOpenNetworkConfigModal,
+        codeModalOpen,             setCodeModalOpen,
 
-    const [config, setConfig] = useState(defaultConfig);
-    const [editingClient, setEditingClient] = useState(null);
-    const [editingGeneralConfigClient, setEditingGeneralConfigClient] = useState(null);
-    const [editingVapidConfigClient, setEditingVapidConfigClient] = useState(null);
-    const [editingEmailConfigClient, setEditingEmailConfigClient] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [codeModalOpen, setCodeModalOpen] = useState(false);
-    const [currentCodeClient, setCurrentCodeClient] = useState(null);
-    const [isFormSubmitted, setIsFormSubmitted] = useState(false);
-    const [anchorEl, setAnchorEl] = useState(null);
+        editingReputationClient,
+        editingResilienceClient,
+        editingNetworkClient,
+        currentCodeClient,
 
-    /**
-     * Displays a toast notification via the Snackbar component.
-     *
-     * @param {string} message - The message to display.
-     * @param {'success'|'error'|'warning'|'info'} [severity='success'] - Alert severity level.
-     */
-    const showSnackbar = (message, severity = 'success') => {
-        setSnackbar({ open: true, message, severity });
-    };
+        showSnackbar,
+        handleSnackbarClose,
+        resetConfig,
+        resetNetworkConfig,
 
-    /**
-     * Handles the Snackbar close event, ignoring clickaway dismissals.
-     *
-     * @param {React.SyntheticEvent} event - The triggering event.
-     * @param {string} reason - The reason the Snackbar is closing.
-     */
-    const handleSnackbarClose = (event, reason) => {
-        if (reason === 'clickaway') return;
-        setSnackbar({ ...snackbar, open: false });
-    };
-
-    /**
-     * Displays a SweetAlert2 success dialog that auto-dismisses after 1.5 seconds.
-     *
-     * @param {string} message - The success message to display as the dialog title.
-     */
-    const showSuccessAlert = (message) => {
-        Swal.fire({
-            icon:              'success',
-            title:             message,
-            showConfirmButton: false,
-            timer:             1500,
-            customClass:       { container: 'swal-custom-zindex' },
-        });
-    };
-
-    /**
-     * Displays a SweetAlert2 error dialog requiring user confirmation.
-     *
-     * @param {string} message - The error detail text to display in the dialog body.
-     */
-    const showErrorAlert = (message) => {
-        Swal.fire({
-            icon:              'error',
-            title:             'Error',
-            text:              message,
-            confirmButtonText: 'OK',
-            customClass:       { container: 'swal-custom-zindex' },
-        });
-    };
-
-    /**
-     * Resets the entire config state to its default values and clears the form submission flag.
-     */
-    const resetConfig = () => {
-        setConfig(defaultConfig);
-        setIsFormSubmitted(false);
-    };
-
-    /**
-     * Resets only the postConfig slice of the config state to its default values.
-     */
-    const resetGeneralConfig = () => {
-        setConfig((prev) => ({ ...prev, postConfig: defaultConfig.postConfig }));
-    };
-
-    /**
-     * Resets only the vapid slice of the config state to its default values.
-     */
-    const resetVapidConfig = () => {
-        setConfig((prev) => ({ ...prev, vapid: defaultConfig.vapid }));
-    };
-
-    /**
-     * Resets only the email slice of the config state to its default values.
-     */
-    const resetEmailConfig = () => {
-        setConfig((prev) => ({ ...prev, email: defaultConfig.email }));
-    };
-
-    /**
-     * Validates whether a given string is a well-formed URL.
-     *
-     * @param {string} url - The URL string to validate.
-     * @returns {boolean} True if the URL is valid, false otherwise.
-     */
-    const isValidUrl = (url) => {
-        try {
-            new URL(url);
-            return true;
-        } catch (e) {
-            return false;
-        }
-    };
-
-    /**
-     * Validates the full client configuration before a create or update operation.
-     * Sets the form-submitted flag so that inline field errors become visible.
-     *
-     * @returns {boolean} True if the configuration is valid, false if any rule is violated.
-     */
-    const validateConfig = () => {
-        setIsFormSubmitted(true);
-
-        if (!config.description || config.description.trim().length < 3) {
-            showErrorAlert(t('client.description_required_min_length'));
-            return false;
-        }
-        if (config.description.length > 50) {
-            showErrorAlert(t('client.description_max_length_exceeded', { max: 50 }));
-            return false;
-        }
-        if (!config.apiUrl || !isValidUrl(config.apiUrl)) {
-            showErrorAlert(t('client.api_url_required_valid'));
-            return false;
-        }
-        if (config.apiUrl.length > 300) {
-            showErrorAlert(t('client.api_url_max_length_exceeded', { max: 300 }));
-            return false;
-        }
-        if (!config.siteUrl || !isValidUrl(config.siteUrl)) {
-            showErrorAlert(t('client.site_url_required_valid'));
-            return false;
-        }
-        if (config.siteUrl.length > 300) {
-            showErrorAlert(t('client.site_url_max_length_exceeded', { max: 300 }));
-            return false;
-        }
-        if (Array.isArray(config.config.login?.providers) && config.config.login.providers.length > 0) {
-            if (!config.config.login.baseUrl || !config.config.login.baseUrl.trim()) {
-                showErrorAlert(t('client.login_base_url_required'));
-                return false;
-            }
-            for (const provider of config.config.login.providers) {
-                if (provider !== 'Quelora') {
-                    const { clientId, clientSecret } = config.config.login.providerDetails?.[provider] || {};
-                    if (!clientId || !clientId.trim() || !clientSecret || !clientSecret.trim()) {
-                        showErrorAlert(t('client.provider_credentials_required', { provider }));
-                        return false;
-                    }
-                }
-            }
-        }
-        if (config.config.moderation?.enabled && (!config.config.moderation.apiKey || !config.config.moderation.apiKey.trim())) {
-            showErrorAlert(t('client.moderation_api_key_required'));
-            return false;
-        }
-        if (config.config.moderation?.enabled && (!config.config.moderation.prompt || !config.config.moderation.prompt.trim())) {
-            showErrorAlert(t('client.moderation_prompt_required'));
-            return false;
-        }
-        if (config.config.toxicity?.enabled && (!config.config.toxicity.apiKey || !config.config.toxicity.apiKey.trim())) {
-            showErrorAlert(t('client.toxicity_api_key_required'));
-            return false;
-        }
-        if (config.config.translation?.enabled && (!config.config.translation.apiKey || !config.config.translation.apiKey.trim())) {
-            showErrorAlert(t('client.translation_api_key_required'));
-            return false;
-        }
-        if (config.config.language?.enabled && (!config.config.language.apiKey || !config.config.language.apiKey.trim())) {
-            showErrorAlert(t('client.language_api_key_required'));
-            return false;
-        }
-        if (config.config.captcha?.enabled && (!config.config.captcha.siteKey || !config.config.captcha.siteKey.trim())) {
-            showErrorAlert(t('client.captcha_site_key_required'));
-            return false;
-        }
-        if (config.config.captcha?.enabled && (!config.config.captcha.secretKey || !config.config.captcha.secretKey.trim())) {
-            showErrorAlert(t('client.captcha_secret_key_required'));
-            return false;
-        }
-        if (config.config.cors?.enabled && (!Array.isArray(config.config.cors.allowedOrigins) || config.config.cors.allowedOrigins.length === 0)) {
-            showErrorAlert(t('client.cors_origins_required'));
-            return false;
-        }
-        if (config.config.cors?.enabled) {
-            const originRegex = /^(https?:\/\/)?(?:[\w-]+\.)*[\w-]+(?:\.\w{2,})?(?::\d+)?$|^https?:\/\/(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?$|^https?:\/\/\[[a-f0-9:]+\](?::\d+)?$/i;
-            for (const origin of config.config.cors.allowedOrigins) {
-                if (!originRegex.test(origin)) {
-                    showErrorAlert(t('client.cors_invalid_origin', { origin }));
-                    return false;
-                }
-            }
-        }
-        if (config.config.modeDiscovery && (!config.config.discoveryDataUrl || !isValidUrl(config.config.discoveryDataUrl))) {
-            showErrorAlert(t('client.api_url_required_valid'));
-            return false;
-        }
-        if (!config.config.login?.jwtSecret || !config.config.login.jwtSecret.trim()) {
-            showErrorAlert(t('client.jwt_secret_required'));
-            return false;
-        }
-        if (config.config.authWidget?.enabled && (!config.config.authWidget.selector || !config.config.authWidget.selector.trim())) {
-            showErrorAlert(t('client.auth_widget_selector_required') || 'Auth Widget selector is required when enabled');
-            return false;
-        }
-
-        return true;
-    };
-
-    /**
-     * Validates the VAPID push-notification configuration.
-     *
-     * @param {Object} vapid - The VAPID configuration object to validate.
-     * @param {string} vapid.publicKey  - The VAPID public key.
-     * @param {string} vapid.privateKey - The VAPID private key.
-     * @param {string} vapid.email      - The administrator email associated with the VAPID keys.
-     * @returns {boolean} True if all VAPID fields pass validation, false otherwise.
-     */
-    const validateVapidConfig = (vapid) => {
-        setIsFormSubmitted(true);
-        if (!vapid.publicKey || vapid.publicKey.trim().length < 10) {
-            showErrorAlert(t('client.vapid_public_key_required'));
-            return false;
-        }
-        if (!vapid.privateKey || vapid.privateKey.trim().length < 10) {
-            showErrorAlert(t('client.vapid_private_key_required'));
-            return false;
-        }
-        if (!vapid.email || !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(vapid.email)) {
-            showErrorAlert(t('client.vapid_email_invalid'));
-            return false;
-        }
-        return true;
-    };
-
-    /**
-     * Validates the outgoing email (SMTP) configuration.
-     *
-     * @param {Object}         email               - The email configuration object to validate.
-     * @param {string}         email.smtp_host      - The SMTP server hostname.
-     * @param {number|string}  email.smtp_port      - The SMTP server port (1–65535).
-     * @param {string}         email.smtp_user      - The SMTP username (required when requires_auth is true).
-     * @param {string}         email.smtp_pass      - The SMTP password (required when requires_auth is true).
-     * @param {boolean}        email.requires_auth  - Whether SMTP authentication is required.
-     * @returns {boolean} True if the email configuration is valid, false otherwise.
-     */
-    const validateEmailConfig = (email) => {
-        setIsFormSubmitted(true);
-        if (!email.smtp_host || email.smtp_host.trim().length < 3) {
-            showErrorAlert(t('client.smtp_host_required'));
-            return false;
-        }
-        const isValidPort = (port) => {
-            const portNum = parseInt(port);
-            return !isNaN(portNum) && portNum >= 1 && portNum <= 65535;
-        };
-        if (!email.smtp_port || !isValidPort(email.smtp_port)) {
-            showErrorAlert(t('client.smtp_port_invalid'));
-            return false;
-        }
-        if (email.requires_auth !== false) {
-            if (!email.smtp_user || email.smtp_user.trim().length < 3) {
-                showErrorAlert(t('client.smtp_user_required'));
-                return false;
-            }
-            if (!email.smtp_pass || email.smtp_pass.trim().length < 6) {
-                showErrorAlert(t('client.smtp_pass_required'));
-                return false;
-            }
-        }
-        return true;
-    };
-
-    /**
-     * Validates the general post/comment configuration.
-     *
-     * @param {Object} postConfig - The post configuration object to validate.
-     * @returns {boolean} True if postConfig passes all business rules, false otherwise.
-     */
-    const validateGeneralConfig = (postConfig) => {
-        if (!postConfig || !postConfig.interaction || !postConfig.moderation || !postConfig.limits || !postConfig.editing) {
-            console.error('Client: postConfig or its properties are undefined:', postConfig);
-            showErrorAlert(t('client.invalid_general_config'));
-            return false;
-        }
-        const errors = {
-            moderation_prompt: postConfig.moderation.enable_content_moderation && !postConfig.moderation.moderation_prompt?.trim(),
-            comment_text:      postConfig.limits.comment_text < 50  || postConfig.limits.comment_text > 1000,
-            reply_text:        postConfig.limits.reply_text   < 50  || postConfig.limits.reply_text   > 1000,
-            edit_time_limit:   postConfig.editing.edit_time_limit < 1 || postConfig.editing.edit_time_limit > 1440,
-        };
-        if (Object.values(errors).some(Boolean)) {
-            console.error('Client: Validation failed with errors:', errors);
-            showErrorAlert(t('client.validation_errors'));
-            return false;
-        }
-        return true;
-    };
-
-    /**
-     * Creates a new client or updates an existing one.
-     * Validates the config before persisting and refreshes the client list on success.
-     *
-     * @async
-     * @returns {Promise<void>}
-     */
-    const handleUpsertClient = async () => {
-        if (!validateConfig()) return;
-
-        try {
-            setLoading(true);
-
-            const cid = editingClient ? editingClient.cid : null;
-
-            const clientToProcess = {
-                description: config.description,
-                apiUrl:      config.apiUrl,
-                siteUrl:     config.siteUrl,
-                config:      config.config,
-                vapid:       config.vapid,
-                email:       config.email,
-                postConfig:  config.postConfig,
-                turn:        config.turn,
-                nostr:       config.nostr,
-                p2p:         config.p2p,
-            };
-
-            const isNewClient = !cid;
-            const { updatedClientList } = await saveClientConfig(cid, clientToProcess);
-
-            setClients(updatedClientList);
-            setOpenConfigDialog(false);
-            setEditingClient(null);
-            resetConfig();
-            showSuccessAlert(isNewClient ? t('client.cid_generated') : t('client.cid_updated'));
-        } catch (err) {
-            console.error('Error in handleUpsertClient:', err);
-            showErrorAlert(t('client.save_client_error'));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    /**
-     * Persists the general post/comment configuration for the client currently being edited.
-     *
-     * @async
-     * @param {Object} newGeneralConfig - The validated postConfig object to save.
-     * @returns {Promise<void>}
-     */
-    const handleSaveGeneralConfig = async (newGeneralConfig) => {
-        if (!validateGeneralConfig(newGeneralConfig)) {
-            console.error('Client: postConfig validation failed');
-            return;
-        }
-        try {
-            setLoading(true);
-            const cid            = editingGeneralConfigClient.cid;
-            const clientToUpdate = clients.find((client) => client.cid === cid);
-            const updatedData    = { ...clientToUpdate, postConfig: newGeneralConfig };
-            const { updatedClientList } = await saveClientConfig(cid, updatedData);
-            setClients(updatedClientList);
-            setOpenGeneralConfigModal(false);
-            setEditingGeneralConfigClient(null);
-            resetGeneralConfig();
-            showSuccessAlert(t('client.general_config_saved'));
-        } catch (err) {
-            console.error('Client: Error saving general config:', err);
-            showErrorAlert(t('client.save_general_config_error'));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    /**
-     * Opens the general post/comment configuration modal for the given client.
-     *
-     * @param {Object} client - The client whose postConfig will be edited.
-     */
-    const handleGeneralConfig = (client) => {
-        setEditingGeneralConfigClient(client);
-        setConfig((prev) => ({
-            ...prev,
-            postConfig: { ...defaultConfig.postConfig, ...client.postConfig },
-        }));
-        setOpenGeneralConfigModal(true);
-    };
-
-    /**
-     * Opens the VAPID configuration modal for the given client.
-     *
-     * @param {Object} client - The client whose VAPID settings will be edited.
-     */
-    const handleVapidConfig = (client) => {
-        setEditingVapidConfigClient(client);
-        setConfig((prev) => ({
-            ...prev,
-            vapid: { ...defaultConfig.vapid, ...client.vapid },
-        }));
-        setOpenVapidConfigModal(true);
-    };
-
-    /**
-     * Validates and persists the VAPID configuration for the client currently being edited.
-     *
-     * @async
-     * @param {Object} vapidConfig - The VAPID configuration object to save.
-     * @returns {Promise<void>}
-     */
-    const handleSaveVapidConfig = async (vapidConfig) => {
-        if (!validateVapidConfig(vapidConfig)) return;
-        try {
-            setLoading(true);
-            const cid            = editingVapidConfigClient.cid;
-            const clientToUpdate = clients.find((client) => client.cid === cid);
-            const updatedData    = { ...clientToUpdate, vapid: vapidConfig };
-            const { updatedClientList } = await saveClientConfig(cid, updatedData);
-            setClients(updatedClientList);
-            setOpenVapidConfigModal(false);
-            setEditingVapidConfigClient(null);
-            resetVapidConfig();
-            showSuccessAlert(t('client.vapid_config_saved'));
-        } catch (err) {
-            console.error('Client: Error saving VAPID config:', err);
-            showErrorAlert(t('client.save_vapid_config_error'));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    /**
-     * Validates and persists the SMTP email configuration for the client currently being edited.
-     *
-     * @async
-     * @param {Object} emailConfig - The email configuration object to save.
-     * @returns {Promise<boolean>} True on success, false if validation or persistence fails.
-     */
-    const handleSaveEmailConfig = async (emailConfig) => {
-        if (!validateEmailConfig(emailConfig)) return false;
-        try {
-            setLoading(true);
-            const cid            = editingEmailConfigClient.cid;
-            const clientToUpdate = clients.find((client) => client.cid === cid);
-            const updatedData    = { ...clientToUpdate, email: emailConfig };
-            const { updatedClientList } = await saveClientConfig(cid, updatedData);
-            setClients(updatedClientList);
-            setConfig((prev) => ({ ...prev, email: { ...emailConfig } }));
-            showSuccessAlert(t('client.email_config_saved'));
-            return true;
-        } catch (err) {
-            console.error('Client: Error saving email config:', err);
-            showErrorAlert(t('client.email_config_save_error'));
-            return false;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    /**
-     * Opens the email configuration modal for the given client.
-     *
-     * @param {Object} client - The client whose email settings will be edited.
-     */
-    const handleEmailConfig = (client) => {
-        setEditingEmailConfigClient(client);
-        setConfig((prev) => ({
-            ...prev,
-            email: { ...defaultConfig.email, ...client.email },
-        }));
-        setOpenEmailConfigModal(true);
-    };
-
-    /**
-     * Opens the reputation configuration modal for the given client.
-     *
-     * @param {Object} client - The client whose reputation settings will be edited.
-     */
-    const handleReputationConfig = (client) => {
-        setEditingReputationClient(client);
-        setOpenReputationConfigModal(true);
-    };
-
-    /**
-     * Opens the resilience configuration modal for the given client.
-     *
-     * @param {Object} client - The client whose resilience settings will be edited.
-     */
-    const handleResilienceConfig = (client) => {
-        setEditingResilienceClient(client);
-        setOpenResilienceConfigModal(true);
-    };
-
-    /**
-     * Called by ResilienceConfigModal after a successful save.
-     * Patches the resilience field in sessionStorage and in the in-memory clients list
-     * so the modal reflects fresh data on its next open without a re-login.
-     *
-     * @param {string} cid            - The CID of the client that was updated.
-     * @param {Object} resilienceData - The resilience object returned by the server.
-     */
-    const handleResilienceSaved = (cid, resilienceData) => {
-        updateClientResilienceInSession(cid, resilienceData);
-        setClients((prev) =>
-            prev.map((c) => (c.cid === cid ? { ...c, resilience: resilienceData } : c))
-        );
-    };
-
-    /**
-     * Opens the code export modal, passing the full decrypted client object so that
-     * CodeModal can compile the integration snippet directly from source data.
-     *
-     * @param {Object} client - The decrypted client object selected for code export.
-     */
-    const handleShowCode = (client) => {
-        setCurrentCodeClient(client);
-        setCodeModalOpen(true);
-    };
-
-    /**
-     * Populates the config form with the selected client's data and opens the edit dialog.
-     *
-     * @param {Object} client - The client to edit.
-     */
-    const handleEditClient = (client) => {
-        setEditingClient(client);
-        setConfig({
-            cid:        client.cid,
-            description: client.description || '',
-            apiUrl:      client.apiUrl  || 'https://api.quelora.org',
-            siteUrl:     client.siteUrl || 'https://www.quelora.org',
-            config:      { ...defaultConfig.config,     ...client.config },
-            vapid:       { ...defaultConfig.vapid,      ...client.vapid },
-            email:       { ...defaultConfig.email,      ...client.email },
-            postConfig:  { ...defaultConfig.postConfig, ...client.postConfig },
-            turn:        { ...defaultConfig.turn,       ...client.turn },
-            nostr:       { ...defaultConfig.nostr,      ...client.nostr },
-            p2p:         { ...defaultConfig.p2p,        ...client.p2p },
-        });
-        setOpenConfigDialog(true);
-    };
-
-    /**
-     * Prompts the user for confirmation by requiring them to type the client ID,
-     * then deletes the client and refreshes the list on confirmation.
-     *
-     * @async
-     * @param {Object} client - The client to delete.
-     * @returns {Promise<void>}
-     */
-    const handleDeleteClient = async (client) => {
-        const { value: inputValue } = await Swal.fire({
-            title:             t('client.delete_client_title'),
-            html:              t('client.delete_client_html', { cid: client.cid }),
-            input:             'text',
-            inputLabel:        t('client.delete_client_input_label'),
-            inputPlaceholder:  t('client.delete_client_input_placeholder'),
-            showCancelButton:  true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor:  '#3085d6',
-            confirmButtonText:  t('client.delete_client_confirm'),
-            cancelButtonText:   t('client.cancel'),
-            inputValidator: (value) => {
-                if (!value)               return t('client.delete_client_input_required');
-                if (value !== client.cid) return t('client.delete_client_input_mismatch');
-            },
-        });
-
-        if (inputValue === client.cid) {
-            try {
-                setLoading(true);
-                await deleteClient(client.cid);
-                const updatedClients = loadClientsFromSession();
-                setClients(updatedClients);
-                showSuccessAlert(t('client.delete_client_success'));
-            } catch (error) {
-                console.error('Error deleting client:', error);
-                showErrorAlert(t('client.delete_client_error'));
-            } finally {
-                setLoading(false);
-            }
-        }
-    };
-
-    useEffect(() => {
-        const clientsData = loadClientsFromSession();
-        setClients(clientsData);
-        if (clientsData.length === 0 && sessionStorage.getItem('clients')) {
-            showErrorAlert(t('client.no_valid_clients'));
-        } else if (sessionStorage.getItem('clients') && clientsData.length === 0) {
-            showErrorAlert(t('client.load_clients_error'));
-        }
-    }, [t]);
+        handleUpsertClient,
+        handleEditClient,
+        handleDeleteClient,
+        handleShowCode,
+        handleGeneralConfig,
+        handleSaveGeneralConfig,
+        handleVapidConfig,
+        handleSaveVapidConfig,
+        handleEmailConfig,
+        handleSaveEmailConfig,
+        handleReputationConfig,
+        handleResilienceConfig,
+        handleResilienceSaved,
+        handleNetworkConfig,
+        handleSaveNetworkConfig,
+    } = useClient();
 
     return (
         <Box className="client-container" sx={{ p: 2 }}>
-            <ClientHeader anchorEl={anchorEl} setAnchorEl={setAnchorEl} showToast={showSnackbar} />
+
+            {/* ── Page header with Clone / Download menu ── */}
+            <ClientHeader
+                anchorEl={anchorEl}
+                setAnchorEl={setAnchorEl}
+                showToast={showSnackbar}
+            />
+
+            {/* ── Card grid ── */}
             <ClientList
                 clients={clients}
                 handleShowCode={handleShowCode}
@@ -697,11 +105,14 @@ const Client = () => {
                 handleDeleteClient={handleDeleteClient}
                 handleReputationConfig={handleReputationConfig}
                 handleResilienceConfig={handleResilienceConfig}
+                handleNetworkConfig={handleNetworkConfig}
             />
+
+            {/* ── Create / Edit dialog (Basic or Advanced mode) ── */}
             <ConfigDialog
                 open={openConfigDialog}
                 editingClient={editingClient}
-                config={config || defaultConfig}
+                config={config}
                 setConfig={setConfig}
                 isFormSubmitted={isFormSubmitted}
                 loading={loading}
@@ -710,82 +121,96 @@ const Client = () => {
                 setEditingClient={setEditingClient}
                 resetConfig={resetConfig}
                 cid={editingClient?.cid || ''}
+                initialMode={configDialogMode}
             />
+
+            {/* ── Integration snippet modal ── */}
             <CodeModal
                 open={codeModalOpen}
                 client={currentCodeClient}
                 setOpen={setCodeModalOpen}
                 showToast={showSnackbar}
             />
+
+            {/* ── General post/comment config modal ── */}
             <PostModal
                 open={openGeneralConfigModal}
-                onClose={() => {
-                    setOpenGeneralConfigModal(false);
-                    setEditingGeneralConfigClient(null);
-                    resetGeneralConfig();
-                }}
+                onClose={() => setOpenGeneralConfigModal(false)}
                 initialData={{ config: config.postConfig }}
                 mode="edit"
                 onSave={handleSaveGeneralConfig}
                 title={t('client.general_comment_config_title')}
             />
+
+            {/* ── VAPID / push notifications modal ── */}
             <VapidConfigModal
                 open={openVapidConfigModal}
-                onClose={() => {
-                    setOpenVapidConfigModal(false);
-                    setEditingGeneralConfigClient(null);
-                    resetVapidConfig();
-                }}
+                onClose={() => setOpenVapidConfigModal(false)}
                 initialData={{ vapid: config.vapid }}
                 onSave={handleSaveVapidConfig}
-                cid={editingVapidConfigClient?.cid}
                 showToast={showSnackbar}
                 loading={loading}
                 isFormSubmitted={isFormSubmitted}
             />
+
+            {/* ── SMTP email configuration modal ── */}
             <EmailConfigModal
                 open={openEmailConfigModal}
-                onClose={() => {
-                    setOpenEmailConfigModal(false);
-                    setEditingEmailConfigClient(null);
-                    resetEmailConfig();
-                }}
+                onClose={() => setOpenEmailConfigModal(false)}
                 initialData={{ email: config.email }}
-                onSave={async (emailConfig) => await handleSaveEmailConfig(emailConfig)}
-                cid={editingEmailConfigClient?.cid}
+                onSave={handleSaveEmailConfig}
                 showToast={showSnackbar}
                 loading={loading}
-                setLoading={setLoading}
+                setLoading={() => {}}
                 isFormSubmitted={isFormSubmitted}
                 keepOpenOnSave={true}
                 setOpenEmailConfigModal={setOpenEmailConfigModal}
             />
+
+            {/* ── Reputation / trust levels modal ── */}
             <ReputationConfigModal
                 open={openReputationConfigModal}
-                onClose={() => {
-                    setOpenReputationConfigModal(false);
-                    setEditingReputationClient(null);
-                }}
+                onClose={() => setOpenReputationConfigModal(false)}
                 client={editingReputationClient}
                 showToast={showSnackbar}
             />
+
+            {/* ── Resilience / P2P fallback modal ── */}
             <ResilienceConfigModal
                 open={openResilienceConfigModal}
-                onClose={() => {
-                    setOpenResilienceConfigModal(false);
-                    setEditingResilienceClient(null);
-                }}
+                onClose={() => setOpenResilienceConfigModal(false)}
                 onSave={handleResilienceSaved}
                 client={editingResilienceClient}
                 showToast={showSnackbar}
             />
+
+            {/* ── Network (TURN / Nostr / P2P) modal ── */}
+            <NetworkConfigModal
+                open={openNetworkConfigModal}
+                onClose={() => {
+                    setOpenNetworkConfigModal(false);
+                    resetNetworkConfig();
+                }}
+                config={config}
+                setConfig={setConfig}
+                client={editingNetworkClient}
+                onSave={handleSaveNetworkConfig}
+                loading={loading}
+                showToast={showSnackbar}
+            />
+
+            {/* ── Global toast notifications ── */}
             <Snackbar
                 open={snackbar.open}
                 autoHideDuration={4000}
                 onClose={handleSnackbarClose}
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
             >
-                <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+                <Alert
+                    onClose={handleSnackbarClose}
+                    severity={snackbar.severity}
+                    sx={{ width: '100%' }}
+                >
                     {snackbar.message}
                 </Alert>
             </Snackbar>

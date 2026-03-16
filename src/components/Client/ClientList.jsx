@@ -1,56 +1,41 @@
 // src/components/Client/ClientList.jsx
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-    Paper,
-    Typography,
-    List,
-    ListItem,
-    ListItemText,
-    IconButton,
-    Tooltip,
     Box,
     Button,
     Container,
-    styled
+    Grid,
+    Typography,
 } from '@mui/material';
-import {
-    VpnKey as VpnKeyIcon,
-    Code as CodeIcon,
-    Download as DownloadIcon,
-    Edit as EditIcon,
-    Add as AddIcon,
-    RateReview as RateReviewIcon,
-    Notifications as NotificationsIcon,
-    Delete as DeleteIcon,
-    Email as EmailIcon,
-    VerifiedUser as ReputationIcon,
-    Security as ResilienceIcon
-} from '@mui/icons-material';
-import { compileIntegrationSnippet } from './CodeModal';
-
-const StyledListItem = styled(ListItem)(({ theme }) => ({
-    borderBottom: '1px solid var(--border-gray)',
-    '&:last-child': { borderBottom: 'none' },
-    '&:nth-of-type(odd)': { backgroundColor: 'rgba(0, 0, 0, 0.02)' },
-    '&:hover': { backgroundColor: theme.palette.action.hover },
-}));
+import { Add as AddIcon } from '@mui/icons-material';
+import ClientCard from './ClientCard';
 
 /**
- * Renders the paginated list of registered clients together with per-row
- * action buttons for code export, editing, and modular configuration.
+ * Renders the paginated grid of registered client cards.
+ *
+ * Replaces the previous icon-only table with a card layout designed for
+ * non-technical users.  Each card is handled by `ClientCard`, which owns
+ * the visual representation and inline contextual help.
+ *
+ * This component is intentionally thin: it only handles the grid scaffold,
+ * the empty-state message, and the "Add new client" button.
  *
  * @param {Object}   props
- * @param {Array}    props.clients                - Decrypted client objects to display.
- * @param {Function} props.handleShowCode         - Opens the CodeModal for a client.
- * @param {Function} props.handleEditClient       - Opens the edit dialog for a client.
- * @param {Function} props.setOpenConfigDialog    - Controls the add/edit dialog visibility.
- * @param {Function} props.resetConfig            - Resets the form to its default state.
- * @param {Function} props.showToast              - Displays a transient toast notification.
- * @param {Function} props.handleGeneralConfig    - Opens the post/comment config modal.
- * @param {Function} props.handleVapidConfig      - Opens the VAPID config modal.
- * @param {Function} props.handleEmailConfig      - Opens the email config modal.
- * @param {Function} props.handleDeleteClient     - Initiates the client deletion flow.
- * @param {Function} props.handleReputationConfig - Opens the reputation config modal.
+ * @param {Array}    props.clients                 - Decrypted client objects to display.
+ * @param {Function} props.handleShowCode          - Opens the CodeModal for a client.
+ * @param {Function} props.handleEditClient        - Opens the edit dialog for a client.
+ * @param {Function} props.setOpenConfigDialog     - Controls add/edit dialog visibility.
+ * @param {Function} props.resetConfig             - Resets the form to its default state.
+ * @param {Function} props.showToast               - Displays a transient toast notification.
+ * @param {Function} props.handleGeneralConfig     - Opens the post/comment config modal.
+ * @param {Function} props.handleVapidConfig       - Opens the VAPID config modal.
+ * @param {Function} props.handleEmailConfig       - Opens the email config modal.
+ * @param {Function} props.handleDeleteClient      - Initiates the client deletion flow.
+ * @param {Function} props.handleReputationConfig  - Opens the reputation config modal.
+ * @param {Function} props.handleResilienceConfig  - Opens the resilience config modal.
+ * @param {Function} props.handleNetworkConfig     - Opens the network config modal.
+ * @returns {JSX.Element}
  */
 const ClientList = ({
     clients,
@@ -64,114 +49,90 @@ const ClientList = ({
     handleEmailConfig,
     handleDeleteClient,
     handleReputationConfig,
-    handleResilienceConfig
+    handleResilienceConfig,
+    handleNetworkConfig,
 }) => {
     const { t } = useTranslation();
 
-    /**
-     * Compiles the integration snippet for the given client and triggers a browser
-     * download as a `.js` file. Uses the same compiler as CodeModal to guarantee
-     * that the downloaded file is always identical to what the modal displays.
-     *
-     * @param {Object} client - The decrypted client object to download.
-     */
-    const handleDownloadCode = (client) => {
-        const code = compileIntegrationSnippet(client);
-        const blob = new Blob([code], { type: 'text/javascript' });
-        const url  = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href     = url;
-        link.download = `quelora-config-${client.cid}.js`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-
-        if (showToast) showToast(t('client.download_success'), 'success');
-    };
-
     return (
-        <Container maxWidth="lg">
-            <Paper elevation={0} sx={{ width: '100%', p: 0 }}>
-                <Box sx={{ p: 2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                        <VpnKeyIcon />
-                        <Typography variant="h6" sx={{ ml: 1 }}>{t('client.manage_cids')}</Typography>
-                    </Box>
-                    <Typography variant="body2">{t('client.manage_cids_description')}</Typography>
-                </Box>
-                <List dense sx={{ width: '100%', p: 0 }}>
-                    {clients.map((client) => (
-                        <StyledListItem key={client.cid} disableGutters sx={{ pr: 2 }}>
-                            <ListItemText
-                                primary={<Typography variant="body2">{client.cid}</Typography>}
-                                secondary={client.description || t('client.no_description')}
-                                secondaryTypographyProps={{ variant: 'caption' }}
-                                sx={{ pl: 2 }}
-                            />
-                            <Box>
-                                <Tooltip title={t('client.tooltip.show_code')}>
-                                    <IconButton onClick={() => handleShowCode(client)}>
-                                        <CodeIcon />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('client.tooltip.download_code')}>
-                                    <IconButton onClick={() => handleDownloadCode(client)}>
-                                        <DownloadIcon />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('client.tooltip.edit_client')}>
-                                    <IconButton onClick={() => handleEditClient(client)}>
-                                        <EditIcon />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('client.tooltip.general_comment_config')}>
-                                    <IconButton onClick={() => handleGeneralConfig(client)}>
-                                        <RateReviewIcon />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('client.tooltip.vapid_config')}>
-                                    <IconButton onClick={() => handleVapidConfig(client)}>
-                                        <NotificationsIcon />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('client.tooltip.email_config')}>
-                                    <IconButton onClick={() => handleEmailConfig(client)}>
-                                        <EmailIcon />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('client.tooltip.reputation_config')}>
-                                    <IconButton onClick={() => handleReputationConfig(client)}>
-                                        <ReputationIcon />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('client.tooltip.resilience_config')}>
-                                    <IconButton onClick={() => handleResilienceConfig(client)}>
-                                        <ResilienceIcon />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('client.tooltip.delete_client')}>
-                                    <IconButton onClick={() => handleDeleteClient(client)}>
-                                        <DeleteIcon />
-                                    </IconButton>
-                                </Tooltip>
-                            </Box>
-                        </StyledListItem>
-                    ))}
-                </List>
-                <Box sx={{ p: 2 }}>
+        <Container maxWidth="lg" disableGutters>
+
+            {/* ── Empty state ────────────────────────────────────────────── */}
+            {clients.length === 0 && (
+                <Box
+                    sx={{
+                        display:        'flex',
+                        flexDirection:  'column',
+                        alignItems:     'center',
+                        justifyContent: 'center',
+                        py:             10,
+                        gap:            2,
+                    }}
+                >
+                    <Typography variant="h6" color="text.secondary">
+                        {t('client.no_clients_yet')}
+                    </Typography>
+                    <Typography variant="body2" color="text.disabled" sx={{ maxWidth: 360, textAlign: 'center' }}>
+                        {t('client.no_clients_yet_help')}
+                    </Typography>
                     <Button
-                        variant="outlined"
+                        variant="contained"
                         startIcon={<AddIcon />}
                         onClick={() => {
                             resetConfig();
                             setOpenConfigDialog(true);
                         }}
+                        sx={{ mt: 1 }}
                     >
                         {t('client.add_new_cid')}
                     </Button>
                 </Box>
-            </Paper>
+            )}
+
+            {/* ── Card grid ──────────────────────────────────────────────── */}
+            {clients.length > 0 && (
+                <>
+                    <Grid container spacing={3}>
+                        {clients.map((client) => (
+                            <Grid
+                                key={client.cid}
+                                item
+                                xs={12}
+                                sm={6}
+                                lg={4}
+                            >
+                                <ClientCard
+                                    client={client}
+                                    handleShowCode={handleShowCode}
+                                    handleEditClient={handleEditClient}
+                                    handleGeneralConfig={handleGeneralConfig}
+                                    handleVapidConfig={handleVapidConfig}
+                                    handleEmailConfig={handleEmailConfig}
+                                    handleDeleteClient={handleDeleteClient}
+                                    handleReputationConfig={handleReputationConfig}
+                                    handleResilienceConfig={handleResilienceConfig}
+                                    handleNetworkConfig={handleNetworkConfig}
+                                    showToast={showToast}
+                                />
+                            </Grid>
+                        ))}
+                    </Grid>
+
+                    {/* ── Add new client button ─────────────────────────── */}
+                    <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-start' }}>
+                        <Button
+                            variant="outlined"
+                            startIcon={<AddIcon />}
+                            onClick={() => {
+                                resetConfig();
+                                setOpenConfigDialog(true);
+                            }}
+                        >
+                            {t('client.add_new_cid')}
+                        </Button>
+                    </Box>
+                </>
+            )}
         </Container>
     );
 };
