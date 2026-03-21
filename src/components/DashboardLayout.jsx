@@ -1,4 +1,4 @@
-// src/layouts/DashboardLayout.js
+// src/components/layouts/DashboardLayout.jsx
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
@@ -35,14 +35,35 @@ import React from 'react';
 import { getUserRole, ROLES } from '../utils/permissions';
 import GodClientSelector from './Common/GodClientSelector';
 import { setActiveClient } from '../api/admin';
+import embedStorage from '../utils/embedStorage';
 
+/**
+ * Inner layout component that has access to the `UserContext` provided by
+ * {@link DashboardLayout}.
+ *
+ * Responsibilities:
+ *  - Renders the top app-bar, sidebar, main scroll container, and the
+ *    persistent console drawer.
+ *  - Manages sidebar open/close state (persisted in `sessionStorage` so it
+ *    survives page refreshes within the same tab).
+ *  - Handles GOD-role client selection, writing the chosen `currentCid` via
+ *    `embedStorage` so embed windows opened afterwards can resolve the CID.
+ *  - Clears all auth data through `embedStorage` on logout so that both
+ *    `localStorage` (embed) and `sessionStorage` (dashboard) are wiped.
+ *
+ * @component
+ * @param {Object} props
+ * @param {function} props.toggleTheme   - Toggles between light and dark theme.
+ * @param {string}   props.currentTheme  - Current theme identifier (`'light'` | `'dark'`).
+ * @returns {JSX.Element}
+ */
 const UserAwareLayout = ({ toggleTheme, currentTheme }) => {
     const { t } = useTranslation();
-    const navigate = useNavigate();
-    const location = useLocation();
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-    
+    const navigate  = useNavigate();
+    const location  = useLocation();
+    const theme     = useTheme();
+    const isMobile  = useMediaQuery(theme.breakpoints.down('md'));
+
     const { user, loading: userLoading, refreshUser } = useUser();
 
     const [open, setOpen] = useState(() => {
@@ -50,9 +71,9 @@ const UserAwareLayout = ({ toggleTheme, currentTheme }) => {
         return saved === 'true';
     });
 
-    const [mobileOpen, setMobileOpen] = useState(false);
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [scrolled, setScrolled] = useState(false);
+    const [mobileOpen,  setMobileOpen]  = useState(false);
+    const [anchorEl,    setAnchorEl]    = useState(null);
+    const [scrolled,    setScrolled]    = useState(false);
 
     const [desktopOpen, setDesktopOpen] = useState(() => {
         const saved = sessionStorage.getItem('sidebarOpen');
@@ -60,7 +81,7 @@ const UserAwareLayout = ({ toggleTheme, currentTheme }) => {
     });
 
     const [isGodSelectionNeeded, setIsGodSelectionNeeded] = useState(false);
-    const [userRole, setUserRole] = useState('user');
+    const [userRole,             setUserRole]             = useState('user');
 
     const handleDrawerToggle = useCallback(() => {
         if (isMobile) {
@@ -73,15 +94,14 @@ const UserAwareLayout = ({ toggleTheme, currentTheme }) => {
     }, [isMobile, desktopOpen]);
 
     useEffect(() => {
-        if (isMobile) {
-            setMobileOpen(false);
-        }
+        if (isMobile) setMobileOpen(false);
     }, [location, isMobile]);
 
     useEffect(() => {
-        const role = getUserRole();
+        const role       = getUserRole();
+        const currentCid = embedStorage.getItem('currentCid');
+
         setUserRole(role);
-        const currentCid = sessionStorage.getItem('currentCid');
 
         if (role === ROLES.GOD && !currentCid) {
             setIsGodSelectionNeeded(true);
@@ -90,53 +110,64 @@ const UserAwareLayout = ({ toggleTheme, currentTheme }) => {
         }
     }, []);
 
+    /**
+     * Handles the GOD-role client selection event.
+     * Writes the selected CID via `embedStorage` so that embed windows opened
+     * from this dashboard session can resolve it from `localStorage`.
+     *
+     * @async
+     * @param {Object} clientData     - The selected client object.
+     * @param {string} clientData.cid - The selected client identifier.
+     * @returns {Promise<void>}
+     */
     const handleGodClientSelected = async (clientData) => {
         try {
             await setActiveClient(clientData.cid);
-            sessionStorage.setItem('currentCid', clientData.cid);
+            embedStorage.setItem('currentCid', clientData.cid);
             await refreshUser();
             setIsGodSelectionNeeded(false);
         } catch (error) {
-            console.error("Error setting active client:", error);
+            console.error('Error setting active client:', error);
         }
     };
 
-    const handleProfileMenuOpen = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
+    const handleProfileMenuOpen = (event) => setAnchorEl(event.currentTarget);
+    const handleMenuClose       = ()       => setAnchorEl(null);
 
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
-
+    /**
+     * Clears all authentication data from both storage backends and redirects
+     * to the login page.
+     *
+     * Using `embedStorage.removeItem` ensures that keys stored in `localStorage`
+     * during an embed login are also removed, preventing stale credentials from
+     * being reused after an explicit logout.
+     *
+     * @returns {void}
+     */
     const handleLogout = () => {
-        sessionStorage.removeItem('token');
-        sessionStorage.removeItem('clients');
-        sessionStorage.removeItem('tokenExpiration');
-        sessionStorage.removeItem('user');
-        sessionStorage.removeItem('currentCid');
+        const keys = ['token', 'clients', 'tokenExpiration', 'user', 'userKey', 'currentCid'];
+        keys.forEach(key => embedStorage.removeItem(key));
         navigate('/login');
     };
 
-    // Manejo del scroll dentro del contenedor principal en lugar de window
+    /** Tracks whether the main content area has been scrolled. */
     const handleMainScroll = (event) => {
         setScrolled(event.target.scrollTop > 10);
     };
 
-    const drawerWidth = 240;
-    const sidebarOpen = isMobile ? mobileOpen : desktopOpen;
+    const drawerWidth        = 240;
+    const sidebarOpen        = isMobile ? mobileOpen : desktopOpen;
     const consoleDrawerWidth = sidebarOpen && !isMobile ? `calc(100% - ${drawerWidth}px)` : '100%';
-    const consoleDrawerLeft = sidebarOpen && !isMobile ? `${drawerWidth}px` : '0px';
-
-    const userPicture = user?.picture || '/images/avatar.jpg';
+    const consoleDrawerLeft  = sidebarOpen && !isMobile ? `${drawerWidth}px` : '0px';
+    const userPicture        = user?.picture || '/images/avatar.jpg';
 
     return (
-        // El contenedor raíz bloquea el scroll global para evitar doble barra
         <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-            <CssBaseline/>
-            <GodClientSelector 
-                open={isGodSelectionNeeded} 
-                onClientSelected={handleGodClientSelected} 
+            <CssBaseline />
+
+            <GodClientSelector
+                open={isGodSelectionNeeded}
+                onClientSelected={handleGodClientSelected}
             />
 
             <header className={`app-bar ${scrolled ? 'scrolled' : ''}`}>
@@ -154,18 +185,18 @@ const UserAwareLayout = ({ toggleTheme, currentTheme }) => {
                                 }),
                             }}
                         >
-                            {sidebarOpen ? <ChevronLeftIcon/> : <MenuIcon/>}
+                            {sidebarOpen ? <ChevronLeftIcon /> : <MenuIcon />}
                         </IconButton>
                         <Typography variant="h6">
                             {t('dashboard.title')}
                         </Typography>
                     </div>
-                    
+
                     <div className="right-controls">
                         {userRole === ROLES.GOD && (
                             <Tooltip title="Change client">
-                                <IconButton 
-                                    onClick={() => setIsGodSelectionNeeded(true)} 
+                                <IconButton
+                                    onClick={() => setIsGodSelectionNeeded(true)}
                                     color="inherit"
                                     sx={{ mr: 1 }}
                                 >
@@ -175,16 +206,13 @@ const UserAwareLayout = ({ toggleTheme, currentTheme }) => {
                         )}
 
                         <ThemeSwitcher theme={currentTheme} toggleTheme={toggleTheme} />
-                        <LanguageMenu/>
-                        <ConsoleToolbarButton open={open} setOpen={setOpen}/>
-                        <IconButton
-                            onClick={handleProfileMenuOpen}
-                            size="small"
-                        >
+                        <LanguageMenu />
+                        <ConsoleToolbarButton open={open} setOpen={setOpen} />
+                        <IconButton onClick={handleProfileMenuOpen} size="small">
                             {userLoading ? (
                                 <CircularProgress size={24} color="inherit" />
                             ) : (
-                                <Avatar alt={user?.given_name || 'User Profile'} src={userPicture}/>
+                                <Avatar alt={user?.given_name || 'User Profile'} src={userPicture} />
                             )}
                         </IconButton>
                     </div>
@@ -195,88 +223,94 @@ const UserAwareLayout = ({ toggleTheme, currentTheme }) => {
                     open={Boolean(anchorEl)}
                     onClose={handleMenuClose}
                 >
-                    <MenuItem onClick={() => {navigate('/profile'); handleMenuClose();}}>
-                        <ListItemIcon><PersonIcon fontSize="small"/></ListItemIcon>
+                    <MenuItem onClick={() => { navigate('/profile'); handleMenuClose(); }}>
+                        <ListItemIcon><PersonIcon fontSize="small" /></ListItemIcon>
                         {t('profile.my_account')}
                     </MenuItem>
-                    <Divider/>
+                    <Divider />
                     <MenuItem onClick={handleLogout} className='logout'>
-                        <ListItemIcon><LogoutIcon fontSize="small"/></ListItemIcon>
+                        <ListItemIcon><LogoutIcon fontSize="small" /></ListItemIcon>
                         {t('profile.logout')}
                     </MenuItem>
                 </Menu>
             </header>
-            
-            <Sidebar 
-                handleLogout={handleLogout} 
+
+            <Sidebar
+                handleLogout={handleLogout}
                 open={sidebarOpen}
                 handleDrawerToggle={handleDrawerToggle}
                 isMobile={isMobile}
             />
-            
+
             <Box
                 component="main"
-                onScroll={handleMainScroll} // Detectamos scroll aquí
+                onScroll={handleMainScroll}
                 sx={{
                     flexGrow: 1,
-                    // Este es el "Scroller" principal de la página
-                    height: '100vh !important', 
-                    overflow: 'auto !important', // Habilita el scroll aquí
-                    width: {sm: `calc(100% - ${sidebarOpen ? drawerWidth : 0}px)`},
+                    height: '100vh !important',
+                    overflow: 'auto !important',
+                    width: { sm: `calc(100% - ${sidebarOpen ? drawerWidth : 0}px)` },
                     transition: theme.transitions.create('width', {
-                        easing: theme.transitions.easing.sharp,
-                        duration: theme.transitions.duration.leavingScreen,
+                        easing:    theme.transitions.easing.sharp,
+                        duration:  theme.transitions.duration.leavingScreen,
                     }),
-                    display: 'flex',
+                    display:       'flex',
                     flexDirection: 'column',
                 }}
             >
-                <Toolbar/> {/* Espaciador para el Header fijo */}
-                
-                {/* Contenedor que limita el ancho y centra el contenido */}
+                <Toolbar />
+
                 <Box sx={{
-                    width: '100%',
+                    width:    '100%',
                     maxWidth: '1280px !important',
-                    mx: 'auto !important',
+                    mx:       'auto !important',
                     flexGrow: 1,
                     pt: 3, pb: 3,
-                    pl: {xs: 1, sm: 3},
-                    pr: {xs: 1, sm: 3}
+                    pl: { xs: 1, sm: 3 },
+                    pr: { xs: 1, sm: 3 },
                 }}>
-                    {!isGodSelectionNeeded && <Outlet/>}
+                    {!isGodSelectionNeeded && <Outlet />}
                 </Box>
             </Box>
 
-            <ConsoleDrawer 
-                open={open} 
+            <ConsoleDrawer
+                open={open}
                 onClose={() => setOpen(false)}
                 anchor="bottom"
                 variant="persistent"
                 sx={{
                     zIndex: 1300,
                     '& .MuiDrawer-paper': {
-                        width: consoleDrawerWidth,
-                        left: consoleDrawerLeft,
-                        right: 0,
-                        bottom: 0,
-                        top: 'auto',
-                        height: '30vh', 
-                        position: 'fixed',
-                        boxSizing: 'content-box',
-                        backgroundColor: '#121212 !important' 
-                    }
+                        width:           consoleDrawerWidth,
+                        left:            consoleDrawerLeft,
+                        right:           0,
+                        bottom:          0,
+                        top:             'auto',
+                        height:          '30vh',
+                        position:        'fixed',
+                        boxSizing:       'content-box',
+                        backgroundColor: '#121212 !important',
+                    },
                 }}
             />
         </Box>
     );
-}
-
-const DashboardLayout = ({ toggleTheme, currentTheme }) => {
-    return (
-        <UserProvider>
-            <UserAwareLayout toggleTheme={toggleTheme} currentTheme={currentTheme} />
-        </UserProvider>
-    );
 };
+
+/**
+ * Root dashboard layout that wraps the application shell with the
+ * `UserProvider` context.
+ *
+ * @component
+ * @param {Object}   props
+ * @param {function} props.toggleTheme  - Toggles between light and dark theme.
+ * @param {string}   props.currentTheme - Current theme identifier.
+ * @returns {JSX.Element}
+ */
+const DashboardLayout = ({ toggleTheme, currentTheme }) => (
+    <UserProvider>
+        <UserAwareLayout toggleTheme={toggleTheme} currentTheme={currentTheme} />
+    </UserProvider>
+);
 
 export default DashboardLayout;

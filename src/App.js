@@ -23,7 +23,7 @@ import PlacementsPage from './pages/PlacementsPage';
 import PlacementPricingPage from './pages/PlacementPricingPage';
 import AdvertiserProfilesPage from './pages/AdvertiserProfilesPage';
 import SystemUsersPage from './pages/SystemUsersPage.jsx';
-import GamificationPage from './pages/GamificationPage.jsx'; // IMPORTADO
+import GamificationPage from './pages/GamificationPage.jsx';
 import EmbedLayout from './components/EmbedLayout';
 
 import './i18n';
