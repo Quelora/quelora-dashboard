@@ -1,88 +1,142 @@
-// src/context/UserContext.js
-import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
+/**
+ * @fileoverview User context provider.
+ *
+ * Provides the authenticated user state, a profile-refresh action, a
+ * profile-update action, and a client-switch signal to the component tree.
+ *
+ * ## Client-switch signal (`clientSwitchCount` / `bumpClientSwitch`)
+ *
+ * When a God-mode user picks a new active client in `DashboardLayout`, the
+ * following sequence runs:
+ *
+ *  1. `POST /admin/set` — Redis `active_cid:<userId>` updated.
+ *  2. `fetchSessionClients()` — storage `clients` + `currentCid` replaced.
+ *  3. `bumpClientSwitch()` — increments `clientSwitchCount` in this context.
+ *
+ * `DashboardLayout` passes `clientSwitchCount` as the `key` prop of the
+ * `<Outlet />` wrapper.  A React `key` change forces the entire routed
+ * subtree to **unmount and remount**.  Every page component re-mounts fresh,
+ * its `useEffect(fn, [])` hooks re-fire, and `loadClientsFromSession()` is
+ * called against the already-updated storage — so `selectedCid` and
+ * `clientList` in every page always reflect the new active client without
+ * any changes to the page components themselves.
+ *
+ * ## Storage contract
+ *
+ * All reads and writes go through {@link module:utils/embedStorage} instead
+ * of accessing `sessionStorage` or `localStorage` directly.
+ *
+ * @module contexts/UserContext
+ */
+
+import React, {
+    createContext,
+    useState,
+    useEffect,
+    useContext,
+    useCallback,
+    useRef,
+} from 'react';
 import { getProfile, updateProfile } from '../api/profile';
+import { loadUserFromStorage } from '../api/auth';
 import { useTranslation } from 'react-i18next';
+import embedStorage from '../utils/embedStorage';
 
 const UserContext = createContext(null);
 
 export const useUser = () => useContext(UserContext);
 
-/**
- * Reads the current user object from sessionStorage.
- *
- * @returns {Object|null} The parsed user object, or null if absent or unreadable.
- */
-const loadUserFromSession = () => {
-    try {
-        const storedUser = sessionStorage.getItem('user');
-        if (storedUser) return JSON.parse(storedUser);
-    } catch (e) {
-        console.error('Failed to parse user from session storage', e);
-    }
-    return null;
-};
+// ---------------------------------------------------------------------------
+// Session helpers
+// ---------------------------------------------------------------------------
 
 /**
- * Builds a map of { cid -> resilience } from the clients currently stored in
- * sessionStorage so that fields managed by other endpoints (resilience,
- * and any future plain-text additions) are never silently dropped when
- * getProfile overwrites the clients array.
+ * Builds a map of `{ cid → resilience }` from the clients currently in
+ * storage so that resilience data managed by a separate endpoint is never
+ * silently dropped when `getProfile` overwrites the clients array.
  *
- * @returns {Map<string, Object|null>} Map keyed by cid.
+ * @returns {Map<string, Object|null>} Map keyed by CID.
  */
 const buildResilienceMap = () => {
     const map = new Map();
     try {
-        const raw = sessionStorage.getItem('clients');
+        const raw = embedStorage.getItem('clients');
         if (!raw) return map;
         const clients = JSON.parse(raw);
         if (Array.isArray(clients)) {
-            clients.forEach(c => {
+            clients.forEach((c) => {
                 if (c.cid) map.set(c.cid, c.resilience ?? null);
             });
         }
     } catch {
-        // Session unreadable — return empty map, nothing to preserve.
+        // Storage unreadable — return empty map.
     }
     return map;
 };
 
 /**
- * Writes the clients array to sessionStorage, preserving any plain-text fields
- * (currently: resilience) that are not returned by the getProfile endpoint but
- * were previously stored by the login or resilience-save flows.
+ * Persists the clients array to the context-appropriate storage backend,
+ * preserving any plain-text fields (currently `resilience`) that are not
+ * returned by the `getProfile` endpoint.
  *
- * @param {Array<Object>} incomingClients - Client objects as returned by getProfile.
+ * @param {Array<Object>} incomingClients - Client objects as returned by
+ *   `getProfile`.
+ * @returns {void}
  */
-const persistClientsToSession = (incomingClients) => {
+const persistClientsToStorage = (incomingClients) => {
     if (!Array.isArray(incomingClients)) return;
 
     const resilienceMap = buildResilienceMap();
 
-    const merged = incomingClients.map(client => ({
+    const merged = incomingClients.map((client) => ({
         ...client,
         resilience: resilienceMap.get(client.cid) ?? client.resilience ?? null,
     }));
 
-    sessionStorage.setItem('clients', JSON.stringify(merged));
+    embedStorage.setItem('clients', JSON.stringify(merged));
 };
+
+// ---------------------------------------------------------------------------
+// Provider
+// ---------------------------------------------------------------------------
 
 /**
  * Provides authenticated user state and related actions to the component tree.
- * Fetches the user profile on mount when no session user is found.
  *
- * @param {Object} props
+ * @param {Object}          props
  * @param {React.ReactNode} props.children
  */
 export const UserProvider = ({ children }) => {
-    const [user,    setUser]    = useState(loadUserFromSession);
-    const [loading, setLoading] = useState(true);
+    const [user,              setUser]              = useState(() => loadUserFromStorage());
+    const [loading,           setLoading]           = useState(true);
+    const [clientSwitchCount, setClientSwitchCount] = useState(0);
     const { i18n } = useTranslation();
+    const i18nRef = useRef(i18n);
+    useEffect(() => {
+        i18nRef.current = i18n;
+    });
+
+    /**
+     * Increments the client-switch counter.
+     *
+     * `DashboardLayout` uses this counter as the `key` prop of the `<Outlet />`
+     * wrapper.  Incrementing it forces React to unmount and remount the entire
+     * routed subtree, causing every page component to re-initialize from the
+     * already-updated storage without requiring any changes to the pages
+     * themselves.
+     *
+     * Must be called **after** `fetchSessionClients()` has resolved so that
+     * storage is already up-to-date when the remounted components read it.
+     *
+     * @returns {void}
+     */
+    const bumpClientSwitch = useCallback(() => {
+        setClientSwitchCount((prev) => prev + 1);
+    }, []);
 
     /**
      * Fetches the current user profile from the API and syncs it to state
-     * and sessionStorage.  Clients are written via persistClientsToSession
-     * to avoid clobbering resilience data stored by other flows.
+     * and storage.
      *
      * @async
      * @returns {Promise<void>}
@@ -92,22 +146,23 @@ export const UserProvider = ({ children }) => {
             setLoading(true);
             const userData = await getProfile();
             setUser(userData);
-            sessionStorage.setItem('user', JSON.stringify(userData));
+
+            embedStorage.setItem('user', JSON.stringify(userData));
 
             if (userData?.clients) {
-                persistClientsToSession(userData.clients);
+                persistClientsToStorage(userData.clients);
             }
 
-            if (userData.locale && i18n.language !== userData.locale) {
-                i18n.changeLanguage(userData.locale);
+            if (userData.locale && i18nRef.current.language !== userData.locale) {
+                i18nRef.current.changeLanguage(userData.locale);
             }
         } catch (error) {
             console.error('Failed to fetch user profile', error);
-            setUser(loadUserFromSession());
+            setUser(loadUserFromStorage());
         } finally {
             setLoading(false);
         }
-    }, [i18n]);
+    }, []);
 
     useEffect(() => {
         if (!user) {
@@ -118,11 +173,11 @@ export const UserProvider = ({ children }) => {
             }
             setLoading(false);
         }
-    }, [user, fetchUser, i18n]);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     /**
      * Updates the user profile via the API and syncs the result to state
-     * and sessionStorage.
+     * and storage.
      *
      * @async
      * @param {Object} profileData - The profile fields to update.
@@ -133,24 +188,27 @@ export const UserProvider = ({ children }) => {
         try {
             const updatedUser = await updateProfile(profileData);
             setUser(updatedUser);
-            sessionStorage.setItem('user', JSON.stringify(updatedUser));
 
-            if (updatedUser.locale && i18n.language !== updatedUser.locale) {
-                i18n.changeLanguage(updatedUser.locale);
+            embedStorage.setItem('user', JSON.stringify(updatedUser));
+
+            if (updatedUser.locale && i18nRef.current.language !== updatedUser.locale) {
+                i18nRef.current.changeLanguage(updatedUser.locale);
             }
             return updatedUser;
         } catch (error) {
             console.error('Failed to update profile', error);
             throw error;
         }
-    }, [i18n]);
+    }, []);
 
     const value = {
         user,
         loading,
         fetchUser,
-        refreshUser:   fetchUser,
-        updateProfile: handleUpdateProfile,
+        refreshUser:      fetchUser,
+        updateProfile:    handleUpdateProfile,
+        clientSwitchCount,
+        bumpClientSwitch,
     };
 
     return (

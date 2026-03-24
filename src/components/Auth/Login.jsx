@@ -1,24 +1,38 @@
-// src/components/Auth/Login.jsx
+/**
+ * @fileoverview Login form component.
+ *
+ * Handles both standard credential submission and TOTP-based two-factor
+ * verification. After a successful authentication the component reads the
+ * stored redirect path (preserved by PrivateRoute before bouncing to /login)
+ * and navigates there, falling back to the role-based default route.
+ *
+ * @module components/Auth/Login
+ */
+
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { login, verifyTwoFactor } from '../../api/auth';
+import { login, verifyTwoFactor, clearAuthData } from '../../api/auth';
 import {
     TextField,
     Button,
     Typography,
     Link,
-    Box
+    Box,
 } from '@mui/material';
 import embedStorage from '../../utils/embedStorage';
 import { encryptJSON, generateKeyFromString } from '../../utils/crypto';
 
 /**
- * @typedef {Object} RoleRedirectMap
- * Maps user role strings to their default post-login route.
+ * Maps each user role to its default post-login route.
+ *
+ * The `god` role routes to `/dashboard` where `GodClientSelector` is
+ * rendered and immediately prompts the user to pick an active client.
+ *
+ * @type {Object.<string, string>}
  */
 const ROLE_REDIRECTS = {
-    god_mode:   '/client',
+    god:        '/dashboard',
     admin:      '/client',
     editor:     '/posts',
     analyst:    '/dashboard',
@@ -28,11 +42,49 @@ const ROLE_REDIRECTS = {
 };
 
 /**
- * Derives a deterministic AES encryption key for the user object.
+ * Converts a JWT `expiresIn` value into milliseconds.
  *
- * The key is derived from the username because `user` has no `cid` of its
- * own. Using the username keeps the key stable across sessions while still
- * being unique per account.
+ * The API may return the TTL as a plain number of seconds (`7200`, `'7200'`)
+ * or as a shorthand duration string (`'1h'`, `'3d'`, `'30m'`).
+ *
+ * The previous implementation used `parseInt(expiresIn, 10)` which silently
+ * truncates unit suffixes: `parseInt('3d', 10) === 3`, producing a
+ * `tokenExpiration` only 3 seconds in the future.  `isTokenValid()` in
+ * `auth.js` then expired the session almost immediately after login and called
+ * `clearAuthData()`, wiping the token before the first API call could fire.
+ *
+ * Supported suffixes: `s` · `m` · `h` · `d`.
+ * Bare numeric strings are treated as seconds.
+ * Unrecognised formats fall back to 2 hours.
+ *
+ * @param {string|number} expiresIn - Raw value from the API response.
+ * @returns {number} Duration in milliseconds.
+ */
+const parseTtlToMs = (expiresIn) => {
+    const FALLBACK_MS = 2 * 60 * 60 * 1000;
+
+    if (!expiresIn) return FALLBACK_MS;
+
+    const raw = String(expiresIn).trim().toLowerCase();
+
+    const MULTIPLIERS = { s: 1_000, m: 60_000, h: 3_600_000, d: 86_400_000 };
+    const match = raw.match(/^(\d+(?:\.\d+)?)(s|m|h|d)$/);
+
+    if (match) {
+        const ms = parseFloat(match[1]) * MULTIPLIERS[match[2]];
+        return isFinite(ms) && ms > 0 ? ms : FALLBACK_MS;
+    }
+
+    const numeric = Number(raw);
+    if (!isNaN(numeric) && numeric > 0) {
+        return numeric * 1_000;
+    }
+
+    return FALLBACK_MS;
+};
+
+/**
+ * Derives a deterministic AES encryption key for the user object.
  *
  * @param {Object} user - The user profile object returned by the API.
  * @returns {string} Hex-encoded SHA-256 key, or empty string if derivation fails.
@@ -47,29 +99,24 @@ const deriveUserKey = (user) => {
 
 /**
  * Persists all authentication data returned by the API into the
- * context-appropriate storage backend (localStorage for embed windows,
- * sessionStorage for the dashboard).
+ * context-appropriate storage backend via {@link module:utils/embedStorage}.
  *
- * Persistence decisions:
- *  - `token`           → plain string (already opaque JWT).
- *  - `clients`         → AES-encrypted via `getEncryptedClient` (handled by auth.js).
- *  - `user`            → AES-CBC encrypted with a key derived from the username.
- *  - `tokenExpiration` → plain numeric timestamp.
- *  - `userKey`         → plain-text identifier used to re-derive the decryption
- *                        key for `user` (username, email, or _id — not a secret).
- *  - `currentCid`      → written when the user belongs to exactly one client,
- *                        so that embed windows can resolve the CID without an
- *                        explicit query-string parameter.
+ * Before writing new credentials, any existing auth data is explicitly
+ * cleared from both storage backends via `clearAuthData`. This prevents a
+ * previous session from persisting alongside the new one when a different
+ * user logs in on the same browser.
  *
  * @param {Object} response             - Successful auth API response.
  * @param {string} response.token       - JWT access token.
  * @param {Array}  response.clients     - Encrypted client list.
  * @param {Object} response.user        - Plain-text user profile object.
- * @param {string} [response.expiresIn] - Token lifetime in seconds (default 7200).
+ * @param {string} [response.expiresIn] - Token lifetime e.g. `'1h'`, `'7200'`.
  * @returns {void}
  */
 const persistAuthData = (response) => {
     const { token, clients, user, expiresIn } = response;
+
+    clearAuthData();
 
     embedStorage.setItem('token',   token);
     embedStorage.setItem('clients', JSON.stringify(clients));
@@ -84,7 +131,7 @@ const persistAuthData = (response) => {
         embedStorage.setItem('user', JSON.stringify(user));
     }
 
-    const expiresInMs = (parseInt(expiresIn) || 7200) * 1000;
+    const expiresInMs = parseTtlToMs(expiresIn);
     embedStorage.setItem('tokenExpiration', String(Date.now() + expiresInMs));
 
     if (Array.isArray(clients) && clients.length === 1) {
@@ -95,10 +142,6 @@ const persistAuthData = (response) => {
 /**
  * Login form component that handles both standard credential submission
  * and TOTP-based two-factor verification.
- *
- * After a successful authentication the component reads the stored redirect
- * path (preserved by PrivateRoute before bouncing to /login) and navigates
- * there, falling back to the role-based default route.
  *
  * @component
  * @returns {JSX.Element}
@@ -118,6 +161,11 @@ const Login = () => {
     /**
      * Persists auth data and navigates to the appropriate post-login route.
      *
+     * Route resolution order:
+     *  1. `redirectPath` stored by PrivateRoute before bouncing to /login.
+     *  2. Role-based default from {@link ROLE_REDIRECTS}.
+     *  3. Hard fallback to `/dashboard`.
+     *
      * @param {Object} response - Successful auth API response.
      * @returns {void}
      */
@@ -129,11 +177,12 @@ const Login = () => {
 
         if (storedRedirectPath) {
             navigate(storedRedirectPath);
-        } else {
-            const userRole   = response.user?.role;
-            const targetPath = ROLE_REDIRECTS[userRole] || '/profile';
-            navigate(targetPath);
+            return;
         }
+
+        const userRole   = response.user?.role;
+        const targetPath = ROLE_REDIRECTS[userRole] || '/dashboard';
+        navigate(targetPath);
     };
 
     /**
@@ -169,8 +218,13 @@ const Login = () => {
                 const response = await verifyTwoFactor(totpCode, tempToken);
                 handleLoginSuccess(response);
             } catch (err) {
-                setError(err.message || t('login.error_2fa'));
-                if (err.message?.includes('expirado')) {
+                const message = err.message || '';
+                setError(message || t('login.error_2fa'));
+
+                if (
+                    message.includes('expired') ||
+                    message.includes('expirado')
+                ) {
                     setStep('login');
                     setTempToken('');
                     setTotpCode('');
@@ -249,7 +303,11 @@ const Login = () => {
                             className='login-input'
                             autoFocus
                             disabled={isLoading}
-                            inputProps={{ maxLength: 6, inputMode: 'numeric', pattern: '[0-9]*' }}
+                            inputProps={{
+                                maxLength:  6,
+                                inputMode:  'numeric',
+                                pattern:    '[0-9]*',
+                            }}
                         />
                     </>
                 )}

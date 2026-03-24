@@ -1,51 +1,84 @@
-// src/utils/embedStorage.js
+/**
+ * @fileoverview Unified storage abstraction that selects the correct Web Storage
+ * backend based on the rendering context and ensures full session isolation.
+ *
+ * ## Context detection
+ * A request is considered an **embed context** exclusively when the current
+ * pathname starts with `/embed/`. The previous heuristic (`window.opener !== null`)
+ * has been removed because any `window.open()` call — including unrelated popups —
+ * activated `localStorage`, causing auth data written by an embed login to persist
+ * across browser sessions and contaminate subsequent dashboard logins.
+ *
+ * ## Storage routing
+ * | Context   | Primary storage | Auth-key mirror |
+ * |-----------|-----------------|-----------------|
+ * | Dashboard | sessionStorage  | localStorage    |
+ * | Embed     | localStorage    | —               |
+ *
+ * Dashboard writes auth keys to **both** storages so that embed windows opened
+ * afterwards can reuse the active session without requiring a separate login.
+ * The embed context reads **exclusively** from `localStorage` — there is no
+ * cross-storage fallback. This eliminates the identity-crossover bug where an
+ * admin session stored in `sessionStorage` leaked into embed windows.
+ *
+ * ## Cleanup guarantee
+ * `removeItem` and `clear` always operate on **both** storages, regardless of
+ * context. This ensures that a dashboard logout never leaves stale credentials in
+ * `localStorage` that could be picked up by a future embed window.
+ *
+ * @module utils/embedStorage
+ */
 
 /**
- * @fileoverview
- * Unified storage abstraction that transparently selects the correct
- * Web Storage backend depending on the rendering context:
+ * Keys that carry authentication or session-identity data.
+ * When the dashboard writes any of these keys, the value is mirrored to
+ * `localStorage` so that embed windows can reuse the active session.
  *
- *  - **Embed context**  (`/embed/*` routes, or when `window.opener` is set):
- *    uses `localStorage` so that authentication data survives across
- *    multiple `window.open()` calls originating from the host site.
- *
- *  - **Dashboard context** (all other routes):
- *    uses `sessionStorage` to preserve the existing tab-isolated
- *    security model.
- *
- * All call-sites that previously referenced `sessionStorage` directly
- * should import and use this module instead.
+ * @type {Set<string>}
  */
+const AUTH_KEYS = new Set([
+    'token',
+    'clients',
+    'user',
+    'userKey',
+    'tokenExpiration',
+    'currentCid',
+]);
 
 /**
  * Returns `true` when the current page is running inside an embed window.
  *
- * Detection criteria (either is sufficient):
- *  1. The pathname starts with `/embed/`.
- *  2. The window was opened by another window (`window.opener !== null`).
+ * Detection is based solely on the pathname starting with `/embed/`.
+ * The `window.opener` heuristic has been intentionally removed: relying on
+ * the opener caused every `window.open()` call to be treated as an embed
+ * context, which routed auth writes to `localStorage` and allowed stale
+ * credentials to survive browser restarts.
  *
  * @returns {boolean}
  */
 export const isEmbedContext = () => {
     try {
-        const isEmbedPath = window.location.pathname.startsWith('/embed/');
-        const hasOpener   = window.opener !== null;
-        return isEmbedPath || hasOpener;
+        return window.location.pathname.startsWith('/embed/');
     } catch {
         return false;
     }
 };
 
 /**
- * Resolves the appropriate `Storage` instance for the current context.
+ * Resolves the primary `Storage` instance for the current context.
  *
  * @returns {Storage} `localStorage` in embed context, `sessionStorage` otherwise.
  */
-const resolveStorage = () =>
-    isEmbedContext() ? localStorage : sessionStorage;
+const resolveStorage = () => (isEmbedContext() ? localStorage : sessionStorage);
 
 /**
- * Stores a string value under `key` in the context-appropriate storage.
+ * Stores `value` under `key` in the context-appropriate storage.
+ *
+ * In **dashboard context**, auth keys are additionally mirrored to
+ * `localStorage` so that embed windows opened from the same browser can read
+ * the active session without requiring a separate login flow.
+ *
+ * In **embed context**, the value is written only to `localStorage`.
  *
  * @param {string} key   - Storage key.
  * @param {string} value - String value to store.
@@ -53,57 +86,57 @@ const resolveStorage = () =>
  */
 export const setItem = (key, value) => {
     resolveStorage().setItem(key, value);
+
+    if (!isEmbedContext() && AUTH_KEYS.has(key)) {
+        localStorage.setItem(key, value);
+    }
 };
 
 /**
- * Retrieves the string value associated with `key` from the
- * context-appropriate storage.
+ * Retrieves the string value associated with `key` from the context-appropriate
+ * storage.
  *
- * When running in embed context the function first checks `localStorage`;
- * if the key is absent it falls back to `sessionStorage` so that a user
- * who authenticated in the dashboard can reuse that session in an embed
- * window without re-logging in.
+ * Unlike the previous implementation, there is **no cross-storage fallback**.
+ * The embed context reads exclusively from `localStorage`; the dashboard context
+ * reads exclusively from `sessionStorage`. The fallback that previously read
+ * from `sessionStorage` when `localStorage` was empty was the root cause of
+ * admin credentials leaking into embed windows.
  *
  * @param {string} key - Storage key.
  * @returns {string|null} The stored value, or `null` if not found.
  */
-export const getItem = (key) => {
-    if (isEmbedContext()) {
-        return localStorage.getItem(key) ?? sessionStorage.getItem(key);
-    }
-    return sessionStorage.getItem(key);
-};
+export const getItem = (key) => resolveStorage().getItem(key);
 
 /**
- * Removes `key` from the context-appropriate storage.
- * In embed context, the key is removed from **both** storages to avoid
- * stale data surviving in the fallback backend.
+ * Removes `key` from **both** `localStorage` and `sessionStorage`,
+ * regardless of the current context.
+ *
+ * This guarantees that a dashboard logout clears any copy of the key that
+ * may have been written to `localStorage` via the auth-key mirror, preventing
+ * stale credentials from being picked up by future embed windows.
  *
  * @param {string} key - Storage key.
  * @returns {void}
  */
 export const removeItem = (key) => {
-    if (isEmbedContext()) {
-        localStorage.removeItem(key);
-        sessionStorage.removeItem(key);
-    } else {
-        sessionStorage.removeItem(key);
-    }
+    localStorage.removeItem(key);
+    sessionStorage.removeItem(key);
 };
 
 /**
- * Clears all keys from the context-appropriate storage.
- * In embed context only `localStorage` is cleared; `sessionStorage`
- * is left untouched because it belongs to the dashboard tab.
+ * Clears all authentication data from both storage backends.
+ *
+ * - Auth keys are explicitly removed from `localStorage`.
+ * - `sessionStorage` is cleared in full.
+ *
+ * This guarantees complete cleanup on logout or forced re-authentication,
+ * regardless of which context triggered the call.
  *
  * @returns {void}
  */
 export const clear = () => {
-    if (isEmbedContext()) {
-        localStorage.clear();
-    } else {
-        sessionStorage.clear();
-    }
+    AUTH_KEYS.forEach((key) => localStorage.removeItem(key));
+    sessionStorage.clear();
 };
 
 const embedStorage = { isEmbedContext, setItem, getItem, removeItem, clear };

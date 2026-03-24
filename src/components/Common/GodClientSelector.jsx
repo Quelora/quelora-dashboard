@@ -14,7 +14,7 @@ import { searchClients } from '../../api/admin';
 import useDebounce from '../../hooks/useDebounce';
 import { useTranslation } from 'react-i18next';
 
-const GodClientSelector = ({ open, onClientSelected }) => {
+const GodClientSelector = ({ open, onClientSelected, onClose }) => {
 
     const { t } = useTranslation();
 
@@ -60,10 +60,11 @@ const GodClientSelector = ({ open, onClientSelected }) => {
     };
 
     return (
-        <Dialog 
-            open={open} 
-            disableEscapeKeyDown
-            maxWidth="sm" 
+        <Dialog
+            open={open}
+            disableEscapeKeyDown={!onClose}
+            onClose={onClose}
+            maxWidth="sm"
             fullWidth
         >
             <DialogTitle>
@@ -107,9 +108,14 @@ const GodClientSelector = ({ open, onClientSelected }) => {
             </DialogContent>
 
             <DialogActions>
-                <Button 
-                    onClick={handleSubmit} 
-                    variant="contained" 
+                {onClose && (
+                    <Button onClick={onClose}>
+                        {t('common.cancel')}
+                    </Button>
+                )}
+                <Button
+                    onClick={handleSubmit}
+                    variant="contained"
                     disabled={!value}
                 >
                     {t('common.godClientSelector.confirmAccess')}

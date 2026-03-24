@@ -46,6 +46,8 @@
 │   │   ├── posts.js
 │   │   ├── profile.js
 │   │   ├── reports.js
+│   │   ├── reputation.js
+│   │   ├── resilience.js
 │   │   ├── stats.js
 │   │   ├── surveys.js
 │   │   ├── systemUsers.js
@@ -72,6 +74,7 @@
 │   │       │   ├── console.json
 │   │       │   ├── dashboard.json
 │   │       │   ├── db.json
+│   │       │   ├── gamification.json
 │   │       │   ├── liveMode.json
 │   │       │   ├── login.json
 │   │       │   ├── moderationAnalytics.json
@@ -99,6 +102,7 @@
 │   │       │   ├── console.json
 │   │       │   ├── dashboard.json
 │   │       │   ├── db.json
+│   │       │   ├── gamification.json
 │   │       │   ├── liveMode.json
 │   │       │   ├── login.json
 │   │       │   ├── moderationAnalytics.json
@@ -186,6 +190,7 @@
 │   │       │   ├── console.json
 │   │       │   ├── dashboard.json
 │   │       │   ├── db.json
+│   │       │   ├── gamification.json
 │   │       │   ├── liveMode.json
 │   │       │   ├── login.json
 │   │       │   ├── moderationAnalytics.json
@@ -213,6 +218,7 @@
 │   │       │   ├── console.json
 │   │       │   ├── dashboard.json
 │   │       │   ├── db.json
+│   │       │   ├── gamification.json
 │   │       │   ├── liveMode.json
 │   │       │   ├── login.json
 │   │       │   ├── moderationAnalytics.json
@@ -240,6 +246,7 @@
 │   │       │   ├── console.json
 │   │       │   ├── dashboard.json
 │   │       │   ├── db.json
+│   │       │   ├── gamification.json
 │   │       │   ├── liveMode.json
 │   │       │   ├── login.json
 │   │       │   ├── moderationAnalytics.json
@@ -267,6 +274,7 @@
 │   │       │   ├── console.json
 │   │       │   ├── dashboard.json
 │   │       │   ├── db.json
+│   │       │   ├── gamification.json
 │   │       │   ├── liveMode.json
 │   │       │   ├── login.json
 │   │       │   ├── moderationAnalytics.json
@@ -294,6 +302,7 @@
 │   │       │   ├── console.json
 │   │       │   ├── dashboard.json
 │   │       │   ├── db.json
+│   │       │   ├── gamification.json
 │   │       │   ├── liveMode.json
 │   │       │   ├── login.json
 │   │       │   ├── moderationAnalytics.json
@@ -321,6 +330,7 @@
 │   │       │   ├── console.json
 │   │       │   ├── dashboard.json
 │   │       │   ├── db.json
+│   │       │   ├── gamification.json
 │   │       │   ├── liveMode.json
 │   │       │   ├── login.json
 │   │       │   ├── moderationAnalytics.json
@@ -348,6 +358,7 @@
 │   │       │   ├── console.json
 │   │       │   ├── dashboard.json
 │   │       │   ├── db.json
+│   │       │   ├── gamification.json
 │   │       │   ├── liveMode.json
 │   │       │   ├── login.json
 │   │       │   ├── moderationAnalytics.json
@@ -375,6 +386,7 @@
 │   │           ├── console.json
 │   │           ├── dashboard.json
 │   │           ├── db.json
+│   │           ├── gamification.json
 │   │           ├── liveMode.json
 │   │           ├── login.json
 │   │           ├── moderationAnalytics.json
@@ -408,8 +420,10 @@
 │   │   │   ├── CampaignModal.jsx
 │   │   │   └── CreativePostSelector.jsx
 │   │   ├── Client
+│   │   │   ├── AuthWidgetConfig.jsx
 │   │   │   ├── CaptchaConfig.jsx
 │   │   │   ├── Client.jsx
+│   │   │   ├── ClientCard.jsx
 │   │   │   ├── ClientHeader.jsx
 │   │   │   ├── ClientList.jsx
 │   │   │   ├── CodeModal.jsx
@@ -419,7 +433,11 @@
 │   │   │   ├── EmailConfigModal.jsx
 │   │   │   ├── EntityConfig.jsx
 │   │   │   ├── LoginConfig.jsx
+│   │   │   ├── NetworkConfig.jsx
+│   │   │   ├── NetworkConfigModal.jsx
 │   │   │   ├── OtherConfig.jsx
+│   │   │   ├── ReputationConfigModal.jsx
+│   │   │   ├── ResilienceConfigModal.jsx
 │   │   │   └── VapidConfigModal.jsx
 │   │   ├── Common
 │   │   │   ├── CustomTextField.jsx
@@ -492,6 +510,7 @@
 │   │   ├── useAdvertiserProfileModal.js
 │   │   ├── useCampaignForm.js
 │   │   ├── useCampaignModal.js
+│   │   ├── useClient.js
 │   │   ├── useDashboardStats.js
 │   │   ├── useDebounce.js
 │   │   ├── useDebouncedResize.js
@@ -530,6 +549,7 @@
 │   ├── setupProxy.js
 │   └── utils
 │       ├── crypto.js
+│       ├── embedStorage.js
 │       ├── exportHelper.js
 │       └── permissions.js
 └── struct.md

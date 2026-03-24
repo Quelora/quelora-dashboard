@@ -102,7 +102,7 @@ const ReportsPage = () => {
             console.error('Error loading clients:', e);
             setClientList([]);
         }
-    }, [setSelectedCid, t, selectedCid]);
+    }, [setSelectedCid, t]);
 
     /**
      * Generates a summary chip array of report types.

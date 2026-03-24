@@ -88,7 +88,7 @@ const UsersPage = () => {
             console.error('Error loading clients:', e);
             setClientList([]);
         }
-    }, [setSelectedCid, setTempInputs, selectedCid]);
+    }, [setSelectedCid, setTempInputs]);
 
     const handleSendPushNotification = async (userId) => {
         const { value: message } = await Swal.fire({

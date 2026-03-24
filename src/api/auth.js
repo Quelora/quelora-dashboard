@@ -1,7 +1,27 @@
-// src/api/auth.js
+/**
+ * @fileoverview Authentication API layer.
+ *
+ * Handles credential submission, two-factor verification, client config
+ * persistence, and session hydration/teardown. All storage operations are
+ * routed through {@link module:utils/embedStorage} to guarantee correct
+ * backend selection in both dashboard and embed contexts.
+ *
+ * @module api/auth
+ */
+
 import api from './axiosConfig';
-import { getEncryptedClient, getDecryptedClient, encryptJSON, decryptJSON, generateKeyFromString } from '../utils/crypto';
+import {
+    getEncryptedClient,
+    getDecryptedClient,
+    encryptJSON,
+    decryptJSON,
+    generateKeyFromString,
+} from '../utils/crypto';
 import embedStorage from '../utils/embedStorage';
+
+// ---------------------------------------------------------------------------
+// Auth requests
+// ---------------------------------------------------------------------------
 
 /**
  * Authenticates a user with username and password.
@@ -25,11 +45,11 @@ export const login = async (username, password) => {
 
         return {
             requires2FA: false,
-            token:       response.data.token,
-            clients:     response.data.clients || [],
-            user:        response.data.user    || {},
-            expiresIn:   response.data.expiresIn || '2h',
-            role:        response.data.role,
+            token:     response.data.token,
+            clients:   response.data.clients   || [],
+            user:      response.data.user       || {},
+            expiresIn: response.data.expiresIn  || '2h',
+            role:      response.data.role,
         };
     } catch (error) {
         if (error.response?.status === 429) throw new Error('LOCKED_ACCOUNT');
@@ -44,25 +64,31 @@ export const login = async (username, password) => {
  *
  * @async
  * @param {string} totpToken - The 6-digit TOTP code.
- * @param {string} tempToken - The temporary token received from the initial
- *   login step.
+ * @param {string} tempToken - The temporary token received from the initial login step.
  * @returns {Promise<Object>} Login result including token, clients, user and role.
  * @throws {Error} On invalid TOTP code or connection failure.
  */
-export const verify2FA = async (totpToken, tempToken) => {
+export const verifyTwoFactor = async (totpToken, tempToken) => {
     try {
         const response = await api.post('/auth/verify-2fa', { totpToken, tempToken });
         return {
             token:     response.data.token,
-            clients:   response.data.clients || [],
-            user:      response.data.user    || {},
-            expiresIn: response.data.expiresIn || '2h',
+            clients:   response.data.clients   || [],
+            user:      response.data.user       || {},
+            expiresIn: response.data.expiresIn  || '2h',
             role:      response.data.role,
         };
     } catch (error) {
         throw new Error('Invalid 2FA code or session expired');
     }
 };
+
+/** @deprecated Use {@link verifyTwoFactor} directly. Kept for backward compatibility. */
+export const verify2FA = verifyTwoFactor;
+
+// ---------------------------------------------------------------------------
+// Session helpers
+// ---------------------------------------------------------------------------
 
 /**
  * Transforms a plain-text client object into an encrypted session object.
@@ -73,21 +99,44 @@ export const verify2FA = async (totpToken, tempToken) => {
 const toSessionClient = (client) => ({ ...getEncryptedClient(client) });
 
 /**
+ * Returns `true` when the stored token expiration timestamp has not yet
+ * been reached.
+ *
+ * An absent, non-numeric, or already-elapsed value is treated as expired so
+ * the session is always cleared rather than silently reused.
+ *
+ * @returns {boolean}
+ */
+const isTokenValid = () => {
+    try {
+        const expiration = embedStorage.getItem('tokenExpiration');
+        if (!expiration) return false;
+        const expiresAt = parseInt(expiration, 10);
+        if (isNaN(expiresAt)) return false;
+        return Date.now() < expiresAt;
+    } catch {
+        return false;
+    }
+};
+
+/**
  * Reads and decrypts the `user` object from the context-appropriate storage.
  *
- * Decryption strategy:
- *  1. Reads the raw `user` value via `embedStorage.getItem`.
- *  2. Reads `userKey` (the plain-text identifier used to derive the AES key).
- *  3. If both are present and the value looks like an encrypted payload
- *     (`ivHex:cipherHex` format), decrypts with AES-CBC.
- *  4. Falls back to `JSON.parse` for sessions created before encryption was
- *     introduced, ensuring backwards compatibility during the transition.
+ * Returns `null` — and clears all auth data — when the stored token has
+ * expired. This prevents a stale identity from being used to resolve roles
+ * in {@link module:utils/permissions} or to skip the login flow in
+ * `PrivateRoute` after a session has naturally expired.
  *
- * @returns {Object|null} The decrypted user profile, or `null` if absent or
- *   unreadable.
+ * @returns {Object|null} The decrypted user profile, or `null` if absent,
+ *   unreadable, or expired.
  */
 export const loadUserFromStorage = () => {
     try {
+        if (!isTokenValid()) {
+            clearAuthData();
+            return null;
+        }
+
         const raw        = embedStorage.getItem('user');
         const userSource = embedStorage.getItem('userKey');
 
@@ -112,10 +161,6 @@ export const loadUserFromStorage = () => {
 /**
  * Loads and decrypts the client configurations stored in the
  * context-appropriate storage backend.
- *
- * In embed windows `embedStorage.getItem` resolves from `localStorage`
- * (with a `sessionStorage` fallback), so clients stored during a dashboard
- * login are immediately available to the embed without re-authentication.
  *
  * @returns {Array<Object>} An array of fully decrypted client configurations.
  */
@@ -148,15 +193,83 @@ export const loadClientsFromSession = () => {
 };
 
 /**
+ * Fetches the encrypted client list for the authenticated user's current
+ * active context from `GET /user/clients` and atomically replaces the
+ * `clients` key in storage with the new payload.
+ *
+ * This is the counterpart to `/admin/set` in the God-mode CID-switch flow.
+ * After the backend updates Redis with the new active CID, this function
+ * must be called so that `loadClientsFromSession()` — and all components
+ * that derive their `cid` query parameter from it — resolve to the correct
+ * client on the next render cycle.
+ *
+ * The raw encrypted array returned by the API is stored directly without
+ * re-encryption, preserving the per-CID AES keys applied server-side
+ * (same scheme as the login payload).
+ *
+ * Additionally writes `currentCid` from the first client in the returned
+ * list so that the Axios request interceptor picks up the new CID on
+ * subsequent requests without requiring a page reload.
+ *
+ * @async
+ * @returns {Promise<Array<Object>>} The decrypted client list, or the
+ *   existing session clients if the request fails (fail-safe).
+ */
+export const fetchSessionClients = async () => {
+    try {
+        const response = await api.get('/user/clients');
+        const rawClients = response.data?.clients;
+
+        if (!Array.isArray(rawClients)) return loadClientsFromSession();
+
+        embedStorage.setItem('clients', JSON.stringify(rawClients));
+
+        if (rawClients.length > 0 && rawClients[0].cid) {
+            embedStorage.setItem('currentCid', rawClients[0].cid);
+        }
+
+        return rawClients
+            .map((client) => {
+                try {
+                    return getDecryptedClient(client);
+                } catch {
+                    return null;
+                }
+            })
+            .filter(Boolean);
+    } catch (error) {
+        console.error('fetchSessionClients failed, keeping existing session clients:', error);
+        return loadClientsFromSession();
+    }
+};
+
+/**
+ * Removes all authentication keys from storage using the symmetric cleanup
+ * provided by {@link module:utils/embedStorage}.
+ *
+ * Operates on both `localStorage` and `sessionStorage` regardless of the
+ * current context so that a logout triggered in any window leaves no
+ * residual credentials in either backend.
+ *
+ * @returns {void}
+ */
+export const clearAuthData = () => {
+    const keys = ['token', 'clients', 'tokenExpiration', 'user', 'userKey', 'currentCid'];
+    keys.forEach((key) => embedStorage.removeItem(key));
+};
+
+// ---------------------------------------------------------------------------
+// Client config persistence
+// ---------------------------------------------------------------------------
+
+/**
  * Creates or updates a client configuration on the backend, then syncs the
  * result into the active session storage array.
  *
  * @async
- * @param {string|null} cid        - The client identifier, or `null` when
- *   creating a new client.
+ * @param {string|null} cid        - The client identifier, or `null` when creating.
  * @param {Object}      clientData - The new or updated configuration object.
- * @returns {Promise<Object>} Contains the newly updated client and the full
- *   updated list.
+ * @returns {Promise<Object>} Contains the newly updated client and the full updated list.
  * @throws {string} The error message from the API response if the request fails.
  */
 export const saveClientConfig = async (cid, clientData) => {
@@ -172,7 +285,7 @@ export const saveClientConfig = async (cid, clientData) => {
         const newClientDecrypted = getDecryptedClient(newClientRaw);
 
         const updatedClientList = cid
-            ? currentClients.map(c =>
+            ? currentClients.map((c) =>
                 c.cid === newClientDecrypted.cid ? newClientDecrypted : c)
             : [...currentClients, newClientDecrypted];
 
@@ -199,8 +312,8 @@ export const deleteClient = async (cid) => {
     try {
         const response = await api.delete(`/client/delete/${cid}`);
 
-        const currentClients  = loadClientsFromSession();
-        const updatedClients  = currentClients.filter(c => c.cid !== cid);
+        const currentClients = loadClientsFromSession();
+        const updatedClients = currentClients.filter((c) => c.cid !== cid);
 
         embedStorage.setItem(
             'clients',
@@ -209,7 +322,11 @@ export const deleteClient = async (cid) => {
 
         return response.data;
     } catch (error) {
-        throw error.response?.data?.message || error.response?.data?.error || 'Error deleting client';
+        throw (
+            error.response?.data?.message ||
+            error.response?.data?.error ||
+            'Error deleting client'
+        );
     }
 };
 
@@ -230,7 +347,7 @@ export const updateClientResilienceInSession = (cid, resilienceData) => {
         if (!Array.isArray(clients)) return;
 
         const key     = generateKeyFromString(cid);
-        const updated = clients.map(c =>
+        const updated = clients.map((c) =>
             c.cid === cid
                 ? { ...c, resilience: resilienceData ? encryptJSON(resilienceData, key) : null }
                 : c
@@ -241,6 +358,3 @@ export const updateClientResilienceInSession = (cid, resilienceData) => {
         console.error('Failed to update resilience in session:', e);
     }
 };
-
-/** Alias for components that import `verifyTwoFactor` by name. */
-export const verifyTwoFactor = verify2FA;

@@ -1,5 +1,5 @@
 // filepath: ./src/pages/SurveysPage.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     Box,
@@ -96,6 +96,7 @@ const SurveysPage = () => {
 
     const [clientList, setClientList] = useState([]);
     const [filterActive, setFilterActive] = useState(true);
+    const filterActiveInitialRef = useRef(true);
 
     const {
         data: surveys,
@@ -119,7 +120,7 @@ const SurveysPage = () => {
         sort: 'created_at',
         order: 'desc',
         dataKey: 'surveys',
-        active: true
+        filters: { active: true }
     });
 
     useEffect(() => {
@@ -134,9 +135,13 @@ const SurveysPage = () => {
             console.error('Error loading clients:', e);
             setClientList([]);
         }
-    }, [setSelectedCid, setTempInputs, selectedCid]);
+    }, [setSelectedCid, setTempInputs]);
 
     useEffect(() => {
+        if (filterActiveInitialRef.current) {
+            filterActiveInitialRef.current = false;
+            return;
+        }
         handleFilterChange('active', filterActive);
     }, [filterActive, handleFilterChange]);
 

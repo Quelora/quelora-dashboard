@@ -1,5 +1,6 @@
 // ./src/hooks/usePaginatedList.js
 import { useState, useEffect, useCallback, useRef } from 'react';
+import embedStorage from '../utils/embedStorage';
 
 const DEBOUNCE_DELAY = 500;
 
@@ -7,7 +8,11 @@ const usePaginatedList = (fetchApiFn, initialCid, initialConfig = {}) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [selectedCid, setSelectedCid] = useState(initialCid);
+    const [selectedCid, setSelectedCid] = useState(
+        () => (initialCid !== null && initialCid !== undefined)
+            ? initialCid
+            : (embedStorage.getItem('currentCid') || null)
+    );
     const [refreshKey, setRefreshKey] = useState(0);
 
     const [pagination, setPagination] = useState({
@@ -34,7 +39,7 @@ const usePaginatedList = (fetchApiFn, initialCid, initialConfig = {}) => {
 
     useEffect(() => {
         if (selectedCid) {
-            sessionStorage.setItem('currentCid', selectedCid);
+            embedStorage.setItem('currentCid', selectedCid);
         }
     }, [selectedCid]);
 
@@ -122,7 +127,7 @@ const usePaginatedList = (fetchApiFn, initialCid, initialConfig = {}) => {
 
     const handleCidChange = useCallback((event) => {
         const newCid = event.target.value;
-        sessionStorage.setItem('currentCid', newCid);
+        embedStorage.setItem('currentCid', newCid);
         setSelectedCid(newCid);
         setPagination(prev => ({...prev, page: 0}));
     }, []);

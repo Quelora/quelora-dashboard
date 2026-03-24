@@ -1,12 +1,24 @@
-// src/api/axiosConfig.js
+/**
+ * @fileoverview Axios instance configuration.
+ *
+ * Provides a pre-configured Axios instance with:
+ *  - Request interceptor that attaches the JWT Bearer token and the active
+ *    client CID to every outgoing request via {@link module:utils/embedStorage}.
+ *  - Response interceptor that transparently decompresses dictionary-encoded
+ *    payloads and handles 401 responses with a centralized cleanup.
+ *
+ * @module api/axiosConfig
+ */
+
 import axios from 'axios';
 import embedStorage from '../utils/embedStorage';
+import { clearAuthData } from './auth';
 
 const API_URL = process.env.REACT_APP_API_URL || '/api';
 
 /**
  * Recursively deserializes a compressed API response payload by expanding
- * short dictionary keys back into their original long-form field names.
+ * short numeric dictionary keys back into their original field names.
  *
  * @param {*}      compressedData - The compressed value to deserialize.
  * @param {Object} dictionary     - Map of short key → long key.
@@ -18,7 +30,7 @@ const deserializeData = (compressedData, dictionary) => {
     }
 
     if (Array.isArray(compressedData)) {
-        return compressedData.map(item => deserializeData(item, dictionary));
+        return compressedData.map((item) => deserializeData(item, dictionary));
     }
 
     const decompressed = {};
@@ -40,14 +52,13 @@ const api = axios.create({
  * Request interceptor — attaches the JWT Bearer token and the active client
  * identifier to every outgoing request.
  *
- * Both values are read via `embedStorage.getItem`, which transparently
- * resolves to `localStorage` in embed windows (with a `sessionStorage`
- * fallback) and to `sessionStorage` in the main dashboard. This ensures
- * that API calls made inside embed popups reuse the token stored during a
- * previous authentication without requiring a new login.
+ * Both values are read via `embedStorage.getItem`, which resolves to
+ * `localStorage` in embed windows and `sessionStorage` in the dashboard.
+ * This ensures that API calls made inside embed popups reuse the session
+ * established during the last login without requiring re-authentication.
  */
 api.interceptors.request.use(
-    config => {
+    (config) => {
         const token = embedStorage.getItem('token');
         const cid   = embedStorage.getItem('currentCid');
 
@@ -61,7 +72,7 @@ api.interceptors.request.use(
 
         return config;
     },
-    error => Promise.reject(error)
+    (error) => Promise.reject(error)
 );
 
 /**
@@ -72,12 +83,15 @@ api.interceptors.request.use(
  *    with the fully expanded object so call-sites never need to be aware of
  *    the compression scheme.
  *
- * 2. **401 handling**: clears all auth data via `embedStorage.removeItem`
- *    (which in embed context removes from both `localStorage` and
- *    `sessionStorage`) and redirects to `/login`.
+ * 2. **401 handling**: calls `clearAuthData()` which removes all auth keys
+ *    from **both** `localStorage` and `sessionStorage` via the embedStorage
+ *    abstraction, then redirects to `/login`.
+ *    Previously this handler iterated a hardcoded subset of keys and only
+ *    removed them from one storage backend, leaving residual credentials that
+ *    could be picked up by the next session.
  */
 api.interceptors.response.use(
-    response => {
+    (response) => {
         const responseData = response.data;
 
         if (responseData?.dictionary && responseData?.data) {
@@ -86,12 +100,9 @@ api.interceptors.response.use(
 
         return response;
     },
-    error => {
+    (error) => {
         if (error.response?.status === 401) {
-            embedStorage.removeItem('token');
-            embedStorage.removeItem('currentCid');
-            embedStorage.removeItem('tokenExpiration');
-            embedStorage.removeItem('clients');
+            clearAuthData();
             window.location.href = '/login';
         }
         return Promise.reject(error);

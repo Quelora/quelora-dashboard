@@ -210,7 +210,7 @@ const CampaignsPage = () => {
             console.error('Error loading clients:', e);
             setClientList([]);
         }
-    }, [setSelectedCid, setTempInputs, selectedCid]);
+    }, [setSelectedCid, setTempInputs]);
 
     const handleSearchChange = (e) => {
         handleDebouncedFilterChange('search', e.target.value);

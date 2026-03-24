@@ -1,5 +1,5 @@
 // ./src/pages/ClientPostsPage.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     Box,
@@ -96,6 +96,7 @@ const ClientPostsPage = () => {
 
     const [clientList, setClientList] = useState([]);
     const [filterLive, setFilterLive] = useState(false);
+    const filterLiveInitialRef = useRef(true);
 
     const {
         data: posts,
@@ -118,7 +119,7 @@ const ClientPostsPage = () => {
     } = usePaginatedList(getClientPosts, null, {
         sort: 'created_at',
         order: 'desc',
-        filters: { deleted: false }
+        filters: { deleted: false, isLive: false }
     });
 
     useEffect(() => {
@@ -133,9 +134,13 @@ const ClientPostsPage = () => {
             console.error('Error loading clients:', e);
             setClientList([]);
         }
-    }, [setSelectedCid, setTempInputs, selectedCid]);
+    }, [setSelectedCid, setTempInputs]);
 
     useEffect(() => {
+        if (filterLiveInitialRef.current) {
+            filterLiveInitialRef.current = false;
+            return;
+        }
         handleFilterChange('isLive', filterLive);
     }, [filterLive, handleFilterChange]);
 
