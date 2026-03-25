@@ -42,5 +42,12 @@
   "profile_updated_success": "プロフィールが正常に更新されました",
   "rotate": "回転",
   "title": "マイプロフィール",
-  "zoom": "ズーム"
+  "zoom": "ズーム",
+  "create_system_user": "ユーザーを作成",
+  "email_security_note": "ウェルカムメールを送信します。セキュリティ上の理由から、パスワードは含まれません（別の手段で伝える必要があります）。",
+  "password_help_temp": "保存する前にパスワードをコピーしてください。",
+  "role": "ロール",
+  "send_welcome_email": "ウェルカムメールを送信",
+  "user_disables": "このユーザーは無効化されます",
+  "username": "ユーザー名"
 }

@@ -593,41 +593,43 @@ const ClientCard = ({
             <CardActions sx={{ flexDirection: 'column', gap: 1, px: 2.25, py: 1.5, alignItems: 'stretch' }}>
 
                 {/* Primary action row: Configure + icon buttons */}
-                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'space-between' }}>
                     <Button
                         variant="contained"
                         startIcon={<ConfigureIcon sx={{ fontSize: '0.9rem !important' }} />}
                         onClick={() => handleEditClient(client)}
                         disableElevation
                         sx={{
-                            flex:          1,
                             textTransform: 'none',
                             fontSize:      '0.82rem',
                             fontWeight:    500,
                             py:            0.75,
+                            px:            2,
                             borderRadius:  'var(--border-radius-md, 8px)',
                         }}
                     >
                         {t('client.configure_button')}
                     </Button>
 
-                    <Tooltip title={t('client.tooltip.show_code')}>
-                        <ActionIconButton onClick={() => handleShowCode(client)} size="small">
-                            <SnippetIcon sx={{ fontSize: '0.9rem' }} />
-                        </ActionIconButton>
-                    </Tooltip>
+                    <Box sx={{ display: 'flex', gap: 0.75 }}>
+                        <Tooltip title={t('client.tooltip.show_code')}>
+                            <ActionIconButton onClick={() => handleShowCode(client)} size="small">
+                                <SnippetIcon sx={{ fontSize: '0.9rem' }} />
+                            </ActionIconButton>
+                        </Tooltip>
 
-                    <Tooltip title={t('client.tooltip.download_code')}>
-                        <ActionIconButton onClick={handleDownloadCode} size="small">
-                            <DownloadIcon sx={{ fontSize: '0.9rem' }} />
-                        </ActionIconButton>
-                    </Tooltip>
+                        <Tooltip title={t('client.tooltip.download_code')}>
+                            <ActionIconButton onClick={handleDownloadCode} size="small">
+                                <DownloadIcon sx={{ fontSize: '0.9rem' }} />
+                            </ActionIconButton>
+                        </Tooltip>
 
-                    <Tooltip title={t('client.tooltip.delete_client')}>
-                        <DangerIconButton onClick={() => handleDeleteClient(client)} size="small">
-                            <DeleteIcon sx={{ fontSize: '0.9rem' }} />
-                        </DangerIconButton>
-                    </Tooltip>
+                        <Tooltip title={t('client.tooltip.delete_client')}>
+                            <DangerIconButton onClick={() => handleDeleteClient(client)} size="small">
+                                <DeleteIcon sx={{ fontSize: '0.9rem' }} />
+                            </DangerIconButton>
+                        </Tooltip>
+                    </Box>
                 </Box>
 
                 {/* Module chips row */}

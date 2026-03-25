@@ -18,5 +18,8 @@
   "settings": "設定とクライアント",
   "surveys": "アンケート",
   "trash": "ゴミ箱",
-  "users": "ユーザー"
+  "users": "ユーザー",
+  "gamification": "ゲーミフィケーション",
+  "profiles": "プロフィール",
+  "system_users": "システムスタッフ"
 }

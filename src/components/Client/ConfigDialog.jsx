@@ -31,6 +31,7 @@ import EntityConfig from './EntityConfig';
 import CaptchaConfig from './CaptchaConfig';
 import OtherConfig from './OtherConfig';
 import AuthWidgetConfig from './AuthWidgetConfig';
+import GiphyConfig from './GiphyConfig';
 import CustomTextField from '../Common/CustomTextField';
 
 /**
@@ -84,6 +85,7 @@ const ADVANCED_TABS = [
     { labelKey: 'client.tab_captcha'    },
     { labelKey: 'client.tab_cors'       },
     { labelKey: 'client.tab_other'      },
+    { labelKey: 'client.tab_giphy'      },
 ];
 
 /**
@@ -110,12 +112,29 @@ const ADVANCED_TABS = [
  * @param {ConfigMode}     [props.initialMode='basic']     - Mode to activate when dialog opens.
  * @returns {JSX.Element}
  */
+/**
+ * Maps a config module name to its ADVANCED_TABS index.
+ * Used to auto-navigate when the server returns field-level errors.
+ */
+const MODULE_TO_ADVANCED_TAB = {
+    moderation:  0,
+    toxicity:    0,
+    captcha:     1,
+    cors:        2,
+    geolocation: 3,
+    translation: 3,
+    language:    3,
+    giphy:       4,
+};
+
 const ConfigDialog = ({
     open,
     editingClient,
     config,
     setConfig,
     isFormSubmitted,
+    fieldErrors = {},
+    onClearFieldError,
     loading,
     handleGenerateOrUpdateCID,
     setOpenConfigDialog,
@@ -143,6 +162,19 @@ const ConfigDialog = ({
             setActiveTab(0);
         }
     }, [open, initialMode]);
+
+    /**
+     * When the server returns field errors, switch to Advanced mode and
+     * navigate to the first tab that contains an error.
+     */
+    useEffect(() => {
+        if (!open || !fieldErrors || Object.keys(fieldErrors).length === 0) return;
+        const errorModule = Object.keys(fieldErrors).find(mod => mod in MODULE_TO_ADVANCED_TAB);
+        if (errorModule) {
+            setMode('advanced');
+            setActiveTab(MODULE_TO_ADVANCED_TAB[errorModule]);
+        }
+    }, [fieldErrors, open]);
 
     /**
      * Switches mode and resets to tab 0 so the user always lands on the
@@ -307,6 +339,15 @@ const ConfigDialog = ({
                         config={config}
                         setConfig={setConfig}
                         isFormSubmitted={isFormSubmitted}
+                    />
+                );
+            case 4:
+                return (
+                    <GiphyConfig
+                        config={config}
+                        setConfig={setConfig}
+                        fieldErrors={fieldErrors.giphy || {}}
+                        onClearFieldError={(field) => onClearFieldError?.('giphy', field)}
                     />
                 );
             default:

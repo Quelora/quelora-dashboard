@@ -34,6 +34,10 @@ const DEFAULT_CONFIG = {
     siteUrl:     'https://www.quelora.org',
     config: {
         login: {
+            queloraSession:  false,
+            loginUrl:        '',
+            logoutUrl:       '',
+            registrationUrl: '',
             baseUrl:         'https://api.quelora.org/login',
             providers:       [],
             providerDetails: {
@@ -52,8 +56,7 @@ const DEFAULT_CONFIG = {
         cors:             { enabled: false, allowedOrigins: [] },
         captcha:          { enabled: false, provider: 'turnstile', siteKey: '', secretKey: '', credentialsJson: '{}' },
         authWidget:       { enabled: false, selector: '', position: 'inside' },
-        modeDiscovery:    false,
-        discoveryDataUrl: '',
+        giphy:            { apiKey: '', searchUrl: '', trendingUrl: '' },
         entityConfig: {
             selector:             'article',
             entityIdAttribute:    'href',
@@ -71,6 +74,7 @@ const DEFAULT_CONFIG = {
         limits:      { comment_text: 200, reply_text: 200 },
         editing:     { allow_edits: true, allow_delete: true, edit_time_limit: 5 },
         audio:       { enable_mic_transcription: false, save_comment_audio: false, max_recording_seconds: 60, bitrate: 16000 },
+        comments:    { allowGif: false },
     },
 };
 
@@ -100,6 +104,12 @@ const useClient = () => {
     const [isFormSubmitted, setIsFormSubmitted]  = useState(false);
     const [snackbar,        setSnackbar]         = useState({ open: false, message: '', severity: 'success' });
     const [anchorEl,        setAnchorEl]         = useState(null);
+    /**
+     * Field-level errors returned by the server (e.g. Mongoose validation failures).
+     * Shape: { [module]: { [field]: errorMessage } }
+     * Example: { giphy: { searchUrl: 'giphy.searchUrl must be a valid HTTP/HTTPS URL' } }
+     */
+    const [fieldErrors,     setFieldErrors]      = useState({});
 
     /**
      * Mode pre-selected when the ConfigDialog opens.
@@ -303,9 +313,6 @@ const useClient = () => {
                 }
             }
         }
-        if (config.config.modeDiscovery && !isValidUrl(config.config.discoveryDataUrl)) {
-            showErrorAlert(t('client.api_url_required_valid')); return false;
-        }
         if (!config.config.login?.jwtSecret?.trim()) {
             showErrorAlert(t('client.jwt_secret_required')); return false;
         }
@@ -371,6 +378,38 @@ const useClient = () => {
     // ── CRUD handlers ─────────────────────────────────────────────────────────
 
     /**
+     * Extracts a human-readable message from a thrown API error.
+     * saveClientConfig throws either a string or an object with a `message` field.
+     *
+     * @param {*} err
+     * @returns {string|null}
+     */
+    const extractServerError = (err) =>
+        typeof err === 'string' ? err : (err?.message ?? null);
+
+    /**
+     * Parses a Mongoose validation error string into a field-error map.
+     * Finds "module.field rest of message" patterns anywhere in the string.
+     *
+     * @param {string|null} errMsg
+     * @returns {{ [module: string]: { [field: string]: string } }}
+     */
+    const parseFieldErrors = (errMsg) => {
+        if (!errMsg || typeof errMsg !== 'string') return {};
+        const errors = {};
+        const re = /\b([a-z]\w+)\.([a-zA-Z]\w*)([^,]*)/g;
+        let m;
+        while ((m = re.exec(errMsg)) !== null) {
+            const mod   = m[1];
+            const field = m[2];
+            const msg   = `${m[1]}.${m[2]}${m[3]}`.trim();
+            if (!errors[mod]) errors[mod] = {};
+            errors[mod][field] = msg;
+        }
+        return errors;
+    };
+
+    /**
      * Creates or updates a client after validation.
      *
      * @async
@@ -395,13 +434,16 @@ const useClient = () => {
             };
             const { updatedClientList } = await saveClientConfig(cid, clientToProcess);
             setClients(updatedClientList);
+            setFieldErrors({});
             setOpenConfigDialog(false);
             setEditingClient(null);
             resetConfig();
             showSuccessAlert(cid ? t('client.cid_updated') : t('client.cid_generated'));
         } catch (err) {
             console.error('useClient: handleUpsertClient error:', err);
-            showErrorAlert(t('client.save_client_error'));
+            const msg = extractServerError(err);
+            setFieldErrors(parseFieldErrors(msg));
+            showErrorAlert(msg || t('client.save_client_error'));
         } finally {
             setLoading(false);
         }
@@ -504,7 +546,7 @@ const useClient = () => {
             showSuccessAlert(t('client.general_config_saved'));
         } catch (err) {
             console.error('useClient: handleSaveGeneralConfig error:', err);
-            showErrorAlert(t('client.save_general_config_error'));
+            showErrorAlert(extractServerError(err) || t('client.save_general_config_error'));
         } finally {
             setLoading(false);
         }
@@ -535,7 +577,7 @@ const useClient = () => {
             showSuccessAlert(t('client.vapid_config_saved'));
         } catch (err) {
             console.error('useClient: handleSaveVapidConfig error:', err);
-            showErrorAlert(t('client.save_vapid_config_error'));
+            showErrorAlert(extractServerError(err) || t('client.save_vapid_config_error'));
         } finally {
             setLoading(false);
         }
@@ -565,7 +607,7 @@ const useClient = () => {
             return true;
         } catch (err) {
             console.error('useClient: handleSaveEmailConfig error:', err);
-            showErrorAlert(t('client.email_config_save_error'));
+            showErrorAlert(extractServerError(err) || t('client.email_config_save_error'));
             return false;
         } finally {
             setLoading(false);
@@ -628,7 +670,7 @@ const useClient = () => {
             showSuccessAlert(t('client.network_config_saved'));
         } catch (err) {
             console.error('useClient: handleSaveNetworkConfig error:', err);
-            showErrorAlert(t('client.network_config_save_error'));
+            showErrorAlert(extractServerError(err) || t('client.network_config_save_error'));
         } finally {
             setLoading(false);
         }
@@ -643,6 +685,8 @@ const useClient = () => {
         setEditingClient,
         loading,
         isFormSubmitted,
+        fieldErrors,
+        setFieldErrors,
         snackbar,
         anchorEl,
         setAnchorEl,

@@ -32,6 +32,7 @@ import {
     DeviceHub as P2PIcon,
 } from '@mui/icons-material';
 import CustomTextField from '../Common/CustomTextField';
+import EnterpriseGate from '../Common/EnterpriseGate';
 
 /**
  * Renders a single tab panel, hiding content when not active.
@@ -275,6 +276,7 @@ const NetworkConfigModal = ({ open, onClose, config, setConfig, client, onSave, 
             </Box>
 
             <DialogContent sx={{ px: 4 }}>
+                <EnterpriseGate module="network">
 
                 {/* ── TAB 0: TURN / WebRTC ─────────────────────────────── */}
                 <TabPanel value={activeTab} index={0}>
@@ -390,6 +392,7 @@ const NetworkConfigModal = ({ open, onClose, config, setConfig, client, onSave, 
                         </Box>
                     </Stack>
                 </TabPanel>
+                </EnterpriseGate>
             </DialogContent>
 
             {loading && <LinearProgress />}

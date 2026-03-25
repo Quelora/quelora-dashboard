@@ -2,6 +2,7 @@
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import {
+    Box,
     Drawer,
     List,
     ListItem,
@@ -42,6 +43,8 @@ import {
 } from '@mui/icons-material';
 import React, { useState, useEffect } from 'react';
 import { getMenuPermissions, getUserRole } from '../utils/permissions';
+import { useEnterprise } from '../hooks/useEnterprise';
+import EnterpriseBadge from './Common/EnterpriseBadge';
 
 const drawerWidth = 240;
 
@@ -68,6 +71,7 @@ const Sidebar = ({ handleLogout, open, handleDrawerToggle, isMobile }) => {
     const { t } = useTranslation();
     const location = useLocation();
     const theme = useTheme();
+    const { hasModule } = useEnterprise();
     
     const [analyticsOpen, setAnalyticsOpen] = useState(false);
     const [advertisingOpen, setAdvertisingOpen] = useState(false);
@@ -107,7 +111,7 @@ const Sidebar = ({ handleLogout, open, handleDrawerToggle, isMobile }) => {
 
     const contentItems = [
         { text: t('sidebar.posts'), icon: <PostsIcon/>, path: '/posts' },
-        { text: t('sidebar.surveys'), icon: <PollIcon/>, path: '/surveys' },
+        { text: t('sidebar.surveys'), icon: <PollIcon/>, path: '/surveys', enterpriseModule: 'surveys' },
         { text: t('sidebar.trash'), icon: <Delete/>, path: '/trash' },
         { text: t('sidebar.reports'), icon: <ReportIcon/>, path: '/reports' },
     ];
@@ -131,35 +135,52 @@ const Sidebar = ({ handleLogout, open, handleDrawerToggle, isMobile }) => {
         return location.pathname.startsWith(path);
     };
 
-    const renderMenuSection = (title, items, isOpen, onToggle, icon, sectionKey) => {
+    // enterpriseModule: if provided, shows the Enterprise badge next to the
+    // section header when the user does NOT have that module.
+    const renderMenuSection = (title, items, isOpen, onToggle, icon, sectionKey, enterpriseModule) => {
         if (!permissions?.hasPermission(sectionKey)) return null;
 
         const visibleItems = permissions.getVisibleItems(items);
         if (visibleItems.length === 0) return null;
+
+        const sectionLocked = enterpriseModule && !hasModule(enterpriseModule);
 
         return (
             <>
                 <StyledListItem onClick={onToggle} sx={{ cursor: 'pointer' }}>
                     <ListItemIcon sx={{ minWidth: '40px', color: 'inherit' }}>{icon}</ListItemIcon>
                     <ListItemText primary={title} />
+                    {sectionLocked && (
+                        <Box sx={{ mr: 0.5 }}>
+                            <EnterpriseBadge size="small" />
+                        </Box>
+                    )}
                     {isOpen ? <ExpandLess /> : <ExpandMore />}
                 </StyledListItem>
                 <Collapse in={isOpen && open} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                        {visibleItems.map((item) => (
-                            <StyledListItem
-                                key={item.text}
-                                component={Link}
-                                to={item.path}
-                                selected={isItemActive(item.path)}
-                                sx={{ pl: 4 }}
-                            >
-                                <ListItemIcon sx={{ minWidth: '40px', color: 'inherit' }}>
-                                    {item.icon}
-                                </ListItemIcon>
-                                <ListItemText primary={item.text} />
-                            </StyledListItem>
-                        ))}
+                        {visibleItems.map((item) => {
+                            const itemLocked = item.enterpriseModule && !hasModule(item.enterpriseModule);
+                            return (
+                                <StyledListItem
+                                    key={item.text}
+                                    component={Link}
+                                    to={item.path}
+                                    selected={isItemActive(item.path)}
+                                    sx={{ pl: 4 }}
+                                >
+                                    <ListItemIcon sx={{ minWidth: '40px', color: 'inherit' }}>
+                                        {item.icon}
+                                    </ListItemIcon>
+                                    <ListItemText primary={item.text} />
+                                    {itemLocked && (
+                                        <Box sx={{ ml: 0.5 }}>
+                                            <EnterpriseBadge size="small" />
+                                        </Box>
+                                    )}
+                                </StyledListItem>
+                            );
+                        })}
                     </List>
                 </Collapse>
             </>
@@ -207,11 +228,9 @@ const Sidebar = ({ handleLogout, open, handleDrawerToggle, isMobile }) => {
 
             <List sx={{ padding: '8px' }}>
                 {renderMenuSection(t('sidebar.analytics'), analyticsItems, analyticsOpen, handleAnalyticsClick, <DashboardIcon />, 'analytics')}
-                {renderMenuSection(t('sidebar.advertising'), advertisingItems, advertisingOpen, handleAdvertisingClick, <CampaignIcon />, 'advertising')}
+                {renderMenuSection(t('sidebar.advertising'), advertisingItems, advertisingOpen, handleAdvertisingClick, <CampaignIcon />, 'advertising', 'advertising')}
                 {renderMenuSection(t('sidebar.content'), contentItems, contentOpen, handleContentClick, <ContentIcon />, 'content')}
-                
-                {/* GAMIFICATION SECTION ADDED HERE */}
-                {renderMenuSection(t('gamification.title', 'Gamification'), gamificationItems, gamificationOpen, handleGamificationClick, <EmojiEvents />, 'gamification')}
+                {renderMenuSection(t('gamification.title', 'Gamification'), gamificationItems, gamificationOpen, handleGamificationClick, <EmojiEvents />, 'gamification', 'gamification')}
                 
                 {renderMenuSection(t('sidebar.profiles'), profilesItems, usersOpen, handleUsersClick, <PeopleIcon />, 'users')}
                 {renderMenuSection(t('sidebar.settings'), settingsItems, settingsOpen, handleSettingsClick, <SettingsIcon />, 'settings')}

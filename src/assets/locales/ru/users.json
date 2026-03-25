@@ -161,5 +161,7 @@
   "view": "Просмотр",
   "viewComments": "Посмотреть комментарии",
   "weak_password_desc": "Пароль должен соответствовать всем требованиям.",
-  "weak_password_title": "Слабый пароль"
+  "weak_password_title": "Слабый пароль",
+  "trust_level": "Уровень",
+  "permissions_title": "Права доступа"
 }

@@ -42,5 +42,12 @@
   "profile_updated_success": "Profil mis à jour avec succès",
   "rotate": "Rotation",
   "title": "Mon profil",
-  "zoom": "Zoom"
+  "zoom": "Zoom",
+  "create_system_user": "Créer un utilisateur",
+  "email_security_note": "Envoie un e-mail de bienvenue. Pour des raisons de sécurité, le mot de passe n'est PAS inclus (vous devez le communiquer par un autre canal).",
+  "password_help_temp": "Assurez-vous de copier le mot de passe avant de sauvegarder.",
+  "role": "Rôles",
+  "send_welcome_email": "Envoyer un e-mail de bienvenue",
+  "user_disables": "Cet utilisateur sera désactivé",
+  "username": "Nom d'utilisateur"
 }

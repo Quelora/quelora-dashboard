@@ -161,5 +161,7 @@
   "view": "查看",
   "viewComments": "查看评论",
   "weak_password_desc": "密码必须满足所有要求。",
-  "weak_password_title": "弱密码"
+  "weak_password_title": "弱密码",
+  "trust_level": "级别",
+  "permissions_title": "权限"
 }

@@ -161,5 +161,7 @@
   "view": "देखें",
   "viewComments": "टिप्पणियाँ देखें",
   "weak_password_desc": "पासवर्ड को सभी आवश्यकताओं को पूरा करना होगा।",
-  "weak_password_title": "कमजोर पासवर्ड"
+  "weak_password_title": "कमजोर पासवर्ड",
+  "trust_level": "स्तर",
+  "permissions_title": "अनुमतियां"
 }

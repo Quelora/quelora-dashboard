@@ -14,5 +14,14 @@
   "subtitle": "用户个人资料互动的聚合指标。",
   "title": "用户个人资料分析",
   "topUsers": "热门用户",
-  "user": "用户"
+  "user": "用户",
+  "activity": "活动",
+  "current_score": "当前信任分数",
+  "date": "日期",
+  "delta": "变化",
+  "event_type": "事件 / 原因",
+  "impact": "影响",
+  "reputation": "声誉历史",
+  "source": "来源",
+  "view_reputation": "查看历史"
 }

@@ -18,5 +18,8 @@
   "settings": "Einstellungen & Clients",
   "surveys": "Umfragen",
   "trash": "Papierkorb",
-  "users": "Benutzer"
+  "users": "Benutzer",
+  "gamification": "Gamification",
+  "profiles": "Profile",
+  "system_users": "Systemmitarbeiter"
 }

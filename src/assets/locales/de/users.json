@@ -161,5 +161,7 @@
   "view": "Anzeigen",
   "viewComments": "Kommentare anzeigen",
   "weak_password_desc": "Das Passwort muss alle Anforderungen erfüllen.",
-  "weak_password_title": "Schwaches Passwort"
+  "weak_password_title": "Schwaches Passwort",
+  "trust_level": "Stufe",
+  "permissions_title": "Berechtigungen"
 }

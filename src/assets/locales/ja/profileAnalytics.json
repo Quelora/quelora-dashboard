@@ -14,5 +14,14 @@
   "subtitle": "ユーザープロフィールのインタラクション集計メトリクス。",
   "title": "ユーザープロフィール分析",
   "topUsers": "トップユーザー",
-  "user": "ユーザー"
+  "user": "ユーザー",
+  "activity": "アクティビティ",
+  "current_score": "現在の信頼スコア",
+  "date": "日付",
+  "delta": "変化",
+  "event_type": "イベント / 理由",
+  "impact": "インパクト",
+  "reputation": "評判履歴",
+  "source": "ソース",
+  "view_reputation": "履歴を見る"
 }

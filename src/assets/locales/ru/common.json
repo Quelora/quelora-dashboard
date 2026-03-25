@@ -44,5 +44,33 @@
     "from": "С",
     "to": "По",
     "apply": "Применить"
+  },
+  "actions": "Действия",
+  "add": "Добавить",
+  "are_you_sure": "Вы уверены?",
+  "change": "Изменить",
+  "copy": "Копировать",
+  "create_new": "Создать новый",
+  "godClientSelector": {
+    "confirmAccess": "Подтвердить доступ",
+    "description": "Как пользователь GOD, вы должны выбрать идентификатор клиента (CID) для работы с панелью управления.",
+    "searchLabel": "Поиск клиента (имя или CID)",
+    "title": "Выбор клиента (режим GOD)"
+  },
+  "realtime": "Реальное время",
+  "realtime_active": "Реальное время активно",
+  "role": "Роль",
+  "upload": "Загрузить",
+  "user": "Пользователь",
+  "password": "Пароль",
+  "copy_to_clipboard": "Скопировать в буфер обмена",
+  "copied": "Скопировано!",
+  "required_fields_error": "Пожалуйста, заполните все обязательные поля.",
+  "enterprise": {
+    "badge_label": "Enterprise",
+    "badge_tooltip": "Эта функция требует тарифного плана Enterprise.",
+    "gate_title": "Функция Enterprise",
+    "gate_body": "Этот модуль не включён в ваш текущий тарифный план. Перейдите на Enterprise, чтобы разблокировать его.",
+    "upgrade_cta": "Перейти на Enterprise"
   }
 }

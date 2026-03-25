@@ -59,7 +59,19 @@
   "yesterday": "Ayer",
   "zoom": "Zoom",
   "change": "Cambiar",
-  "realtime":"En vivo",
-  "realtime_active":"En vivo activo",
-  "upload": "Subir Marco"
+  "realtime": "En vivo",
+  "realtime_active": "En vivo activo",
+  "upload": "Subir Marco",
+  "add": "Agregar",
+  "password": "Contraseña",
+  "copy_to_clipboard": "Copiar al portapapeles",
+  "copied": "¡Copiado!",
+  "required_fields_error": "Por favor, complete todos los campos obligatorios.",
+  "enterprise": {
+    "badge_label": "Enterprise",
+    "badge_tooltip": "Esta función requiere un plan Enterprise.",
+    "gate_title": "Función Enterprise",
+    "gate_body": "Este módulo no está incluido en tu plan actual. Actualiza a Enterprise para desbloquearlo.",
+    "upgrade_cta": "Actualizar a Enterprise"
+  }
 }

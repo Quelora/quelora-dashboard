@@ -161,5 +161,7 @@
   "view": "Visualizar",
   "viewComments": "Visualizar comentários",
   "weak_password_desc": "A senha deve atender a todos os requisitos.",
-  "weak_password_title": "Senha Fraca"
+  "weak_password_title": "Senha Fraca",
+  "trust_level": "Nível",
+  "permissions_title": "Permissões"
 }

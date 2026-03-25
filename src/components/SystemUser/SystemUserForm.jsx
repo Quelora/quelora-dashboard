@@ -274,7 +274,7 @@ const SystemUserForm = ({ onSuccess, onCancel, availableClients, currentUserRole
                             <InfoIcon color="primary" sx={{ fontSize: 20, mt: 0.2 }} />
                             <Box>
                                 <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 600, fontSize: '0.75rem' }}>
-                                    {formData.role.toUpperCase()} PERMISSIONS:
+                                    {formData.role.toUpperCase()} — {t('users.permissions_title')}
                                 </Typography>
                                 <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.3 }}>
                                     {t(`role_descriptions.${formData.role}`)}
@@ -337,13 +337,13 @@ const SystemUserForm = ({ onSuccess, onCancel, availableClients, currentUserRole
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position="end">
-                                    <Tooltip title="Generate Random Password">
+                                    <Tooltip title={t('users.generate_random')}>
                                         <IconButton onClick={generateRandomPassword} edge="end" sx={{ mr: 0.5 }}>
                                             <CasinoIcon color="primary" />
                                         </IconButton>
                                     </Tooltip>
-                                    <Tooltip title={copied ? "Copied!" : "Copy to Clipboard"}>
-                                        <IconButton 
+                                    <Tooltip title={copied ? t('common.copied') : t('common.copy_to_clipboard')}>
+                                        <IconButton
                                             onClick={handleCopyPassword} 
                                             edge="end" 
                                             sx={{ mr: 0.5 }}

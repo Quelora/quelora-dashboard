@@ -161,5 +161,7 @@
   "view": "表示",
   "viewComments": "コメントを表示",
   "weak_password_desc": "パスワードはすべての要件を満たす必要があります。",
-  "weak_password_title": "弱いパスワード"
+  "weak_password_title": "弱いパスワード",
+  "trust_level": "レベル",
+  "permissions_title": "権限"
 }

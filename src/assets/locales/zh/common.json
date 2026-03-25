@@ -44,5 +44,33 @@
     "from": "从",
     "to": "到",
     "apply": "应用"
+  },
+  "actions": "操作",
+  "add": "添加",
+  "are_you_sure": "您确定吗？",
+  "change": "更改",
+  "copy": "复制",
+  "create_new": "创建新",
+  "godClientSelector": {
+    "confirmAccess": "确认访问",
+    "description": "作为 GOD 用户，您必须选择一个客户端 ID（CID）才能操作仪表板。",
+    "searchLabel": "搜索客户端（名称或 CID）",
+    "title": "客户端选择（GOD 模式）"
+  },
+  "realtime": "实时",
+  "realtime_active": "实时已激活",
+  "role": "角色",
+  "upload": "上传",
+  "user": "用户",
+  "password": "密码",
+  "copy_to_clipboard": "复制到剪贴板",
+  "copied": "已复制！",
+  "required_fields_error": "请填写所有必填字段。",
+  "enterprise": {
+    "badge_label": "Enterprise",
+    "badge_tooltip": "此功能需要 Enterprise 计划。",
+    "gate_title": "Enterprise 功能",
+    "gate_body": "此模块不包含在您当前的计划中。升级到 Enterprise 以解锁它。",
+    "upgrade_cta": "升级到 Enterprise"
   }
 }

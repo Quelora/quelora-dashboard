@@ -42,5 +42,12 @@
   "profile_updated_success": "个人资料更新成功",
   "rotate": "旋转",
   "title": "我的个人资料",
-  "zoom": "缩放"
+  "zoom": "缩放",
+  "create_system_user": "创建用户",
+  "email_security_note": "发送欢迎邮件。出于安全考虑，密码不包含在内（需通过其他渠道告知）。",
+  "password_help_temp": "保存前请务必复制密码。",
+  "role": "角色",
+  "send_welcome_email": "发送欢迎邮件",
+  "user_disables": "此用户将被停用",
+  "username": "用户名"
 }

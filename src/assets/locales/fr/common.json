@@ -44,5 +44,33 @@
     "from": "Du",
     "to": "Au",
     "apply": "Appliquer"
+  },
+  "actions": "Actions",
+  "add": "Ajouter",
+  "are_you_sure": "Êtes-vous sûr ?",
+  "change": "Modifier",
+  "copy": "Copier",
+  "create_new": "Créer nouveau",
+  "godClientSelector": {
+    "confirmAccess": "Confirmer l'accès",
+    "description": "En tant qu'utilisateur GOD, vous devez sélectionner un identifiant client (CID) pour opérer le tableau de bord.",
+    "searchLabel": "Rechercher un client (Nom ou CID)",
+    "title": "Sélection du client (Mode GOD)"
+  },
+  "realtime": "Temps réel",
+  "realtime_active": "Temps réel actif",
+  "role": "Rôle",
+  "upload": "Téléverser",
+  "user": "Utilisateur",
+  "password": "Mot de passe",
+  "copy_to_clipboard": "Copier dans le presse-papiers",
+  "copied": "Copié !",
+  "required_fields_error": "Veuillez remplir tous les champs obligatoires.",
+  "enterprise": {
+    "badge_label": "Enterprise",
+    "badge_tooltip": "Cette fonctionnalité nécessite un plan Enterprise.",
+    "gate_title": "Fonctionnalité Enterprise",
+    "gate_body": "Ce module n'est pas inclus dans votre plan actuel. Passez à Enterprise pour le débloquer.",
+    "upgrade_cta": "Passer à Enterprise"
   }
 }

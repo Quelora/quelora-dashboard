@@ -15,6 +15,7 @@ import {
 } from '@mui/icons-material';
 import CustomTextField from '../Common/CustomTextField';
 import { saveResilienceConfig, generateResilienceKeys } from '../../api/resilience';
+import EnterpriseGate from '../Common/EnterpriseGate';
 
 /** Modes available for the resilience engine. */
 const RESILIENCE_MODES = ['HYBRID', 'P2P_ONLY', 'SERVER_ONLY', 'PASSIVE'];
@@ -226,6 +227,7 @@ const ResilienceConfigModal = ({ open, onClose, onSave, client, showToast }) => 
             </Box>
 
             <DialogContent>
+                <EnterpriseGate module="resilience">
                 <>
                     {/* ── TAB 0: GENERAL ──────────────────────────────────── */}
                     {currentTab === 0 && (
@@ -463,6 +465,7 @@ const ResilienceConfigModal = ({ open, onClose, onSave, client, showToast }) => 
                         </Box>
                     )}
                 </>
+                </EnterpriseGate>
             </DialogContent>
 
             <DialogActions>

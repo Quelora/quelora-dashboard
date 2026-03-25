@@ -14,5 +14,14 @@
   "subtitle": "Aggregierte Benutzerprofil-Interaktionsmetriken.",
   "title": "Benutzerprofil-Analysen",
   "topUsers": "Top-Benutzer",
-  "user": "Benutzer"
+  "user": "Benutzer",
+  "activity": "Aktivität",
+  "current_score": "Aktueller Vertrauenswert",
+  "date": "Datum",
+  "delta": "Änderung",
+  "event_type": "Ereignis / Grund",
+  "impact": "Auswirkung",
+  "reputation": "Reputationsverlauf",
+  "source": "Quelle",
+  "view_reputation": "Verlauf anzeigen"
 }

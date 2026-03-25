@@ -44,5 +44,33 @@
     "from": "से",
     "to": "तक",
     "apply": "लागू करें"
+  },
+  "actions": "कार्रवाइयां",
+  "add": "जोड़ें",
+  "are_you_sure": "क्या आप सुनिश्चित हैं?",
+  "change": "बदलें",
+  "copy": "कॉपी करें",
+  "create_new": "नया बनाएं",
+  "godClientSelector": {
+    "confirmAccess": "एक्सेस की पुष्टि करें",
+    "description": "GOD उपयोगकर्ता के रूप में, आपको डैशबोर्ड संचालित करने के लिए एक क्लाइंट ID (CID) चुननी होगी।",
+    "searchLabel": "क्लाइंट खोजें (नाम या CID)",
+    "title": "क्लाइंट चयन (GOD मोड)"
+  },
+  "realtime": "रियल-टाइम",
+  "realtime_active": "रियल-टाइम सक्रिय",
+  "role": "भूमिका",
+  "upload": "अपलोड",
+  "user": "उपयोगकर्ता",
+  "password": "पासवर्ड",
+  "copy_to_clipboard": "क्लिपबोर्ड पर कॉपी करें",
+  "copied": "कॉपी किया गया!",
+  "required_fields_error": "कृपया सभी आवश्यक फ़ील्ड भरें।",
+  "enterprise": {
+    "badge_label": "Enterprise",
+    "badge_tooltip": "इस सुविधा के लिए Enterprise प्लान आवश्यक है।",
+    "gate_title": "Enterprise सुविधा",
+    "gate_body": "यह मॉड्यूल आपके वर्तमान प्लान में शामिल नहीं है। इसे अनलॉक करने के लिए Enterprise में अपग्रेड करें।",
+    "upgrade_cta": "Enterprise में अपग्रेड करें"
   }
 }

@@ -44,5 +44,33 @@
     "from": "Von",
     "to": "Bis",
     "apply": "Anwenden"
+  },
+  "actions": "Aktionen",
+  "add": "Hinzufügen",
+  "are_you_sure": "Sind Sie sicher?",
+  "change": "Ändern",
+  "copy": "Kopieren",
+  "create_new": "Neu erstellen",
+  "godClientSelector": {
+    "confirmAccess": "Zugang bestätigen",
+    "description": "Als GOD-Benutzer müssen Sie eine Client-ID (CID) auswählen, um das Dashboard zu bedienen.",
+    "searchLabel": "Client suchen (Name oder CID)",
+    "title": "Client-Auswahl (GOD-Modus)"
+  },
+  "realtime": "Echtzeit",
+  "realtime_active": "Echtzeit aktiv",
+  "role": "Rolle",
+  "upload": "Hochladen",
+  "user": "Benutzer",
+  "password": "Passwort",
+  "copy_to_clipboard": "In Zwischenablage kopieren",
+  "copied": "Kopiert!",
+  "required_fields_error": "Bitte füllen Sie alle Pflichtfelder aus.",
+  "enterprise": {
+    "badge_label": "Enterprise",
+    "badge_tooltip": "Diese Funktion erfordert einen Enterprise-Plan.",
+    "gate_title": "Enterprise-Funktion",
+    "gate_body": "Dieses Modul ist in Ihrem aktuellen Plan nicht enthalten. Wechseln Sie zu Enterprise, um es freizuschalten.",
+    "upgrade_cta": "Zu Enterprise wechseln"
   }
 }

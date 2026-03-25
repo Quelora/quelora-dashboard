@@ -269,6 +269,7 @@ const UserCommentsModal = ({ open, onClose, user, cid, initialTab = 0 }) => {
                                 component="div" count={listPagination.totalItems} page={listPagination.page} rowsPerPage={listPagination.limit}
                                 onPageChange={(e, p) => setListPagination(prev => ({...prev, page: p}))}
                                 onRowsPerPageChange={(e) => setListPagination(prev => ({...prev, limit: e.target.value, page: 0}))}
+                                labelRowsPerPage={t('common.rowsPerPage')}
                             />
                         </>
                     )}
@@ -276,8 +277,8 @@ const UserCommentsModal = ({ open, onClose, user, cid, initialTab = 0 }) => {
 
                 <TabPanel value={tab} index={2}>
                     <Box sx={{display:'flex', gap: 2, alignItems: 'center', mb: 2}}>
-                        <TextField type="number" size="small" value={nolanLimit} onChange={e => setNolanLimit(e.target.value)} label="Limit" />
-                        <Button variant="contained" onClick={fetchNolanAnalysis}>Analyze</Button>
+                        <TextField type="number" size="small" value={nolanLimit} onChange={e => setNolanLimit(e.target.value)} label={t('users.nolan.commentLimit')} />
+                        <Button variant="contained" onClick={fetchNolanAnalysis}>{t('users.nolan.generateChart')}</Button>
                     </Box>
                     {loadingNolan ? <CircularProgress /> : nolanData && <NolanChart data={nolanData} user={user} />}
                 </TabPanel>
@@ -293,7 +294,7 @@ const UserCommentsModal = ({ open, onClose, user, cid, initialTab = 0 }) => {
                                 <Typography variant="caption">pts</Typography>
                             </Box>
                         </Box>
-                        <Chip label={`Level ${currentTrust.level}`} color="primary" variant="outlined" />
+                        <Chip label={`${t('users.trust_level')} ${currentTrust.level}`} color="primary" variant="outlined" />
                     </Box>
 
                     <PaginatedTable

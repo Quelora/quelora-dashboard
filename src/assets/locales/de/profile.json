@@ -42,5 +42,12 @@
   "profile_updated_success": "Profil erfolgreich aktualisiert",
   "rotate": "Drehen",
   "title": "Mein Profil",
-  "zoom": "Zoomen"
+  "zoom": "Zoomen",
+  "create_system_user": "Benutzer erstellen",
+  "email_security_note": "Sendet eine Willkommens-E-Mail. Aus Sicherheitsgründen wird das Passwort NICHT eingeschlossen (Sie müssen es über einen anderen Kanal mitteilen).",
+  "password_help_temp": "Stellen Sie sicher, dass Sie das Passwort vor dem Speichern kopieren.",
+  "role": "Rollen",
+  "send_welcome_email": "Willkommens-E-Mail senden",
+  "user_disables": "Dieser Benutzer wird deaktiviert",
+  "username": "Benutzername"
 }

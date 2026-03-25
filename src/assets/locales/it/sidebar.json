@@ -18,5 +18,8 @@
   "settings": "Impostazioni & Clienti",
   "surveys": "Sondaggi",
   "trash": "Cestino",
-  "users": "Utenti"
+  "users": "Utenti",
+  "gamification": "Gamification",
+  "profiles": "Profili",
+  "system_users": "Staff di Sistema"
 }

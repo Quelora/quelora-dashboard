@@ -14,5 +14,14 @@
   "subtitle": "Métricas agregadas de interacción del perfil de usuario.",
   "title": "Analíticas de Perfil de Usuario",
   "topUsers": "Usuarios Principales",
-  "user": "Usuario"
+  "user": "Usuario",
+  "activity": "Actividad",
+  "current_score": "Puntaje de Confianza Actual",
+  "date": "Fecha",
+  "delta": "Cambio",
+  "event_type": "Evento / Razón",
+  "impact": "Impacto",
+  "reputation": "Historial de Reputación",
+  "source": "Fuente",
+  "view_reputation": "Ver Historial"
 }

@@ -44,5 +44,33 @@
     "from": "De",
     "to": "Até",
     "apply": "Aplicar"
+  },
+  "actions": "Ações",
+  "add": "Adicionar",
+  "are_you_sure": "Tem a certeza?",
+  "change": "Alterar",
+  "copy": "Copiar",
+  "create_new": "Criar novo",
+  "godClientSelector": {
+    "confirmAccess": "Confirmar acesso",
+    "description": "Como utilizador GOD, deve selecionar um ID de cliente (CID) para operar o dashboard.",
+    "searchLabel": "Pesquisar cliente (Nome ou CID)",
+    "title": "Seleção de cliente (Modo GOD)"
+  },
+  "realtime": "Tempo real",
+  "realtime_active": "Tempo real ativo",
+  "role": "Função",
+  "upload": "Carregar",
+  "user": "Utilizador",
+  "password": "Senha",
+  "copy_to_clipboard": "Copiar para área de transferência",
+  "copied": "Copiado!",
+  "required_fields_error": "Por favor, preencha todos os campos obrigatórios.",
+  "enterprise": {
+    "badge_label": "Enterprise",
+    "badge_tooltip": "Este recurso requer um plano Enterprise.",
+    "gate_title": "Recurso Enterprise",
+    "gate_body": "Este módulo não está incluído no seu plano atual. Atualize para Enterprise para desbloqueá-lo.",
+    "upgrade_cta": "Atualizar para Enterprise"
   }
 }

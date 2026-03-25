@@ -24,6 +24,7 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { vapid, searchAuthors, generateVapidKeys } from '../../api/vapid';
 import CustomTextField from '../Common/CustomTextField';
+import EnterpriseGate from '../Common/EnterpriseGate';
 import React from 'react';
 
 /**
@@ -315,6 +316,7 @@ const VapidConfigModal = ({
         >
             <DialogTitle>{t('client.vapid_config_title')}</DialogTitle>
             <DialogContent>
+                <EnterpriseGate module="push">
                 <Tabs value={tabValue} onChange={handleTabChange} centered>
                     <Tab label={t('client.vapid_config')}/>
                     {isVapidComplete() && <Tab label={t('client.vapid_test')}/>}
@@ -500,6 +502,7 @@ const VapidConfigModal = ({
                         </Button>
                     </Box>
                 )}
+                </EnterpriseGate>
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose} data-testid="close-button">

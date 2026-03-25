@@ -36,24 +36,38 @@ export function compileIntegrationSnippet(client) {
     const captchaConfig    = clientConfig.captcha || {};
     const authWidgetConfig = clientConfig.authWidget || {};
     const providerDetails  = clientConfig.login?.providerDetails || {};
+    // providerDetails is used below inside the queloraSession branch
 
     const geolocation = {
         enabled:  clientConfig.geolocation?.enabled  ?? false,
         provider: clientConfig.geolocation?.provider || 'ipapi',
     };
 
-    const login = {
-        baseUrl:        clientConfig.login?.baseUrl || '',
-        providers:      clientConfig.login?.providers || [],
-        providerDetails: Object.keys(providerDetails).reduce((acc, provider) => {
-            if (clientConfig.login?.providers?.includes(provider)) {
-                acc[provider] = {
-                    clientId: providerDetails[provider]?.clientId || '',
-                    ...(provider === 'Quelora' ? { enabled: providerDetails[provider]?.enabled ?? false } : {}),
-                };
-            }
-            return acc;
-        }, {}),
+    const loginSource = clientConfig.login || {};
+    const login = loginSource.queloraSession
+        ? {
+            queloraSession: true,
+            baseUrl:        loginSource.baseUrl || '',
+            providers:      loginSource.providers || [],
+            providerDetails: Object.keys(providerDetails).reduce((acc, provider) => {
+                if (loginSource.providers?.includes(provider)) {
+                    acc[provider] = {
+                        clientId: providerDetails[provider]?.clientId || '',
+                        ...(provider === 'Quelora' ? { enabled: providerDetails[provider]?.enabled ?? false } : {}),
+                    };
+                }
+                return acc;
+            }, {}),
+        }
+        : {
+            queloraSession:  false,
+            loginUrl:        loginSource.loginUrl        || '',
+            logoutUrl:       loginSource.logoutUrl       || '',
+            registrationUrl: loginSource.registrationUrl || '',
+        };
+
+    const comments = {
+        allowGif: postConfig.comments?.allowGif ?? false,
     };
 
     const audio = postConfig.audio || {
@@ -102,6 +116,7 @@ export function compileIntegrationSnippet(client) {
         captcha,
         authWidget,
         entityConfig,
+        comments,
         nostrRelays,
         trackerUrls,
         rtcServers,

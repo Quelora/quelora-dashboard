@@ -18,5 +18,8 @@
   "settings": "Paramètres et clients",
   "surveys": "Sondages",
   "trash": "Corbeille",
-  "users": "Utilisateurs"
+  "users": "Utilisateurs",
+  "gamification": "Gamification",
+  "profiles": "Profils",
+  "system_users": "Personnel Système"
 }

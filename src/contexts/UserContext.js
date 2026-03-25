@@ -21,6 +21,18 @@
  * `clientList` in every page always reflect the new active client without
  * any changes to the page components themselves.
  *
+ * ## Enterprise plan fields
+ *
+ * The user object returned by `getProfile` is expected to carry two optional
+ * fields that drive the enterprise feature gates:
+ *
+ *  - `accountType`       {string}   — 'community' | 'enterprise'
+ *  - `enterpriseModules` {string[]} — list of enabled module identifiers
+ *    (e.g. ['surveys', 'gamification', 'advertising', 'network',
+ *            'resilience', 'push', 'liveMode'])
+ *
+ * These fields are passed through as-is and consumed by {@link module:hooks/useEnterprise}.
+ *
  * ## Storage contract
  *
  * All reads and writes go through {@link module:utils/embedStorage} instead

@@ -161,5 +161,7 @@
   "view": "Voir",
   "viewComments": "Voir les commentaires",
   "weak_password_desc": "Le mot de passe doit respecter toutes les exigences.",
-  "weak_password_title": "Mot de passe faible"
+  "weak_password_title": "Mot de passe faible",
+  "trust_level": "Niveau",
+  "permissions_title": "Permissions"
 }

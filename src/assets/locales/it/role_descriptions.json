@@ -1,0 +1,9 @@
+{
+  "admin": "Può gestire i client assegnati, creare utenti staff e configurare il portale.",
+  "advertiser": "Può gestire campagne pubblicitarie, caricare creatività e visualizzare le performance.",
+  "analyst": "Accesso in sola lettura a dashboard, statistiche e report.",
+  "editor": "Può creare, modificare e pubblicare post, sondaggi e gestire i contenuti.",
+  "god": "Accesso completo. Può creare client, gestire la fatturazione e visualizzare tutti i dati.",
+  "moderator": "Può esaminare le segnalazioni, moderare i commenti e bannare gli utenti abusivi.",
+  "user": "Accesso di base limitato."
+}

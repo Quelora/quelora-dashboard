@@ -161,5 +161,7 @@
   "view": "View",
   "viewComments": "View comments",
   "weak_password_desc": "Password must meet all requirements.",
-  "weak_password_title": "Weak Password"
+  "weak_password_title": "Weak Password",
+  "trust_level": "Level",
+  "permissions_title": "Permissions"
 }

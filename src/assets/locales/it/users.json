@@ -161,5 +161,7 @@
   "view": "Visualizza",
   "viewComments": "Visualizza commenti",
   "weak_password_desc": "La password deve soddisfare tutti i requisiti.",
-  "weak_password_title": "Password debole"
+  "weak_password_title": "Password debole",
+  "trust_level": "Livello",
+  "permissions_title": "Autorizzazioni"
 }

@@ -161,5 +161,7 @@
   "view": "عرض",
   "viewComments": "عرض التعليقات",
   "weak_password_desc": "يجب أن تستوفي كلمة المرور جميع المتطلبات.",
-  "weak_password_title": "كلمة مرور ضعيفة"
+  "weak_password_title": "كلمة مرور ضعيفة",
+  "trust_level": "المستوى",
+  "permissions_title": "الصلاحيات"
 }

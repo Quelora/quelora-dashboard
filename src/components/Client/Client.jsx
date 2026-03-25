@@ -40,6 +40,8 @@ const Client = () => {
         setEditingClient,
         loading,
         isFormSubmitted,
+        fieldErrors,
+        setFieldErrors,
         snackbar,
         anchorEl,
         setAnchorEl,
@@ -115,6 +117,14 @@ const Client = () => {
                 config={config}
                 setConfig={setConfig}
                 isFormSubmitted={isFormSubmitted}
+                fieldErrors={fieldErrors}
+                onClearFieldError={(mod, field) =>
+                    setFieldErrors(prev => {
+                        const next = { ...prev, [mod]: { ...prev[mod] } };
+                        delete next[mod][field];
+                        return next;
+                    })
+                }
                 loading={loading}
                 handleGenerateOrUpdateCID={handleUpsertClient}
                 setOpenConfigDialog={setOpenConfigDialog}

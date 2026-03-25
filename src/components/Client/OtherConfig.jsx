@@ -378,7 +378,7 @@ const OtherConfig = ({ config, setConfig, isFormSubmitted }) => {
                                             size="small"
                                             startIcon={<ScienceIcon />}
                                             onClick={handleOpenTestDialog}
-                                            disabled={!geoConfig.enabled}
+                                            disabled={!backend.dbPath?.trim()}
                                             fullWidth
                                         >
                                             {t('client.test_geolocation')}

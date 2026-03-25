@@ -60,6 +60,17 @@
   "zoom": "Zoom",
   "change": "Change",
   "realtime": "Realtime",
-  "realtime_active":"Realtime active",
-  "upload":"Upload"
+  "realtime_active": "Realtime active",
+  "upload": "Upload",
+  "password": "Password",
+  "copy_to_clipboard": "Copy to Clipboard",
+  "copied": "Copied!",
+  "required_fields_error": "Please fill in all required fields.",
+  "enterprise": {
+    "badge_label": "Enterprise",
+    "badge_tooltip": "This feature requires an Enterprise plan.",
+    "gate_title": "Enterprise Feature",
+    "gate_body": "This module is not included in your current plan. Upgrade to Enterprise to unlock it.",
+    "upgrade_cta": "Upgrade to Enterprise"
+  }
 }

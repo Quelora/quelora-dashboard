@@ -14,5 +14,14 @@
   "subtitle": "Métriques agrégées d'interaction du profil utilisateur.",
   "title": "Analyses du profil utilisateur",
   "topUsers": "Meilleurs utilisateurs",
-  "user": "Utilisateur"
+  "user": "Utilisateur",
+  "activity": "Activité",
+  "current_score": "Score de confiance actuel",
+  "date": "Date",
+  "delta": "Variation",
+  "event_type": "Événement / Raison",
+  "impact": "Impact",
+  "reputation": "Historique de réputation",
+  "source": "Source",
+  "view_reputation": "Voir l'historique"
 }

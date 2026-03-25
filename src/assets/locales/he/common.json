@@ -44,5 +44,33 @@
     "from": "מאת",
     "to": "עד",
     "apply": "החל"
+  },
+  "actions": "פעולות",
+  "add": "הוסף",
+  "are_you_sure": "האם אתה בטוח?",
+  "change": "שנה",
+  "copy": "העתק",
+  "create_new": "צור חדש",
+  "godClientSelector": {
+    "confirmAccess": "אשר גישה",
+    "description": "כמשתמש GOD, עליך לבחור מזהה לקוח (CID) להפעלת לוח המחוונים.",
+    "searchLabel": "חפש לקוח (שם או CID)",
+    "title": "בחירת לקוח (מצב GOD)"
+  },
+  "realtime": "זמן אמת",
+  "realtime_active": "זמן אמת פעיל",
+  "role": "תפקיד",
+  "upload": "העלה",
+  "user": "משתמש",
+  "password": "סיסמה",
+  "copy_to_clipboard": "העתק ללוח",
+  "copied": "הועתק!",
+  "required_fields_error": "אנא מלא את כל השדות הנדרשים.",
+  "enterprise": {
+    "badge_label": "Enterprise",
+    "badge_tooltip": "תכונה זו דורשת תוכנית Enterprise.",
+    "gate_title": "תכונת Enterprise",
+    "gate_body": "מודול זה אינו כלול בתוכנית הנוכחית שלך. שדרג ל-Enterprise כדי לפתוח אותו.",
+    "upgrade_cta": "שדרג ל-Enterprise"
   }
 }

@@ -161,5 +161,7 @@
   "view": "צפייה",
   "viewComments": "צפה בתגובות",
   "weak_password_desc": "הסיסמה חייבת לעמוד בכל הדרישות.",
-  "weak_password_title": "סיסמה חלשה"
+  "weak_password_title": "סיסמה חלשה",
+  "trust_level": "רמה",
+  "permissions_title": "הרשאות"
 }

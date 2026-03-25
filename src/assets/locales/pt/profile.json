@@ -42,5 +42,12 @@
   "profile_updated_success": "Perfil atualizado com sucesso",
   "rotate": "Rodar",
   "title": "Meu Perfil",
-  "zoom": "Zoom"
+  "zoom": "Zoom",
+  "create_system_user": "Criar utilizador",
+  "email_security_note": "Envia um e-mail de boas-vindas. Por segurança, a palavra-passe NÃO está incluída (deve comunicá-la por outro canal).",
+  "password_help_temp": "Certifique-se de copiar a palavra-passe antes de guardar.",
+  "role": "Funções",
+  "send_welcome_email": "Enviar e-mail de boas-vindas",
+  "user_disables": "Este utilizador será desativado",
+  "username": "Nome de utilizador"
 }

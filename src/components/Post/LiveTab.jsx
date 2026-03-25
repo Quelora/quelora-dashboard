@@ -7,10 +7,12 @@ import {
     Grid
 } from '@mui/material';
 import CustomTextField from '../Common/CustomTextField';
+import EnterpriseGate from '../Common/EnterpriseGate';
 import React from 'react';
 
 const LiveTab = ({ formData, handleChange, handleNumberChange, t, validationErrors }) => {
     return (
+        <EnterpriseGate module="liveMode">
         <Box className="live-tab-content" sx={{ p: 3 }}>
             <Typography variant="subtitle2" className="subsection-title" sx={{ mb: 2 }}>
                 {t('liveMode.title', 'Live Mode Configuration')}
@@ -61,6 +63,7 @@ const LiveTab = ({ formData, handleChange, handleNumberChange, t, validationErro
                 </Box>
             )}
         </Box>
+        </EnterpriseGate>
     );
 };
 
