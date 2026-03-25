@@ -25,6 +25,7 @@ import { getPlacements, deletePlacement } from '../api/placements';
 import usePlacementModal from '../hooks/usePlacementModal';
 import PlacementModal from '../components/Placement/PlacementModal';
 import PaginatedTable from '../components/Common/PaginatedTable';
+import EnterpriseGate from '../components/Common/EnterpriseGate';
 
 // Definición de cabeceras compatible con PaginatedTable
 const PlacementTableHeaders = [
@@ -250,6 +251,7 @@ const PlacementsPage = () => {
     );
 
     return (
+        <EnterpriseGate module="advertising" fullPage>
         <Box>
             <Box sx={{ 
                 display: 'flex', 
@@ -302,6 +304,7 @@ const PlacementsPage = () => {
                 onSave={handleSave}
             />
         </Box>
+        </EnterpriseGate>
     );
 };
 

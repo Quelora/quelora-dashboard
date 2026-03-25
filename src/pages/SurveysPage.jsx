@@ -41,6 +41,7 @@ import SurveyModal from '../components/Survey/SurveyModal';
 import usePaginatedList from '../hooks/usePaginatedList';
 import PaginatedTable from '../components/Common/PaginatedTable';
 import { loadClientsFromSession } from '../api/auth';
+import EnterpriseGate from '../components/Common/EnterpriseGate';
 
 const SurveyTableHeaders = [
     { id: 'question', labelKey: 'survey.question', numeric: false, sortable: true, minWidth: 300 },
@@ -254,6 +255,7 @@ const SurveysPage = () => {
     };
 
     return (
+        <EnterpriseGate module="surveys" fullPage>
         <Box className="client-posts-container">
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', mb: 3, p: 2, background: 'var(--card-bg)', borderRadius: '12px' }}>
                 <Typography variant="h4" className="title">
@@ -364,6 +366,7 @@ const SurveysPage = () => {
                 onSave={handleSurveySave}
             />
         </Box>
+        </EnterpriseGate>
     );
 };
 

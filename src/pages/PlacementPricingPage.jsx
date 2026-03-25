@@ -33,6 +33,7 @@ import { loadClientsFromSession } from '../api/auth';
 import usePlacementPricingModal from '../hooks/usePlacementPricingModal';
 import PlacementPricingModal from '../components/Placement/PlacementPricingModal';
 import PaginatedTable from '../components/Common/PaginatedTable';
+import EnterpriseGate from '../components/Common/EnterpriseGate';
 
 const PlacementPricingTableHeaders = [
     { id: 'placement', labelKey: 'placementPricing.placement', numeric: false, sortable: true, minWidth: 200 },
@@ -296,6 +297,7 @@ const PlacementPricingPage = () => {
     };
 
     return (
+        <EnterpriseGate module="advertising" fullPage>
         <Box className="client-posts-container">
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', mb: 3, p: 2, background: 'var(--card-bg)', borderRadius: '12px' }}>
                 <Typography variant="h4" className="title">
@@ -393,6 +395,7 @@ const PlacementPricingPage = () => {
                 onSave={handleSave}
             />
         </Box>
+        </EnterpriseGate>
     );
 };
 

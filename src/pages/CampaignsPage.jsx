@@ -46,6 +46,7 @@ import CampaignModal from '../components/Campaign/CampaignModal';
 import usePaginatedList from '../hooks/usePaginatedList';
 import PaginatedTable from '../components/Common/PaginatedTable';
 import { loadClientsFromSession } from '../api/auth';
+import EnterpriseGate from '../components/Common/EnterpriseGate';
 
 // --- Headers actualizados con Budget ---
 const CampaignTableHeaders = [
@@ -316,6 +317,7 @@ const CampaignsPage = () => {
     };
 
     return (
+        <EnterpriseGate module="advertising" fullPage>
         <Box className="client-posts-container">
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', mb: 3, p: 2, background: 'var(--card-bg)', borderRadius: '12px' }}>
                 <Typography variant="h4" className="title">
@@ -415,6 +417,7 @@ const CampaignsPage = () => {
                 cid={selectedCid}
             />
         </Box>
+        </EnterpriseGate>
     );
 };
 

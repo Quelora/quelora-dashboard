@@ -16,6 +16,7 @@ import {
 import CustomTextField from '../Common/CustomTextField';
 import { saveResilienceConfig, generateResilienceKeys } from '../../api/resilience';
 import EnterpriseGate from '../Common/EnterpriseGate';
+import { useEnterprise } from '../../hooks/useEnterprise';
 
 /** Modes available for the resilience engine. */
 const RESILIENCE_MODES = ['HYBRID', 'P2P_ONLY', 'SERVER_ONLY', 'PASSIVE'];
@@ -82,6 +83,7 @@ function buildInitialData(clientResilience) {
  */
 const ResilienceConfigModal = ({ open, onClose, onSave, client, showToast }) => {
     const { t } = useTranslation();
+    const { hasModule } = useEnterprise();
 
     const [saving,       setSaving]       = useState(false);
     const [keysLoading,  setKeysLoading]  = useState(false);
@@ -472,14 +474,16 @@ const ResilienceConfigModal = ({ open, onClose, onSave, client, showToast }) => 
                 <Button onClick={onClose} disabled={saving}>
                     {t('common.cancel')}
                 </Button>
-                <Button
-                    onClick={handleSave}
-                    variant="contained"
-                    disabled={saving || !!weightsError}
-                    startIcon={saving ? <CircularProgress size={16} /> : <SaveIcon />}
-                >
-                    {t('common.save')}
-                </Button>
+                {hasModule('resilience') && (
+                    <Button
+                        onClick={handleSave}
+                        variant="contained"
+                        disabled={saving || !!weightsError}
+                        startIcon={saving ? <CircularProgress size={16} /> : <SaveIcon />}
+                    >
+                        {t('common.save')}
+                    </Button>
+                )}
             </DialogActions>
         </Dialog>
     );

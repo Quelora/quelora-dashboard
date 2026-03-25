@@ -12,7 +12,7 @@ import React from 'react';
 
 const LiveTab = ({ formData, handleChange, handleNumberChange, t, validationErrors }) => {
     return (
-        <EnterpriseGate module="liveMode">
+        <EnterpriseGate module="liveMode" compact>
         <Box className="live-tab-content" sx={{ p: 3 }}>
             <Typography variant="subtitle2" className="subsection-title" sx={{ mb: 2 }}>
                 {t('liveMode.title', 'Live Mode Configuration')}

@@ -25,6 +25,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { vapid, searchAuthors, generateVapidKeys } from '../../api/vapid';
 import CustomTextField from '../Common/CustomTextField';
 import EnterpriseGate from '../Common/EnterpriseGate';
+import { useEnterprise } from '../../hooks/useEnterprise';
 import React from 'react';
 
 /**
@@ -53,6 +54,7 @@ const VapidConfigModal = ({
     isFormSubmitted
 }) => {
     const { t } = useTranslation();
+    const { hasModule } = useEnterprise();
     const [tabValue, setTabValue] = useState(0);
     const [vapidConfig, setVapidConfig] = useState({
         publicKey: '',
@@ -508,7 +510,7 @@ const VapidConfigModal = ({
                 <Button onClick={onClose} data-testid="close-button">
                     {t('client.close')}
                 </Button>
-                {tabValue === 0 && (
+                {tabValue === 0 && hasModule('push') && (
                     <Button
                         variant="contained"
                         onClick={() => onSave(vapidConfig)}

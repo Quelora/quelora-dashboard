@@ -26,12 +26,12 @@ const UPGRADE_URL = 'https://quelora.org/pricing';
 
 /**
  * @param {Object}          props
- * @param {string}          props.module    - Enterprise module identifier.
- * @param {React.ReactNode} props.children  - Content to gate.
- * @param {boolean}         [props.fullPage=false] - When true the gate fills
- *   the entire viewport height (useful for page-level gates).
+ * @param {string}          props.module             - Enterprise module identifier.
+ * @param {React.ReactNode} props.children           - Content to gate.
+ * @param {boolean}         [props.fullPage=false]   - Gate fills viewport height (page-level).
+ * @param {boolean}         [props.compact=false]    - Reduced card for small containers (tabs, panels).
  */
-const EnterpriseGate = ({ module, children, fullPage = false }) => {
+const EnterpriseGate = ({ module, children, fullPage = false, compact = false }) => {
     const { hasModule } = useEnterprise();
     const { t } = useTranslation();
 
@@ -44,7 +44,7 @@ const EnterpriseGate = ({ module, children, fullPage = false }) => {
         <Box
             sx={{
                 position: 'relative',
-                minHeight: fullPage ? 'calc(100vh - 120px)' : 'inherit',
+                minHeight: fullPage ? 'calc(100vh - 120px)' : compact ? 140 : 'inherit',
             }}
         >
             {/* Degraded background content */}
@@ -80,9 +80,9 @@ const EnterpriseGate = ({ module, children, fullPage = false }) => {
                 <Paper
                     elevation={6}
                     sx={{
-                        px: 5,
-                        py: 4,
-                        maxWidth: 380,
+                        px: compact ? 3 : 5,
+                        py: compact ? 2.5 : 4,
+                        maxWidth: compact ? 300 : 380,
                         textAlign: 'center',
                         borderRadius: 3,
                         border: (theme) =>
@@ -91,50 +91,49 @@ const EnterpriseGate = ({ module, children, fullPage = false }) => {
                 >
                     <Box
                         sx={{
-                            width: 56,
-                            height: 56,
+                            width: compact ? 36 : 56,
+                            height: compact ? 36 : 56,
                             borderRadius: '50%',
                             backgroundColor: (theme) => `${theme.palette.primary.main}18`,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             mx: 'auto',
-                            mb: 2,
+                            mb: compact ? 1 : 2,
                         }}
                     >
                         <LockIcon
-                            sx={{ fontSize: 28, color: 'primary.main' }}
+                            sx={{ fontSize: compact ? 18 : 28, color: 'primary.main' }}
                         />
                     </Box>
 
                     <Typography
-                        variant="h6"
+                        variant={compact ? 'subtitle2' : 'h6'}
                         fontWeight={700}
-                        sx={{ mb: 1 }}
+                        sx={{ mb: compact ? 0.5 : 1 }}
                     >
-                        {t('enterprise.gate_title', 'Enterprise Feature')}
+                        {t('common.enterprise.gate_title')}
                     </Typography>
 
-                    <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mb: 3 }}
-                    >
-                        {t(
-                            'enterprise.gate_body',
-                            'This module is not included in your current plan. Upgrade to Enterprise to unlock it.'
-                        )}
-                    </Typography>
+                    {!compact && (
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ mb: 3 }}
+                        >
+                            {t('common.enterprise.gate_body')}
+                        </Typography>
+                    )}
 
                     <Button
                         variant="contained"
-                        size="large"
+                        size={compact ? 'small' : 'large'}
                         href={UPGRADE_URL}
                         target="_blank"
                         rel="noopener noreferrer"
-                        sx={{ borderRadius: 2, px: 4 }}
+                        sx={{ borderRadius: 2, px: compact ? 2 : 4, mt: compact ? 1.5 : 0 }}
                     >
-                        {t('enterprise.upgrade_cta', 'Upgrade to Enterprise')}
+                        {t('common.enterprise.upgrade_cta')}
                     </Button>
                 </Paper>
             </Box>

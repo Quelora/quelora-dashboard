@@ -49,6 +49,8 @@ import {
     GppBad as CaptchaIcon,
 } from '@mui/icons-material';
 import { compileIntegrationSnippet } from './CodeModal';
+import { useEnterprise } from '../../hooks/useEnterprise';
+import EnterpriseBadge from '../Common/EnterpriseBadge';
 
 // ── Styled components ─────────────────────────────────────────────────────────
 
@@ -351,6 +353,7 @@ const ClientCard = ({
     showToast,
 }) => {
     const { t } = useTranslation();
+    const { hasModule } = useEnterprise();
 
     const [checklistOpen, setChecklistOpen] = useState(false);
     const [helpAnchor,    setHelpAnchor]    = useState(null);
@@ -651,6 +654,7 @@ const ClientCard = ({
                         >
                             <VapidIcon sx={{ fontSize: 12 }} />
                             {t('client.module_vapid')}
+                            {!hasModule('push') && <EnterpriseBadge size="small" sx={{ ml: 0.5 }} />}
                         </ModuleChip>
                     </Tooltip>
 
@@ -681,6 +685,7 @@ const ClientCard = ({
                         >
                             <ResilienceIcon sx={{ fontSize: 12 }} />
                             {t('client.module_resilience')}
+                            {!hasModule('resilience') && <EnterpriseBadge size="small" sx={{ ml: 0.5 }} />}
                         </ModuleChip>
                     </Tooltip>
 
@@ -695,6 +700,7 @@ const ClientCard = ({
                         >
                             <NetworkIcon sx={{ fontSize: 12 }} />
                             {t('client.module_network')}
+                            {!hasModule('network') && <EnterpriseBadge size="small" sx={{ ml: 0.5 }} />}
                         </ModuleChip>
                     </Tooltip>
                 </Box>

@@ -17,6 +17,7 @@ import GamificationUsersTab from '../components/Gamification/GamificationUsersTa
 import GamificationQuestsTab from '../components/Gamification/GamificationQuestsTab';
 
 import GamificationShopTab from '../components/Gamification/GamificationShopTab'; 
+import EnterpriseGate from '../components/Common/EnterpriseGate';
 
 const GamificationPage = () => {
     const { t } = useTranslation();
@@ -56,6 +57,7 @@ const GamificationPage = () => {
     };
 
     return (
+        <EnterpriseGate module="gamification" fullPage>
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Box sx={{ p: 2, background: 'var(--card-bg)', borderRadius: '12px', mb: 1 }}>
                 <Typography variant="h4" className="title">
@@ -135,6 +137,7 @@ const GamificationPage = () => {
                 </Paper>
             )}
         </Box>
+        </EnterpriseGate>
     );
 };
 

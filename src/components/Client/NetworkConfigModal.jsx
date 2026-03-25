@@ -33,6 +33,7 @@ import {
 } from '@mui/icons-material';
 import CustomTextField from '../Common/CustomTextField';
 import EnterpriseGate from '../Common/EnterpriseGate';
+import { useEnterprise } from '../../hooks/useEnterprise';
 
 /**
  * Renders a single tab panel, hiding content when not active.
@@ -74,6 +75,7 @@ function TabPanel({ children, value, index }) {
  */
 const NetworkConfigModal = ({ open, onClose, config, setConfig, client, onSave, loading, showToast }) => {
     const { t } = useTranslation();
+    const { hasModule } = useEnterprise();
     const [activeTab,    setActiveTab]    = useState(0);
     const [newRelay,     setNewRelay]     = useState('');
     const [newTracker,   setNewTracker]   = useState('');
@@ -401,14 +403,16 @@ const NetworkConfigModal = ({ open, onClose, config, setConfig, client, onSave, 
                 <Button onClick={onClose} disabled={loading}>
                     {t('common.cancel')}
                 </Button>
-                <Button
-                    onClick={handleSave}
-                    variant="contained"
-                    disabled={loading}
-                    startIcon={<SaveIcon />}
-                >
-                    {t('common.save')}
-                </Button>
+                {hasModule('network') && (
+                    <Button
+                        onClick={handleSave}
+                        variant="contained"
+                        disabled={loading}
+                        startIcon={<SaveIcon />}
+                    >
+                        {t('common.save')}
+                    </Button>
+                )}
             </DialogActions>
         </Dialog>
     );

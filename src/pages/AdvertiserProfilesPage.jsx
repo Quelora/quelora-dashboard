@@ -35,6 +35,7 @@ import { getAdvertiserProfiles, deleteAdvertiserProfile, restoreAdvertiserProfil
 import useAdvertiserProfileModal from '../hooks/useAdvertiserProfileModal';
 import AdvertiserProfileModal from '../components/Advertiser/AdvertiserProfileModal';
 import PaginatedTable from '../components/Common/PaginatedTable';
+import EnterpriseGate from '../components/Common/EnterpriseGate';
 
 const apiBaseUrl = process.env.REACT_APP_API_URL || '';
 
@@ -332,6 +333,7 @@ const AdvertiserProfilesPage = () => {
     );
 
     return (
+        <EnterpriseGate module="advertising" fullPage>
         <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', mb: 3, p: 2, background: 'var(--card-bg)', borderRadius: '12px' }}>
                 <Typography variant="h4" className="title">
@@ -398,6 +400,7 @@ const AdvertiserProfilesPage = () => {
                 onSave={handleSave}
             />
         </Box>
+        </EnterpriseGate>
     );
 };
 
