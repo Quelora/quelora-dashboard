@@ -1,0 +1,11 @@
+{
+  "cpu": "CPU: {{load}}",
+  "cpuTooltip": "Last (1m, 5m, 15m): {{load1}}, {{load5}}, {{load15}} | Kerne: {{cores}}",
+  "memoryTooltip": "System - Belegt: {{used}} / Gesamt: {{total}}",
+  "nodeVersion": "Node.js v{{version}}",
+  "processMemory": "Prozess: {{memory}}",
+  "processMemoryTooltip": "Prozess-Speicher (RSS)",
+  "ram": "RAM: {{percent}}%",
+  "title": "APP",
+  "uptime": "Betriebszeit: {{uptime}}"
+}

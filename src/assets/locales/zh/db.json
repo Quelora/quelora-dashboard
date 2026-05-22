@@ -1,0 +1,11 @@
+{
+  "connections": "连接数：{{current}}",
+  "connectionsTooltip": "活动：{{active}} | 可用：{{available}}",
+  "memory": "内存：{{memory}}",
+  "memoryTooltip": "数据库常驻内存 (v{{version}})",
+  "queries": "查询：{{queries}}",
+  "queriesTooltip": "读取操作",
+  "storage": "存储：{{storage}}",
+  "storageTooltip": "数据：{{data}} | 索引：{{indexes}}",
+  "title": "数据库 (DB)"
+}

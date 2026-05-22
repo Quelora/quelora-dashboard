@@ -1,0 +1,11 @@
+{
+  "cpu": "CPU: {{load}}",
+  "cpuTooltip": "लोड (1m, 5m, 15m): {{load1}}, {{load5}}, {{load15}} | कोर: {{cores}}",
+  "memoryTooltip": "सिस्टम - प्रयुक्त: {{used}} / कुल: {{total}}",
+  "nodeVersion": "Node.js v{{version}}",
+  "processMemory": "प्रक्रिया: {{memory}}",
+  "processMemoryTooltip": "प्रक्रिया मेमोरी (RSS)",
+  "ram": "RAM: {{percent}}%",
+  "title": "ऐप",
+  "uptime": "सक्रिय समय: {{uptime}}"
+}

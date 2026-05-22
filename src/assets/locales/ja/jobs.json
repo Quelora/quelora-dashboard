@@ -1,0 +1,146 @@
+{
+  "title": "ジョブ",
+  "subtitle": "スケジュールタスク管理",
+  "tabs": {
+    "jobs": "ジョブ",
+    "logs": "実行ログ"
+  },
+  "sections": {
+    "client_jobs": "クライアントジョブ",
+    "system_jobs": "システムジョブ"
+  },
+  "columns": {
+    "job": "ジョブ",
+    "queue": "キュー",
+    "enabled": "有効",
+    "cron": "Cron",
+    "last_status": "最終ステータス",
+    "last_run": "最終実行",
+    "duration": "所要時間",
+    "actions": "操作"
+  },
+  "actions": {
+    "trigger": "実行",
+    "edit": "編集"
+  },
+  "status": {
+    "success": "成功",
+    "failed": "失敗",
+    "running": "実行中",
+    "unknown": "不明"
+  },
+  "edit_dialog": {
+    "title": "ジョブを編集",
+    "enabled": "有効",
+    "cron": "Cron 式",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "section_general": "基本設定",
+    "section_weights": "重み"
+  },
+  "trigger_dialog": {
+    "title": "ジョブを実行",
+    "message": "\"{{jobKey}}\" を手動で実行しますか？即時実行がキューに追加されます。",
+    "confirm": "実行",
+    "cancel": "キャンセル"
+  },
+  "logs": {
+    "columns": {
+      "job": "ジョブ",
+      "client": "クライアント",
+      "status": "ステータス",
+      "started": "開始",
+      "completed": "終了",
+      "duration": "所要時間",
+      "error": "エラー"
+    },
+    "filters": {
+      "job_name": "ジョブ名",
+      "status": "ステータス",
+      "all_statuses": "全ステータス"
+    },
+    "no_error": "—"
+  },
+  "readonly_badge": "読み取り専用",
+  "never": "なし",
+  "ms": "ms",
+  "errors": {
+    "load": "ジョブの読み込みに失敗",
+    "update": "ジョブの更新に失敗",
+    "trigger": "ジョブの実行に失敗",
+    "logs": "ログの読み込みに失敗"
+  },
+  "success": {
+    "trigger": "ジョブが正常に実行されました",
+    "update": "ジョブが更新されました"
+  },
+  "sidebar": "ジョブ",
+  "cron_editor": {
+    "type_seconds": "秒",
+    "type_minutes": "分",
+    "type_hours": "時間",
+    "type_daily": "毎日",
+    "type_custom": "カスタム",
+    "every": "每",
+    "seconds": "秒ごと",
+    "minutes": "分ごと",
+    "hours": "時間ごと",
+    "daily_at": "毎日",
+    "hour": "時",
+    "minute": "分",
+    "expression": "式",
+    "preview": "式",
+    "desc_seconds": "{{n}} 秒ごと",
+    "desc_minutes": "{{n}} 分ごと",
+    "desc_hours": "{{n}} 時間ごと",
+    "desc_daily": "毎日 {{time}}"
+  },
+  "config": {
+    "suggestion": {
+      "suggestionLimit": {
+        "label": "提案数の上限",
+        "desc": "ユーザーごとの最大提案数"
+      },
+      "daysActive": {
+        "label": "アクティブ日数",
+        "desc": "過去 N 日間にアクティブなユーザーのみ処理"
+      },
+      "interestWindowDays": {
+        "label": "関心ウィンドウ（日）",
+        "desc": "いいねした投稿を遡る日数"
+      },
+      "weights": {
+        "socialConnection": {
+          "label": "ソーシャル接続",
+          "desc": "相互接続ごとのスコア"
+        },
+        "interestMatch": {
+          "label": "共通の関心",
+          "desc": "共有インタレストごとのスコア"
+        },
+        "geoExact": {
+          "label": "完全一致の位置",
+          "desc": "ジオハッシュ完全一致のボーナス"
+        },
+        "geoNear": {
+          "label": "近隣の位置",
+          "desc": "近隣ジオハッシュのボーナス"
+        },
+        "verified": {
+          "label": "認証済み",
+          "desc": "認証アカウントへのボーナス"
+        },
+        "popularityMultiplier": {
+          "label": "人気度乗数",
+          "desc": "フォロワー数 log10 への乗数"
+        }
+      }
+    },
+    "gravityDecay": {
+      "maxAgeDays": {
+        "label": "最大投稿年齢（日）",
+        "desc": "N 日以内の投稿のスコアのみ再計算"
+      }
+    }
+  }
+}

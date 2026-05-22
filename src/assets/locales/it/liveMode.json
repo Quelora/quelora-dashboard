@@ -1,0 +1,8 @@
+{
+  "invalidMaxClients": "Il numero massimo di clienti deve essere compreso tra {{min}} e {{max}}.",
+  "isLiveActive": "Abilita Streaming Live",
+  "maxClients": "Clienti Simultanei Massimi",
+  "startTime": "Orario di Inizio Programmato",
+  "tabTitle": "Modalità Live",
+  "title": "Impostazioni Modalità Live"
+}

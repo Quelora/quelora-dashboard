@@ -1,0 +1,13 @@
+{
+  "allLevels": "すべてのレベル",
+  "clear": "クリア",
+  "filter": "フィルター",
+  "level": "レベル",
+  "message": "メッセージ",
+  "noLogs": "ログが利用できません",
+  "pause": "一時停止",
+  "resume": "再開",
+  "timestamp": "タイムスタンプ",
+  "title": "コンソールログ",
+  "toggle": "コンソールの切り替え"
+}

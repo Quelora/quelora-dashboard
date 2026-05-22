@@ -1,0 +1,18 @@
+{
+  "actions": "Aktionen",
+  "cancel": "Abbrechen",
+  "category": "Kategorie",
+  "confirmRestoreText": "Sind Sie sicher, dass Sie dieses Element wiederherstellen möchten?",
+  "confirmRestoreTitle": "Wiederherstellung bestätigen",
+  "deletedDate": "Löschdatum",
+  "description": "Beschreibung",
+  "errorFetching": "Fehler beim Abrufen der Elemente im Papierkorb",
+  "noDescription": "Keine Beschreibung",
+  "restore": "Wiederherstellen",
+  "restoreErrorText": "Beim Wiederherstellen des Elements ist ein Fehler aufgetreten.",
+  "restoreErrorTitle": "Wiederherstellung fehlgeschlagen",
+  "restoreSuccessText": "Das Element wurde erfolgreich wiederhergestellt.",
+  "restoreSuccessTitle": "Element wiederhergestellt",
+  "retry": "Wiederholen",
+  "title": "Papierkorb"
+}

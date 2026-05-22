@@ -1,0 +1,13 @@
+{
+  "add_new_cid": "新規クライアントを追加",
+  "cid_description": "クライアントの説明",
+  "cid_generated": "クライアントが正常に生成されました",
+  "cid_updated": "クライアントの説明が正常に更新されました",
+  "description_required": "説明は必須です",
+  "edit_cid_description": "クライアントの説明を編集",
+  "manage_cids": "クライアントを管理",
+  "manage_cids_description": "あなたのアカウントのクライアントを表示および管理します",
+  "new_description": "新しい説明",
+  "no_description": "説明なし",
+  "title": "アカウント管理"
+}

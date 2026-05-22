@@ -1,0 +1,18 @@
+{
+  "allProviders": "所有提供商",
+  "allTasks": "所有任务",
+  "completionTokens": "完成代币",
+  "estimatedCost": "估计成本 (USD)",
+  "filterByProvider": "按提供商过滤",
+  "filterByTask": "按任务过滤",
+  "page_title": "内容审核分析",
+  "promptTokens": "提示代币",
+  "provider": "提供商",
+  "subtitle": "AI 服务相关的代币使用和成本。",
+  "task": "任务",
+  "title": "内容审核分析",
+  "tokensByProvider": "按提供商划分的代币",
+  "tokensByTask": "按任务划分的代币",
+  "tokensOverTime": "代币使用情况（随时间）",
+  "totalTokens": "代币总数"
+}

@@ -1,0 +1,18 @@
+{
+  "allProviders": "Все поставщики",
+  "allTasks": "Все задачи",
+  "completionTokens": "Токены завершения",
+  "estimatedCost": "Оценочная стоимость (USD)",
+  "filterByProvider": "Фильтровать по поставщику",
+  "filterByTask": "Фильтровать по задаче",
+  "page_title": "Аналитика модерации",
+  "promptTokens": "Токены подсказки (Prompt)",
+  "provider": "Поставщик",
+  "subtitle": "Использование токенов и связанные расходы с услугами ИИ.",
+  "task": "Задача",
+  "title": "Аналитика модерации",
+  "tokensByProvider": "Токены по поставщикам",
+  "tokensByTask": "Токены по задачам",
+  "tokensOverTime": "Использование токенов (за время)",
+  "totalTokens": "Всего токенов"
+}

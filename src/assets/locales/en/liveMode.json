@@ -1,0 +1,8 @@
+{
+  "invalidMaxClients": "Max Clients must be between {{min}} and {{max}}.",
+  "isLiveActive": "Enable Live Streaming",
+  "maxClients": "Maximum Concurrent Clients",
+  "startTime": "Scheduled Start Time",
+  "tabTitle": "Live Mode",
+  "title": "Live Mode Configuration"
+}

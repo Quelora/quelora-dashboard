@@ -1,0 +1,18 @@
+{
+  "actions": "Azioni",
+  "cancel": "Annulla",
+  "category": "Categoria",
+  "confirmRestoreText": "Sei sicuro di voler ripristinare questo elemento?",
+  "confirmRestoreTitle": "Conferma Ripristino",
+  "deletedDate": "Data Eliminazione",
+  "description": "Descrizione",
+  "errorFetching": "Errore nel recupero elementi cestino",
+  "noDescription": "Nessuna descrizione",
+  "restore": "Ripristina",
+  "restoreErrorText": "Si è verificato un errore durante il ripristino dell'elemento.",
+  "restoreErrorTitle": "Ripristino Fallito",
+  "restoreSuccessText": "L'elemento è stato ripristinato con successo.",
+  "restoreSuccessTitle": "Elemento Ripristinato",
+  "retry": "Riprova",
+  "title": "Cestino"
+}

@@ -1,0 +1,11 @@
+{
+  "clients": "العملاء",
+  "clientsTooltip": "العملاء المتصلون",
+  "keys": "المفاتيح",
+  "keysTooltip": "المفاتيح المخزنة",
+  "memoryTooltip": "الذاكرة المستخدمة بواسطة Redis",
+  "ops": "عملية/ثانية",
+  "opsTooltip": "العمليات في الثانية",
+  "title": "الذاكرة المخبأة (CACHE)",
+  "uptimeTooltip": "مدة تشغيل خادم Redis"
+}

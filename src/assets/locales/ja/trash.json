@@ -1,0 +1,18 @@
+{
+  "actions": "アクション",
+  "cancel": "キャンセル",
+  "category": "カテゴリ",
+  "confirmRestoreText": "このアイテムを復元してもよろしいですか？",
+  "confirmRestoreTitle": "復元を確認",
+  "deletedDate": "削除日",
+  "description": "説明",
+  "errorFetching": "ゴミ箱アイテムの取得中にエラーが発生しました",
+  "noDescription": "説明なし",
+  "restore": "復元",
+  "restoreErrorText": "アイテムの復元中にエラーが発生しました。",
+  "restoreErrorTitle": "復元失敗",
+  "restoreSuccessText": "アイテムは正常に復元されました。",
+  "restoreSuccessTitle": "アイテム復元完了",
+  "retry": "再試行",
+  "title": "ゴミ箱"
+}

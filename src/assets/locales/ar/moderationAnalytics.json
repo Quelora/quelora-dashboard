@@ -1,0 +1,18 @@
+{
+  "allProviders": "جميع المزودين",
+  "allTasks": "جميع المهام",
+  "completionTokens": "رموز الإكمال",
+  "estimatedCost": "التكلفة التقديرية (USD)",
+  "filterByProvider": "تصفية حسب المزود",
+  "filterByTask": "تصفية حسب المهمة",
+  "page_title": "تحليلات الإشراف",
+  "promptTokens": "رموز الموجه",
+  "provider": "المزود",
+  "subtitle": "استخدام الرموز والتكاليف المرتبطة بخدمات الذكاء الاصطناعي.",
+  "task": "المهمة",
+  "title": "تحليلات الإشراف",
+  "tokensByProvider": "الرموز حسب المزود",
+  "tokensByTask": "الرموز حسب المهمة",
+  "tokensOverTime": "استخدام الرموز (مع مرور الوقت)",
+  "totalTokens": "إجمالي الرموز"
+}

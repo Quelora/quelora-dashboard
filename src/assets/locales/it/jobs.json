@@ -1,0 +1,146 @@
+{
+  "title": "Jobs",
+  "subtitle": "Gestione delle attività pianificate",
+  "tabs": {
+    "jobs": "Jobs",
+    "logs": "Log di esecuzione"
+  },
+  "sections": {
+    "client_jobs": "Jobs client",
+    "system_jobs": "Jobs di sistema"
+  },
+  "columns": {
+    "job": "Job",
+    "queue": "Coda",
+    "enabled": "Abilitato",
+    "cron": "Cron",
+    "last_status": "Ultimo stato",
+    "last_run": "Ultima esecuzione",
+    "duration": "Durata",
+    "actions": "Azioni"
+  },
+  "actions": {
+    "trigger": "Avvia",
+    "edit": "Modifica"
+  },
+  "status": {
+    "success": "Successo",
+    "failed": "Fallito",
+    "running": "In esecuzione",
+    "unknown": "Sconosciuto"
+  },
+  "edit_dialog": {
+    "title": "Modifica Job",
+    "enabled": "Abilitato",
+    "cron": "Espressione Cron",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "section_general": "Generale",
+    "section_weights": "Pesi"
+  },
+  "trigger_dialog": {
+    "title": "Avvia Job",
+    "message": "Avviare manualmente \"{{jobKey}}\"? Verrà accodata un'esecuzione immediata.",
+    "confirm": "Avvia",
+    "cancel": "Annulla"
+  },
+  "logs": {
+    "columns": {
+      "job": "Job",
+      "client": "Cliente",
+      "status": "Stato",
+      "started": "Inizio",
+      "completed": "Fine",
+      "duration": "Durata",
+      "error": "Errore"
+    },
+    "filters": {
+      "job_name": "Nome Job",
+      "status": "Stato",
+      "all_statuses": "Tutti gli stati"
+    },
+    "no_error": "—"
+  },
+  "readonly_badge": "Sola lettura",
+  "never": "Mai",
+  "ms": "ms",
+  "errors": {
+    "load": "Impossibile caricare i jobs",
+    "update": "Impossibile aggiornare il job",
+    "trigger": "Impossibile avviare il job",
+    "logs": "Impossibile caricare i log"
+  },
+  "success": {
+    "trigger": "Job avviato con successo",
+    "update": "Job aggiornato"
+  },
+  "sidebar": "Jobs",
+  "cron_editor": {
+    "type_seconds": "Secondi",
+    "type_minutes": "Minuti",
+    "type_hours": "Ore",
+    "type_daily": "Giornaliero",
+    "type_custom": "Personalizzato",
+    "every": "Ogni",
+    "seconds": "secondo/i",
+    "minutes": "minuto/i",
+    "hours": "ora/e",
+    "daily_at": "Ogni giorno alle",
+    "hour": "Ora",
+    "minute": "Minuto",
+    "expression": "Espressione",
+    "preview": "Espressione",
+    "desc_seconds": "Ogni {{n}} secondo/i",
+    "desc_minutes": "Ogni {{n}} minuto/i",
+    "desc_hours": "Ogni {{n}} ora/e",
+    "desc_daily": "Ogni giorno alle {{time}}"
+  },
+  "config": {
+    "suggestion": {
+      "suggestionLimit": {
+        "label": "Limite suggerimenti",
+        "desc": "Massimo suggerimenti per utente"
+      },
+      "daysActive": {
+        "label": "Giorni attivi",
+        "desc": "Elabora solo utenti attivi negli ultimi N giorni"
+      },
+      "interestWindowDays": {
+        "label": "Finestra interesse (giorni)",
+        "desc": "Quanti giorni indietro cercare post messi mi piace"
+      },
+      "weights": {
+        "socialConnection": {
+          "label": "Connessione sociale",
+          "desc": "Punti per connessione reciproca"
+        },
+        "interestMatch": {
+          "label": "Interesse condiviso",
+          "desc": "Punti per interesse condiviso"
+        },
+        "geoExact": {
+          "label": "Posizione esatta",
+          "desc": "Bonus per corrispondenza geohash esatta"
+        },
+        "geoNear": {
+          "label": "Posizione vicina",
+          "desc": "Bonus per geohash vicino"
+        },
+        "verified": {
+          "label": "Verificato",
+          "desc": "Bonus per account verificati"
+        },
+        "popularityMultiplier": {
+          "label": "Moltiplicatore popolarità",
+          "desc": "Moltiplicatore su log10 dei follower"
+        }
+      }
+    },
+    "gravityDecay": {
+      "maxAgeDays": {
+        "label": "Età massima (giorni)",
+        "desc": "Ricalcola solo post più recenti di N giorni"
+      }
+    }
+  }
+}

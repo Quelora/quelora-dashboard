@@ -1,0 +1,11 @@
+{
+  "connections": "חיבורים: {{current}}",
+  "connectionsTooltip": "פעילים: {{active}} | זמינים: {{available}}",
+  "memory": "זיכרון: {{memory}}",
+  "memoryTooltip": "זיכרון תושב DB (v{{version}})",
+  "queries": "שאילתות: {{queries}}",
+  "queriesTooltip": "פעולות קריאה",
+  "storage": "אחסון: {{storage}}",
+  "storageTooltip": "נתונים: {{data}} | אינדקסים: {{indexes}}",
+  "title": "מסד נתונים (DB)"
+}

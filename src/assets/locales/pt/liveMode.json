@@ -1,0 +1,8 @@
+{
+  "invalidMaxClients": "O Máx. Clientes deve estar entre {{min}} e {{max}}.",
+  "isLiveActive": "Ativar Transmissão em Direto",
+  "maxClients": "Máximo de Clientes Concorrentes",
+  "startTime": "Hora de Início Programada",
+  "tabTitle": "Modo em Direto",
+  "title": "Configuração do Modo em Direto"
+}

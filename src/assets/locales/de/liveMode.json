@@ -1,0 +1,8 @@
+{
+  "invalidMaxClients": "Max. Clients muss zwischen {{min}} und {{max}} liegen.",
+  "isLiveActive": "Live-Stream aktivieren",
+  "maxClients": "Maximale gleichzeitige Clients",
+  "startTime": "Geplante Startzeit",
+  "tabTitle": "Live-Modus",
+  "title": "Live-Modus-Einstellungen"
+}

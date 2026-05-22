@@ -1,0 +1,146 @@
+{
+  "title": "Jobs",
+  "subtitle": "Verwaltung geplanter Aufgaben",
+  "tabs": {
+    "jobs": "Jobs",
+    "logs": "Ausführungsprotokolle"
+  },
+  "sections": {
+    "client_jobs": "Client-Jobs",
+    "system_jobs": "System-Jobs"
+  },
+  "columns": {
+    "job": "Job",
+    "queue": "Warteschlange",
+    "enabled": "Aktiviert",
+    "cron": "Cron",
+    "last_status": "Letzter Status",
+    "last_run": "Letzte Ausführung",
+    "duration": "Dauer",
+    "actions": "Aktionen"
+  },
+  "actions": {
+    "trigger": "Auslösen",
+    "edit": "Bearbeiten"
+  },
+  "status": {
+    "success": "Erfolgreich",
+    "failed": "Fehlgeschlagen",
+    "running": "Läuft",
+    "unknown": "Unbekannt"
+  },
+  "edit_dialog": {
+    "title": "Job bearbeiten",
+    "enabled": "Aktiviert",
+    "cron": "Cron-Ausdruck",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "section_general": "Allgemein",
+    "section_weights": "Gewichtungen"
+  },
+  "trigger_dialog": {
+    "title": "Job auslösen",
+    "message": "\"{{jobKey}}\" manuell auslösen? Eine sofortige Ausführung wird in die Warteschlange gestellt.",
+    "confirm": "Auslösen",
+    "cancel": "Abbrechen"
+  },
+  "logs": {
+    "columns": {
+      "job": "Job",
+      "client": "Client",
+      "status": "Status",
+      "started": "Beginn",
+      "completed": "Ende",
+      "duration": "Dauer",
+      "error": "Fehler"
+    },
+    "filters": {
+      "job_name": "Job-Name",
+      "status": "Status",
+      "all_statuses": "Alle Status"
+    },
+    "no_error": "—"
+  },
+  "readonly_badge": "Nur Lesen",
+  "never": "Nie",
+  "ms": "ms",
+  "errors": {
+    "load": "Jobs konnten nicht geladen werden",
+    "update": "Job konnte nicht aktualisiert werden",
+    "trigger": "Job konnte nicht ausgelöst werden",
+    "logs": "Protokolle konnten nicht geladen werden"
+  },
+  "success": {
+    "trigger": "Job erfolgreich ausgelöst",
+    "update": "Job aktualisiert"
+  },
+  "sidebar": "Jobs",
+  "cron_editor": {
+    "type_seconds": "Sekunden",
+    "type_minutes": "Minuten",
+    "type_hours": "Stunden",
+    "type_daily": "Täglich",
+    "type_custom": "Benutzerdefiniert",
+    "every": "Alle",
+    "seconds": "Sekunde(n)",
+    "minutes": "Minute(n)",
+    "hours": "Stunde(n)",
+    "daily_at": "Täglich um",
+    "hour": "Stunde",
+    "minute": "Minute",
+    "expression": "Ausdruck",
+    "preview": "Ausdruck",
+    "desc_seconds": "Alle {{n}} Sekunde(n)",
+    "desc_minutes": "Alle {{n}} Minute(n)",
+    "desc_hours": "Alle {{n}} Stunde(n)",
+    "desc_daily": "Täglich um {{time}}"
+  },
+  "config": {
+    "suggestion": {
+      "suggestionLimit": {
+        "label": "Vorschlagslimit",
+        "desc": "Max. Vorschläge pro Nutzer"
+      },
+      "daysActive": {
+        "label": "Aktive Tage",
+        "desc": "Nur Nutzer verarbeiten, die in den letzten N Tagen aktiv waren"
+      },
+      "interestWindowDays": {
+        "label": "Interessensfenster (Tage)",
+        "desc": "Wie viele Tage zurück nach gelikten Posts suchen"
+      },
+      "weights": {
+        "socialConnection": {
+          "label": "Soziale Verbindung",
+          "desc": "Punkte pro gegenseitiger Verbindung"
+        },
+        "interestMatch": {
+          "label": "Gemeinsames Interesse",
+          "desc": "Punkte pro geteilidem Interesse"
+        },
+        "geoExact": {
+          "label": "Genauer Standort",
+          "desc": "Bonus bei exaktem Geohash"
+        },
+        "geoNear": {
+          "label": "Naher Standort",
+          "desc": "Bonus bei nahem Geohash"
+        },
+        "verified": {
+          "label": "Verifiziert",
+          "desc": "Bonus für verifizierte Konten"
+        },
+        "popularityMultiplier": {
+          "label": "Popularitätsmultiplikator",
+          "desc": "Multiplikator auf log10 der Followerzahl"
+        }
+      }
+    },
+    "gravityDecay": {
+      "maxAgeDays": {
+        "label": "Max. Alter (Tage)",
+        "desc": "Scores nur für Beiträge jünger als N Tage neu berechnen"
+      }
+    }
+  }
+}

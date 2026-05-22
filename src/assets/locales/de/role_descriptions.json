@@ -1,0 +1,9 @@
+{
+  "admin": "Kann zugewiesene Kunden verwalten, Mitarbeiter erstellen und das Portal konfigurieren.",
+  "advertiser": "Kann Werbekampagnen verwalten, Creatives hochladen und Leistungsdaten einsehen.",
+  "analyst": "Nur-Lese-Zugriff auf Dashboards, Statistiken und Berichte.",
+  "editor": "Kann Beiträge, Umfragen erstellen, bearbeiten, veröffentlichen und Inhalte verwalten.",
+  "god": "Vollzugriff. Kann Kunden erstellen, Abrechnungen verwalten und alle Daten einsehen.",
+  "moderator": "Kann Meldungen prüfen, Kommentare moderieren und missbräuchliche Benutzer sperren.",
+  "user": "Eingeschränkter Basiszugang."
+}

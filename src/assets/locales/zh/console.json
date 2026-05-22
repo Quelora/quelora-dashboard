@@ -1,0 +1,13 @@
+{
+  "allLevels": "所有级别",
+  "clear": "清除",
+  "filter": "过滤",
+  "level": "级别",
+  "message": "消息",
+  "noLogs": "无可用日志",
+  "pause": "暂停",
+  "resume": "恢复",
+  "timestamp": "时间戳",
+  "title": "控制台日志",
+  "toggle": "切换控制台"
+}

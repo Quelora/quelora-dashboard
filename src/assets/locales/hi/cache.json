@@ -1,0 +1,11 @@
+{
+  "clients": "ग्राहक",
+  "clientsTooltip": "जुड़े हुए ग्राहक",
+  "keys": "कुंजियाँ",
+  "keysTooltip": "संग्रहीत कुंजियाँ",
+  "memoryTooltip": "Redis द्वारा प्रयुक्त मेमोरी",
+  "ops": "ऑप्स/सेकंड",
+  "opsTooltip": "प्रति सेकंड ऑपरेशन",
+  "title": "कैश",
+  "uptimeTooltip": "Redis सर्वर का सक्रिय समय"
+}

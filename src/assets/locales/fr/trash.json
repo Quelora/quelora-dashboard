@@ -1,0 +1,18 @@
+{
+  "actions": "Actions",
+  "cancel": "Annuler",
+  "category": "Catégorie",
+  "confirmRestoreText": "Êtes-vous sûr de vouloir restaurer cet élément ?",
+  "confirmRestoreTitle": "Confirmer la restauration",
+  "deletedDate": "Date de suppression",
+  "description": "Description",
+  "errorFetching": "Erreur lors du chargement des éléments de la corbeille",
+  "noDescription": "Aucune description",
+  "restore": "Restaurer",
+  "restoreErrorText": "Une erreur s'est produite lors de la restauration de l'élément.",
+  "restoreErrorTitle": "Échec de la restauration",
+  "restoreSuccessText": "L'élément a été restauré avec succès.",
+  "restoreSuccessTitle": "Élément restauré",
+  "retry": "Réessayer",
+  "title": "Corbeille"
+}

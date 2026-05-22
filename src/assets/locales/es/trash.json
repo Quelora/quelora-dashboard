@@ -1,0 +1,18 @@
+{
+  "actions": "Acciones",
+  "cancel": "Cancelar",
+  "category": "Categoría",
+  "confirmRestoreText": "¿Estás seguro de que quieres restaurar este elemento?",
+  "confirmRestoreTitle": "Confirmar Restauración",
+  "deletedDate": "Fecha de Eliminación",
+  "description": "Descripción",
+  "errorFetching": "Error cargando elementos de la papelera",
+  "noDescription": "Sin descripción",
+  "restore": "Restaurar",
+  "restoreErrorText": "Hubo un error restaurando el elemento.",
+  "restoreErrorTitle": "Restauración Fallida",
+  "restoreSuccessText": "El elemento fue restaurado exitosamente.",
+  "restoreSuccessTitle": "Elemento Restaurado",
+  "retry": "Volver a intentar",
+  "title": "Papelera de Reciclaje"
+}

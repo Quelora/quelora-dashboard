@@ -1,0 +1,13 @@
+{
+  "add_new_cid": "إضافة عميل جديد",
+  "cid_description": "وصف العميل",
+  "cid_generated": "تم إنشاء العميل بنجاح",
+  "cid_updated": "تم تحديث وصف العميل بنجاح",
+  "description_required": "الوصف مطلوب",
+  "edit_cid_description": "تعديل وصف العميل",
+  "manage_cids": "إدارة العملاء",
+  "manage_cids_description": "عرض وإدارة عملاء حسابك",
+  "new_description": "وصف جديد",
+  "no_description": "بدون وصف",
+  "title": "إدارة الحسابات"
+}

@@ -1,0 +1,13 @@
+{
+  "add_new_cid": "नया ग्राहक जोड़ें",
+  "cid_description": "ग्राहक का विवरण",
+  "cid_generated": "ग्राहक सफलतापूर्वक उत्पन्न हुआ",
+  "cid_updated": "ग्राहक विवरण सफलतापूर्वक अद्यतन किया गया",
+  "description_required": "विवरण आवश्यक है",
+  "edit_cid_description": "ग्राहक का विवरण संपादित करें",
+  "manage_cids": "ग्राहकों का प्रबंधन करें",
+  "manage_cids_description": "अपने खाते के ग्राहकों को देखें और प्रबंधित करें",
+  "new_description": "नया विवरण",
+  "no_description": "कोई विवरण नहीं",
+  "title": "खाता प्रबंधन"
+}

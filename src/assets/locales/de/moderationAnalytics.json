@@ -1,0 +1,18 @@
+{
+  "allProviders": "Alle Anbieter",
+  "allTasks": "Alle Aufgaben",
+  "completionTokens": "Vervollständigungs-Token",
+  "estimatedCost": "Geschätzte Kosten (USD)",
+  "filterByProvider": "Nach Anbieter filtern",
+  "filterByTask": "Nach Aufgabe filtern",
+  "page_title": "Moderationsanalysen",
+  "promptTokens": "Prompt-Token",
+  "provider": "Anbieter",
+  "subtitle": "Token-Nutzung und damit verbundene Kosten für KI-Dienste.",
+  "task": "Aufgabe",
+  "title": "Moderationsanalysen",
+  "tokensByProvider": "Token nach Anbieter",
+  "tokensByTask": "Token nach Aufgabe",
+  "tokensOverTime": "Token-Nutzung (über die Zeit)",
+  "totalTokens": "Gesamt-Token"
+}

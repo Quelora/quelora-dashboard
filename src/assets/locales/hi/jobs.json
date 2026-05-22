@@ -1,0 +1,146 @@
+{
+  "title": "जॉब्स",
+  "subtitle": "अनुसूचित कार्य प्रबंधन",
+  "tabs": {
+    "jobs": "जॉब्स",
+    "logs": "निष्पादन लॉग"
+  },
+  "sections": {
+    "client_jobs": "क्लाइंट जॉब्स",
+    "system_jobs": "सिस्टम जॉब्स"
+  },
+  "columns": {
+    "job": "जॉब",
+    "queue": "कतार",
+    "enabled": "सक्षम",
+    "cron": "Cron",
+    "last_status": "अंतिम स्थिति",
+    "last_run": "अंतिम चलाया",
+    "duration": "अवधि",
+    "actions": "क्रियाएँ"
+  },
+  "actions": {
+    "trigger": "चलाएँ",
+    "edit": "संपादित करें"
+  },
+  "status": {
+    "success": "सफल",
+    "failed": "विफल",
+    "running": "चल रहा है",
+    "unknown": "अज्ञात"
+  },
+  "edit_dialog": {
+    "title": "जॉब संपादित करें",
+    "enabled": "सक्षम",
+    "cron": "Cron अभिव्यक्ति",
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "section_general": "सामान्य",
+    "section_weights": "वज़न"
+  },
+  "trigger_dialog": {
+    "title": "जॉब चलाएँ",
+    "message": "\"{{jobKey}}\" को मैन्युअल रूप से चलाएँ? तत्काल निष्पादन कतार में जोड़ा जाएगा।",
+    "confirm": "चलाएँ",
+    "cancel": "रद्द करें"
+  },
+  "logs": {
+    "columns": {
+      "job": "जॉब",
+      "client": "क्लाइंट",
+      "status": "स्थिति",
+      "started": "शुरुआत",
+      "completed": "समाप्त",
+      "duration": "अवधि",
+      "error": "त्रुटि"
+    },
+    "filters": {
+      "job_name": "जॉब नाम",
+      "status": "स्थिति",
+      "all_statuses": "सभी स्थितियाँ"
+    },
+    "no_error": "—"
+  },
+  "readonly_badge": "केवल पढ़ें",
+  "never": "कभी नहीं",
+  "ms": "मि.से.",
+  "errors": {
+    "load": "जॉब्स लोड करने में विफल",
+    "update": "जॉब अपडेट करने में विफल",
+    "trigger": "जॉब चलाने में विफल",
+    "logs": "लॉग लोड करने में विफल"
+  },
+  "success": {
+    "trigger": "जॉब सफलतापूर्वक चलाया गया",
+    "update": "जॉब अपडेट किया गया"
+  },
+  "sidebar": "जॉब्स",
+  "cron_editor": {
+    "type_seconds": "सेकंड",
+    "type_minutes": "मिनट",
+    "type_hours": "घंटे",
+    "type_daily": "दैनिक",
+    "type_custom": "कस्टम",
+    "every": "हर",
+    "seconds": "सेकंड",
+    "minutes": "मिनट",
+    "hours": "घंटे",
+    "daily_at": "प्रतिदिन",
+    "hour": "घंटा",
+    "minute": "मिनट",
+    "expression": "अभिव्यक्ति",
+    "preview": "अभिव्यक्ति",
+    "desc_seconds": "हर {{n}} सेकंड",
+    "desc_minutes": "हर {{n}} मिनट",
+    "desc_hours": "हर {{n}} घंटे",
+    "desc_daily": "प्रतिदिन {{time}} बजे"
+  },
+  "config": {
+    "suggestion": {
+      "suggestionLimit": {
+        "label": "सुझाव सीमा",
+        "desc": "प्रति उपयोगकर्ता अधिकतम सुझाव"
+      },
+      "daysActive": {
+        "label": "सक्रिय दिन",
+        "desc": "केवल पिछले N दिनों में सक्रिय उपयोगकर्ताओं को संसाधित करें"
+      },
+      "interestWindowDays": {
+        "label": "रुचि विंडो (दिन)",
+        "desc": "लाइक किए गए पोस्ट के लिए कितने दिन पीछे जाएं"
+      },
+      "weights": {
+        "socialConnection": {
+          "label": "सामाजिक कनेक्शन",
+          "desc": "प्रत्येक म्यूचुअल कनेक्शन के लिए स्कोर"
+        },
+        "interestMatch": {
+          "label": "साझा रुचि",
+          "desc": "प्रत्येक साझा रुचि के लिए स्कोर"
+        },
+        "geoExact": {
+          "label": "सटीक स्थान",
+          "desc": "सटीक जियोहैश मिलान के लिए बोनस"
+        },
+        "geoNear": {
+          "label": "नजदीकी स्थान",
+          "desc": "नजदीकी जियोहैश के लिए बोनस"
+        },
+        "verified": {
+          "label": "सत्यापित",
+          "desc": "सत्यापित खातों के लिए बोनस"
+        },
+        "popularityMultiplier": {
+          "label": "लोकप्रियता गुणक",
+          "desc": "फॉलोअर काउंट के log10 पर गुणक"
+        }
+      }
+    },
+    "gravityDecay": {
+      "maxAgeDays": {
+        "label": "अधिकतम आयु (दिन)",
+        "desc": "केवल N दिनों से नए पोस्ट के स्कोर पुनः गणना करें"
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "activity": "Activity",
+  "activityOverTime": "Activity Over Time",
+  "avgToxicity": "Avg. Toxicity",
+  "commentsAdded": "Comments Created",
+  "current_score": "Current Trust Score",
+  "date": "Date",
+  "delta": "Change",
+  "event_type": "Event / Reason",
+  "impact": "Impact",
+  "likesGiven": "Likes Given",
+  "likesReceived": "Likes Received",
+  "repliesAdded": "Replies Created",
+  "repliesReceived": "Replies Received",
+  "reputation": "Reputation History",
+  "source": "Source",
+  "subtitle": "Engagement and behavior metrics.",
+  "title": "Profile Analytics",
+  "user": "User",
+  "view_reputation": "View History"
+}

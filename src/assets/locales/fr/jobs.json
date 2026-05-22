@@ -1,0 +1,146 @@
+{
+  "title": "Jobs",
+  "subtitle": "Gestion des tâches planifiées",
+  "tabs": {
+    "jobs": "Jobs",
+    "logs": "Journaux d'exécution"
+  },
+  "sections": {
+    "client_jobs": "Jobs client",
+    "system_jobs": "Jobs système"
+  },
+  "columns": {
+    "job": "Job",
+    "queue": "File",
+    "enabled": "Activé",
+    "cron": "Cron",
+    "last_status": "Dernier statut",
+    "last_run": "Dernière exécution",
+    "duration": "Durée",
+    "actions": "Actions"
+  },
+  "actions": {
+    "trigger": "Déclencher",
+    "edit": "Modifier"
+  },
+  "status": {
+    "success": "Succès",
+    "failed": "Échec",
+    "running": "En cours",
+    "unknown": "Inconnu"
+  },
+  "edit_dialog": {
+    "title": "Modifier le Job",
+    "enabled": "Activé",
+    "cron": "Expression Cron",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "section_general": "Général",
+    "section_weights": "Pondérations"
+  },
+  "trigger_dialog": {
+    "title": "Déclencher le Job",
+    "message": "Déclencher manuellement \"{{jobKey}}\" ? Une exécution immédiate sera mise en file d'attente.",
+    "confirm": "Déclencher",
+    "cancel": "Annuler"
+  },
+  "logs": {
+    "columns": {
+      "job": "Job",
+      "client": "Client",
+      "status": "Statut",
+      "started": "Début",
+      "completed": "Fin",
+      "duration": "Durée",
+      "error": "Erreur"
+    },
+    "filters": {
+      "job_name": "Nom du Job",
+      "status": "Statut",
+      "all_statuses": "Tous les statuts"
+    },
+    "no_error": "—"
+  },
+  "readonly_badge": "Lecture seule",
+  "never": "Jamais",
+  "ms": "ms",
+  "errors": {
+    "load": "Échec du chargement des jobs",
+    "update": "Échec de la mise à jour du job",
+    "trigger": "Échec du déclenchement du job",
+    "logs": "Échec du chargement des journaux"
+  },
+  "success": {
+    "trigger": "Job déclenché avec succès",
+    "update": "Job mis à jour"
+  },
+  "sidebar": "Jobs",
+  "cron_editor": {
+    "type_seconds": "Secondes",
+    "type_minutes": "Minutes",
+    "type_hours": "Heures",
+    "type_daily": "Quotidien",
+    "type_custom": "Personnalisé",
+    "every": "Toutes les",
+    "seconds": "seconde(s)",
+    "minutes": "minute(s)",
+    "hours": "heure(s)",
+    "daily_at": "Chaque jour à",
+    "hour": "Heure",
+    "minute": "Minute",
+    "expression": "Expression",
+    "preview": "Expression",
+    "desc_seconds": "Toutes les {{n}} seconde(s)",
+    "desc_minutes": "Toutes les {{n}} minute(s)",
+    "desc_hours": "Toutes les {{n}} heure(s)",
+    "desc_daily": "Chaque jour à {{time}}"
+  },
+  "config": {
+    "suggestion": {
+      "suggestionLimit": {
+        "label": "Limite de suggestions",
+        "desc": "Maximum de suggestions par utilisateur"
+      },
+      "daysActive": {
+        "label": "Jours actifs",
+        "desc": "Traiter uniquement les utilisateurs actifs dans les N derniers jours"
+      },
+      "interestWindowDays": {
+        "label": "Fenêtre d'intérêt (jours)",
+        "desc": "Nombre de jours en arrière pour chercher les posts aimés"
+      },
+      "weights": {
+        "socialConnection": {
+          "label": "Connexion sociale",
+          "desc": "Points par connexion mutuelle"
+        },
+        "interestMatch": {
+          "label": "Intérêt commun",
+          "desc": "Points par intérêt partagé"
+        },
+        "geoExact": {
+          "label": "Localisation exacte",
+          "desc": "Bonus pour géohash exact"
+        },
+        "geoNear": {
+          "label": "Localisation proche",
+          "desc": "Bonus pour géohash proche"
+        },
+        "verified": {
+          "label": "Vérifié",
+          "desc": "Bonus pour comptes vérifiés"
+        },
+        "popularityMultiplier": {
+          "label": "Multiplicateur popularité",
+          "desc": "Multiplicateur sur log10 des abonnés"
+        }
+      }
+    },
+    "gravityDecay": {
+      "maxAgeDays": {
+        "label": "Âge maximum (jours)",
+        "desc": "Recalculer uniquement les posts plus récents que N jours"
+      }
+    }
+  }
+}

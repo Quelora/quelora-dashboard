@@ -1,0 +1,117 @@
+{
+  "title": "Jobs",
+  "subtitle": "Scheduled task management",
+  "tabs": {
+    "jobs": "Jobs",
+    "logs": "Execution Logs"
+  },
+  "sections": {
+    "client_jobs": "Client Jobs",
+    "system_jobs": "System Jobs"
+  },
+  "columns": {
+    "job": "Job",
+    "queue": "Queue",
+    "enabled": "Enabled",
+    "cron": "Cron",
+    "last_status": "Last Status",
+    "last_run": "Last Run",
+    "duration": "Duration",
+    "actions": "Actions"
+  },
+  "actions": {
+    "trigger": "Trigger",
+    "edit": "Edit"
+  },
+  "status": {
+    "success": "Success",
+    "failed": "Failed",
+    "running": "Running",
+    "unknown": "Unknown"
+  },
+  "edit_dialog": {
+    "title": "Edit Job",
+    "enabled": "Enabled",
+    "cron": "Cron Expression",
+    "save": "Save",
+    "cancel": "Cancel",
+    "section_general": "General",
+    "section_weights": "Weights"
+  },
+  "trigger_dialog": {
+    "title": "Trigger Job",
+    "message": "Manually trigger \"{{jobKey}}\"? This will queue an immediate execution.",
+    "confirm": "Trigger",
+    "cancel": "Cancel"
+  },
+  "logs": {
+    "columns": {
+      "job": "Job",
+      "client": "Client",
+      "status": "Status",
+      "started": "Started",
+      "completed": "Completed",
+      "duration": "Duration",
+      "error": "Error"
+    },
+    "output": "Output",
+    "filters": {
+      "job_name": "Job Name",
+      "status": "Status",
+      "all_statuses": "All Statuses"
+    },
+    "no_error": "—"
+  },
+  "readonly_badge": "Read-only",
+  "never": "Never",
+  "ms": "ms",
+  "errors": {
+    "load": "Failed to load jobs",
+    "update": "Failed to update job",
+    "trigger": "Failed to trigger job",
+    "logs": "Failed to load logs"
+  },
+  "success": {
+    "trigger": "Job triggered successfully",
+    "update": "Job updated"
+  },
+  "sidebar": "Jobs",
+  "cron_editor": {
+    "type_seconds": "Seconds",
+    "type_minutes": "Minutes",
+    "type_hours": "Hours",
+    "type_daily": "Daily",
+    "type_custom": "Custom",
+    "every": "Every",
+    "seconds": "second(s)",
+    "minutes": "minute(s)",
+    "hours": "hour(s)",
+    "daily_at": "Daily at",
+    "hour": "Hour",
+    "minute": "Minute",
+    "expression": "Expression",
+    "preview": "Expression",
+    "desc_seconds": "Every {{n}} second(s)",
+    "desc_minutes": "Every {{n}} minute(s)",
+    "desc_hours": "Every {{n}} hour(s)",
+    "desc_daily": "Daily at {{time}}"
+  },
+  "config": {
+    "suggestion": {
+      "suggestionLimit":    { "label": "Suggestion Limit",       "desc": "Max suggestions generated per user" },
+      "daysActive":         { "label": "Active Days",            "desc": "Only process users active in the last N days" },
+      "interestWindowDays": { "label": "Interest Window (days)", "desc": "How far back to look for liked posts when matching interests" },
+      "weights": {
+        "socialConnection":    { "label": "Social Connection",    "desc": "Score per mutual connection" },
+        "interestMatch":       { "label": "Interest Match",       "desc": "Score per shared interest" },
+        "geoExact":            { "label": "Exact Location",       "desc": "Bonus for exact geohash match" },
+        "geoNear":             { "label": "Near Location",        "desc": "Bonus for nearby geohash match" },
+        "verified":            { "label": "Verified",             "desc": "Bonus for verified accounts" },
+        "popularityMultiplier":{ "label": "Popularity Multiplier","desc": "Multiplier on log10 of follower count" }
+      }
+    },
+    "gravityDecay": {
+      "maxAgeDays": { "label": "Max Age (days)", "desc": "Only recalculate scores for posts newer than N days" }
+    }
+  }
+}

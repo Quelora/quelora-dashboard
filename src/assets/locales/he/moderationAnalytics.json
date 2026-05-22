@@ -1,0 +1,18 @@
+{
+  "allProviders": "כל הספקים",
+  "allTasks": "כל המשימות",
+  "completionTokens": "אסימוני השלמה",
+  "estimatedCost": "עלות משוערת (USD)",
+  "filterByProvider": "סנן לפי ספק",
+  "filterByTask": "סנן לפי משימה",
+  "page_title": "ניתוח מודרציה",
+  "promptTokens": "אסימוני הנחיה",
+  "provider": "ספק",
+  "subtitle": "שימוש באסימונים ועלויות נלוות לשירותי AI.",
+  "task": "משימה",
+  "title": "ניתוח מודרציה",
+  "tokensByProvider": "אסימונים לפי ספק",
+  "tokensByTask": "אסימונים לפי משימה",
+  "tokensOverTime": "שימוש באסימונים (לאורך זמן)",
+  "totalTokens": "סך האסימונים"
+}

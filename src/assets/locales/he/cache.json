@@ -1,0 +1,11 @@
+{
+  "clients": "לקוחות",
+  "clientsTooltip": "לקוחות מחוברים",
+  "keys": "מפתחות",
+  "keysTooltip": "מפתחות מאוחסנים",
+  "memoryTooltip": "זיכרון בשימוש על ידי Redis",
+  "ops": "פעולות/שנייה",
+  "opsTooltip": "פעולות לשנייה",
+  "title": "מטמון (CACHE)",
+  "uptimeTooltip": "זמן פעולה של שרת Redis"
+}

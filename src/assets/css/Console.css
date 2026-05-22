@@ -1,0 +1,121 @@
+/*
+ * Quelora — quelora-dashboard
+ * Copyright (C) 2026 Germán Zelaya — https://quelora.org
+ * SPDX-License-Identifier: AGPL-3.0-only
+ *
+ * This file is part of Quelora. See the LICENSE file for terms.
+ */
+
+/* ./src/assets/css/Console.css */
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono&display=swap');
+
+.console-paper {
+    height: 30vh !important;
+    width: 100% !important;
+    background-color: #121212 !important; /* Fondo negro sólido para la consola */
+    color: var(--console-text);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    margin-left: 0;
+    margin-right: 0;
+    border-radius: 0 !important;
+    top: auto !important;
+    bottom: 0 !important;
+    z-index: 1300 !important; /* Z-Index alto para que esté encima del Sidebar (z-index 1200) */
+    box-shadow: 0 -6px 16px rgba(0,0,0,0.4);
+}
+
+.console-resize-handle {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.2);
+    cursor: ns-resize;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.console-resize-handle:hover {
+    background: rgba(255,255,255,0.4);
+}
+
+.console-toolbar {
+    color: var(--console-text) !important;
+    min-height: 48px !important;
+    padding: 0 16px !important;
+}
+
+.console-toolbar .MuiFormLabel-root {
+    visibility: hidden;
+}
+
+.console-toolbar .MuiTypography-caption{
+    width: 100px!important;
+}
+
+.console-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    font-family: 'Ubuntu Mono', 'Courier New', monospace !important;
+    font-size: 0.875rem;
+    white-space: pre-wrap;
+    background: transparent !important;
+    margin-top: -48px;
+}
+
+.console-log {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 4px;
+    line-height: 1.4;
+    color: var(--console-text);
+}
+
+.console-time {
+    color: var(--console-time-color); 
+    flex-shrink: 0;
+}
+
+.console-level {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.console-message {
+    flex: 1;
+    word-break: break-word;
+}
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(8px);
+    animation: fadeInSlide 0.35s ease-out forwards;
+}
+
+@keyframes fadeInSlide {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.console-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.console-content::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.05);
+}
+
+.console-content::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.25);
+    border-radius: 4px;
+}
+
+.console-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.4);
+}

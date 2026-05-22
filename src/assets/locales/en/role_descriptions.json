@@ -1,0 +1,9 @@
+{
+  "admin": "Can manage assigned clients, create staff users, and configure the portal.",
+  "advertiser": "Can manage ad campaigns, upload creatives, and view performance.",
+  "analyst": "Read-only access to dashboards, statistics, and reports.",
+  "editor": "Can create, edit, and publish posts, surveys, and manage content.",
+  "god": "Full access. Can create clients, manage billing, and view all data.",
+  "moderator": "Can review reports, moderate comments, and ban abusive users.",
+  "user": "Restricted basic access."
+}

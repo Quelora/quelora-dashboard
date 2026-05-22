@@ -1,0 +1,13 @@
+{
+  "add_new_cid": "Ajouter un nouveau client",
+  "cid_description": "Description du client",
+  "cid_generated": "Client généré avec succès",
+  "cid_updated": "Description du client mise à jour avec succès",
+  "description_required": "La description est requise",
+  "edit_cid_description": "Modifier la description du client",
+  "manage_cids": "Gérer les clients",
+  "manage_cids_description": "Afficher et gérer les clients de votre compte",
+  "new_description": "Nouvelle description",
+  "no_description": "Aucune description",
+  "title": "Gestion des comptes"
+}

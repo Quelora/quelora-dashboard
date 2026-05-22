@@ -1,0 +1,18 @@
+{
+  "allProviders": "All Providers",
+  "allTasks": "All Tasks",
+  "completionTokens": "Completion Tokens",
+  "estimatedCost": "Estimated Cost (USD)",
+  "filterByProvider": "Filter by provider",
+  "filterByTask": "Filter by task",
+  "page_title": "Moderation Analytics",
+  "promptTokens": "Prompt Tokens",
+  "provider": "Provider",
+  "subtitle": "Token usage and associated costs with AI services.",
+  "task": "Task",
+  "title": "Moderation Analytics",
+  "tokensByProvider": "Tokens by Provider",
+  "tokensByTask": "Tokens by Task",
+  "tokensOverTime": "Token Usage (Over Time)",
+  "totalTokens": "Total Tokens"
+}

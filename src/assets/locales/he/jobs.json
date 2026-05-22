@@ -1,0 +1,146 @@
+{
+  "title": "משימות",
+  "subtitle": "ניהול משימות מתוזמנות",
+  "tabs": {
+    "jobs": "משימות",
+    "logs": "יומני ביצוע"
+  },
+  "sections": {
+    "client_jobs": "משימות לקוח",
+    "system_jobs": "משימות מערכת"
+  },
+  "columns": {
+    "job": "משימה",
+    "queue": "תור",
+    "enabled": "מופעל",
+    "cron": "Cron",
+    "last_status": "סטטוס אחרון",
+    "last_run": "הרצה אחרונה",
+    "duration": "משך",
+    "actions": "פעולות"
+  },
+  "actions": {
+    "trigger": "הפעל",
+    "edit": "ערוך"
+  },
+  "status": {
+    "success": "הצלחה",
+    "failed": "נכשל",
+    "running": "רץ",
+    "unknown": "לא ידוע"
+  },
+  "edit_dialog": {
+    "title": "ערוך משימה",
+    "enabled": "מופעל",
+    "cron": "ביטוי Cron",
+    "save": "שמור",
+    "cancel": "ביטול",
+    "section_general": "כללי",
+    "section_weights": "משקלים"
+  },
+  "trigger_dialog": {
+    "title": "הפעל משימה",
+    "message": "להפעיל ידנית את \"{{jobKey}}\"? ביצוע מיידי יתווסף לתור.",
+    "confirm": "הפעל",
+    "cancel": "ביטול"
+  },
+  "logs": {
+    "columns": {
+      "job": "משימה",
+      "client": "לקוח",
+      "status": "סטטוס",
+      "started": "התחלה",
+      "completed": "סיום",
+      "duration": "משך",
+      "error": "שגיאה"
+    },
+    "filters": {
+      "job_name": "שם משימה",
+      "status": "סטטוס",
+      "all_statuses": "כל הסטטוסים"
+    },
+    "no_error": "—"
+  },
+  "readonly_badge": "קריאה בלבד",
+  "never": "אף פעם",
+  "ms": "ms",
+  "errors": {
+    "load": "טעינת המשימות נכשלה",
+    "update": "עדכון המשימה נכשל",
+    "trigger": "הפעלת המשימה נכשלה",
+    "logs": "טעינת היומנים נכשלה"
+  },
+  "success": {
+    "trigger": "המשימה הופעלה בהצלחה",
+    "update": "המשימה עודכנה"
+  },
+  "sidebar": "משימות",
+  "cron_editor": {
+    "type_seconds": "שניות",
+    "type_minutes": "דקות",
+    "type_hours": "שעות",
+    "type_daily": "יומי",
+    "type_custom": "מותאם",
+    "every": "כל",
+    "seconds": "שנייה/ות",
+    "minutes": "דקה/ות",
+    "hours": "שעה/ות",
+    "daily_at": "מדי יום בשעה",
+    "hour": "שעה",
+    "minute": "דקה",
+    "expression": "ביטוי",
+    "preview": "ביטוי",
+    "desc_seconds": "כל {{n}} שנייה/ות",
+    "desc_minutes": "כל {{n}} דקה/ות",
+    "desc_hours": "כל {{n}} שעה/ות",
+    "desc_daily": "מדי יום בשעה {{time}}"
+  },
+  "config": {
+    "suggestion": {
+      "suggestionLimit": {
+        "label": "מגבלת הצעות",
+        "desc": "מקסימום הצעות למשתמש"
+      },
+      "daysActive": {
+        "label": "ימי פעילות",
+        "desc": "עבד רק משתמשים פעילים ב-N הימים האחרונים"
+      },
+      "interestWindowDays": {
+        "label": "חלון עניין (ימים)",
+        "desc": "כמה ימים אחורה לחפש פוסטים שסומנו בלייק"
+      },
+      "weights": {
+        "socialConnection": {
+          "label": "חיבור חברתי",
+          "desc": "ניקוד לכל חיבור הדדי"
+        },
+        "interestMatch": {
+          "label": "תחום עניין משותף",
+          "desc": "ניקוד לכל עניין משותף"
+        },
+        "geoExact": {
+          "label": "מיקום מדויק",
+          "desc": "בונוס על התאמת geohash מדויקת"
+        },
+        "geoNear": {
+          "label": "מיקום קרוב",
+          "desc": "בונוס על geohash קרוב"
+        },
+        "verified": {
+          "label": "מאומת",
+          "desc": "בונוס לחשבונות מאומתים"
+        },
+        "popularityMultiplier": {
+          "label": "מכפיל פופולריות",
+          "desc": "מכפיל על log10 של מספר עוקבים"
+        }
+      }
+    },
+    "gravityDecay": {
+      "maxAgeDays": {
+        "label": "גיל מקסימלי (ימים)",
+        "desc": "חשב מחדש ניקוד רק לפוסטים חדשים מ-N ימים"
+      }
+    }
+  }
+}

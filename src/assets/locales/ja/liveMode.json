@@ -1,0 +1,8 @@
+{
+  "invalidMaxClients": "最大クライアント数は {{min}} から {{max}} の間でなければなりません。",
+  "isLiveActive": "ライブストリームを有効にする",
+  "maxClients": "最大同時接続クライアント数",
+  "startTime": "スケジュールされた開始時間",
+  "tabTitle": "ライブモード",
+  "title": "ライブモード設定"
+}

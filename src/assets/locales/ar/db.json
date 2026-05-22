@@ -1,0 +1,11 @@
+{
+  "connections": "الاتصالات: {{current}}",
+  "connectionsTooltip": "نشط: {{active}} | متاح: {{available}}",
+  "memory": "الذاكرة: {{memory}}",
+  "memoryTooltip": "ذاكرة DB المقيمة (v{{version}})",
+  "queries": "الاستعلامات: {{queries}}",
+  "queriesTooltip": "عمليات القراءة",
+  "storage": "التخزين: {{storage}}",
+  "storageTooltip": "البيانات: {{data}} | الفهارس: {{indexes}}",
+  "title": "قاعدة البيانات (DB)"
+}

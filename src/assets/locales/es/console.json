@@ -1,0 +1,14 @@
+{
+  "allLevels": "Todos los Niveles",
+  "clear": "Limpiar",
+  "filter": "Filtrar",
+  "level": "Nivel",
+  "message": "Mensaje",
+  "noLogs": "No hay registros disponibles",
+  "pause": "Pausar",
+  "resume": "Reanudar",
+  "timestamp": "Marca de Tiempo",
+  "title": "Registros de Consola",
+  "toggle": "Alternar Consola",
+  "search": "Buscar"
+}

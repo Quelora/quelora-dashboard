@@ -1,0 +1,11 @@
+{
+  "connections": "कनेक्शन: {{current}}",
+  "connectionsTooltip": "सक्रिय: {{active}} | उपलब्ध: {{available}}",
+  "memory": "मेमोरी: {{memory}}",
+  "memoryTooltip": "DB रेजिडेंट मेमोरी (v{{version}})",
+  "queries": "क्वेरी: {{queries}}",
+  "queriesTooltip": "पठन ऑपरेशन",
+  "storage": "भंडारण: {{storage}}",
+  "storageTooltip": "डेटा: {{data}} | इंडेक्स: {{indexes}}",
+  "title": "DB"
+}

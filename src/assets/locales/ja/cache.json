@@ -1,0 +1,11 @@
+{
+  "clients": "クライアント",
+  "clientsTooltip": "接続中のクライアント",
+  "keys": "キー",
+  "keysTooltip": "保存されているキー",
+  "memoryTooltip": "Redisが使用しているメモリ",
+  "ops": "操作/秒",
+  "opsTooltip": "1秒あたりの操作数",
+  "title": "キャッシュ (CACHE)",
+  "uptimeTooltip": "Redisサーバーの稼働時間"
+}

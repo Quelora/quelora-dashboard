@@ -1,0 +1,146 @@
+{
+  "title": "المهام",
+  "subtitle": "إدارة المهام المجدولة",
+  "tabs": {
+    "jobs": "المهام",
+    "logs": "سجلات التنفيذ"
+  },
+  "sections": {
+    "client_jobs": "مهام العميل",
+    "system_jobs": "مهام النظام"
+  },
+  "columns": {
+    "job": "المهمة",
+    "queue": "قائمة الانتظار",
+    "enabled": "مُفعّل",
+    "cron": "Cron",
+    "last_status": "آخر حالة",
+    "last_run": "آخر تشغيل",
+    "duration": "المدة",
+    "actions": "الإجراءات"
+  },
+  "actions": {
+    "trigger": "تشغيل",
+    "edit": "تعديل"
+  },
+  "status": {
+    "success": "ناجح",
+    "failed": "فشل",
+    "running": "قيد التشغيل",
+    "unknown": "غير معروف"
+  },
+  "edit_dialog": {
+    "title": "تعديل المهمة",
+    "enabled": "مُفعّل",
+    "cron": "تعبير Cron",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "section_general": "عام",
+    "section_weights": "الأوزان"
+  },
+  "trigger_dialog": {
+    "title": "تشغيل المهمة",
+    "message": "هل تريد تشغيل \"{{jobKey}}\" يدويًا؟ سيتم إضافة تنفيذ فوري إلى قائمة الانتظار.",
+    "confirm": "تشغيل",
+    "cancel": "إلغاء"
+  },
+  "logs": {
+    "columns": {
+      "job": "المهمة",
+      "client": "العميل",
+      "status": "الحالة",
+      "started": "البدء",
+      "completed": "الانتهاء",
+      "duration": "المدة",
+      "error": "خطأ"
+    },
+    "filters": {
+      "job_name": "اسم المهمة",
+      "status": "الحالة",
+      "all_statuses": "جميع الحالات"
+    },
+    "no_error": "—"
+  },
+  "readonly_badge": "للقراءة فقط",
+  "never": "أبدًا",
+  "ms": "مللي ثانية",
+  "errors": {
+    "load": "فشل تحميل المهام",
+    "update": "فشل تحديث المهمة",
+    "trigger": "فشل تشغيل المهمة",
+    "logs": "فشل تحميل السجلات"
+  },
+  "success": {
+    "trigger": "تم تشغيل المهمة بنجاح",
+    "update": "تم تحديث المهمة"
+  },
+  "sidebar": "المهام",
+  "cron_editor": {
+    "type_seconds": "ثواني",
+    "type_minutes": "دقائق",
+    "type_hours": "ساعات",
+    "type_daily": "يومياً",
+    "type_custom": "مخصص",
+    "every": "كل",
+    "seconds": "ثانية",
+    "minutes": "دقيقة",
+    "hours": "ساعة",
+    "daily_at": "يومياً في",
+    "hour": "الساعة",
+    "minute": "الدقيقة",
+    "expression": "التعبير",
+    "preview": "التعبير",
+    "desc_seconds": "كل {{n}} ثانية",
+    "desc_minutes": "كل {{n}} دقيقة",
+    "desc_hours": "كل {{n}} ساعة",
+    "desc_daily": "يومياً في {{time}}"
+  },
+  "config": {
+    "suggestion": {
+      "suggestionLimit": {
+        "label": "حد الاقتراحات",
+        "desc": "الحد الأقصى للاقتراحات لكل مستخدم"
+      },
+      "daysActive": {
+        "label": "أيام النشاط",
+        "desc": "معالجة المستخدمين النشطين خلال آخر N يوم فقط"
+      },
+      "interestWindowDays": {
+        "label": "نافذة الاهتمام (أيام)",
+        "desc": "كم يوماً للخلف للبحث في المنشورات التي أعجبت المستخدم"
+      },
+      "weights": {
+        "socialConnection": {
+          "label": "الارتباط الاجتماعي",
+          "desc": "نقاط لكل اتصال متبادل"
+        },
+        "interestMatch": {
+          "label": "تطابق الاهتمام",
+          "desc": "نقاط لكل اهتمام مشترك"
+        },
+        "geoExact": {
+          "label": "موقع دقيق",
+          "desc": "مكافأة على تطابق جيوهاش دقيق"
+        },
+        "geoNear": {
+          "label": "موقع قريب",
+          "desc": "مكافأة على جيوهاش قريب"
+        },
+        "verified": {
+          "label": "موثّق",
+          "desc": "مكافأة للحسابات الموثّقة"
+        },
+        "popularityMultiplier": {
+          "label": "مضاعف الشعبية",
+          "desc": "مضاعف على log10 عدد المتابعين"
+        }
+      }
+    },
+    "gravityDecay": {
+      "maxAgeDays": {
+        "label": "الحد الأقصى للعمر (أيام)",
+        "desc": "إعادة حساب نقاط المنشورات الأحدث من N يوم فقط"
+      }
+    }
+  }
+}

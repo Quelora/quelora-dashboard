@@ -1,0 +1,146 @@
+{
+  "title": "任务",
+  "subtitle": "定时任务管理",
+  "tabs": {
+    "jobs": "任务",
+    "logs": "执行日志"
+  },
+  "sections": {
+    "client_jobs": "客户端任务",
+    "system_jobs": "系统任务"
+  },
+  "columns": {
+    "job": "任务",
+    "queue": "队列",
+    "enabled": "已启用",
+    "cron": "Cron",
+    "last_status": "最近状态",
+    "last_run": "最近运行",
+    "duration": "时长",
+    "actions": "操作"
+  },
+  "actions": {
+    "trigger": "触发",
+    "edit": "编辑"
+  },
+  "status": {
+    "success": "成功",
+    "failed": "失败",
+    "running": "运行中",
+    "unknown": "未知"
+  },
+  "edit_dialog": {
+    "title": "编辑任务",
+    "enabled": "已启用",
+    "cron": "Cron 表达式",
+    "save": "保存",
+    "cancel": "取消",
+    "section_general": "常规",
+    "section_weights": "权重"
+  },
+  "trigger_dialog": {
+    "title": "触发任务",
+    "message": "手动触发 \"{{jobKey}}\"？将立即加入执行队列。",
+    "confirm": "触发",
+    "cancel": "取消"
+  },
+  "logs": {
+    "columns": {
+      "job": "任务",
+      "client": "客户端",
+      "status": "状态",
+      "started": "开始",
+      "completed": "结束",
+      "duration": "时长",
+      "error": "错误"
+    },
+    "filters": {
+      "job_name": "任务名称",
+      "status": "状态",
+      "all_statuses": "所有状态"
+    },
+    "no_error": "—"
+  },
+  "readonly_badge": "只读",
+  "never": "从未",
+  "ms": "毫秒",
+  "errors": {
+    "load": "加载任务失败",
+    "update": "更新任务失败",
+    "trigger": "触发任务失败",
+    "logs": "加载日志失败"
+  },
+  "success": {
+    "trigger": "任务已成功触发",
+    "update": "任务已更新"
+  },
+  "sidebar": "任务",
+  "cron_editor": {
+    "type_seconds": "秒",
+    "type_minutes": "分钟",
+    "type_hours": "小时",
+    "type_daily": "每天",
+    "type_custom": "自定义",
+    "every": "每",
+    "seconds": "秒",
+    "minutes": "分钟",
+    "hours": "小时",
+    "daily_at": "每天",
+    "hour": "时",
+    "minute": "分",
+    "expression": "表达式",
+    "preview": "表达式",
+    "desc_seconds": "每 {{n}} 秒",
+    "desc_minutes": "每 {{n}} 分钟",
+    "desc_hours": "每 {{n}} 小时",
+    "desc_daily": "每天 {{time}}"
+  },
+  "config": {
+    "suggestion": {
+      "suggestionLimit": {
+        "label": "推荐数量限制",
+        "desc": "每用户最多生成的推荐数量"
+      },
+      "daysActive": {
+        "label": "活跃天数",
+        "desc": "仅处理最近 N 天内活跃的用户"
+      },
+      "interestWindowDays": {
+        "label": "兴趣窗口（天）",
+        "desc": "向前查找点赞帖子的天数"
+      },
+      "weights": {
+        "socialConnection": {
+          "label": "社交连接",
+          "desc": "每个共同连接的得分"
+        },
+        "interestMatch": {
+          "label": "共同兴趣",
+          "desc": "每个共同兴趣的得分"
+        },
+        "geoExact": {
+          "label": "精确位置",
+          "desc": "精确 geohash 匹配奖励"
+        },
+        "geoNear": {
+          "label": "邻近位置",
+          "desc": "邻近 geohash 匹配奖励"
+        },
+        "verified": {
+          "label": "已认证",
+          "desc": "认证账户奖励"
+        },
+        "popularityMultiplier": {
+          "label": "人气乘数",
+          "desc": "关注者数量 log10 的乘数"
+        }
+      }
+    },
+    "gravityDecay": {
+      "maxAgeDays": {
+        "label": "最大帖龄（天）",
+        "desc": "仅重新计算 N 天内的帖子分数"
+      }
+    }
+  }
+}

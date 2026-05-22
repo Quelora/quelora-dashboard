@@ -1,0 +1,18 @@
+{
+  "actions": "Ações",
+  "cancel": "Cancelar",
+  "category": "Categoria",
+  "confirmRestoreText": "Tem certeza de que deseja restaurar este item?",
+  "confirmRestoreTitle": "Confirmar Restauro",
+  "deletedDate": "Data de Exclusão",
+  "description": "Descrição",
+  "errorFetching": "Erro ao obter itens do lixo",
+  "noDescription": "Sem descrição",
+  "restore": "Restaurar",
+  "restoreErrorText": "Ocorreu um erro ao restaurar o item.",
+  "restoreErrorTitle": "Falha no Restauro",
+  "restoreSuccessText": "O item foi restaurado com sucesso.",
+  "restoreSuccessTitle": "Item Restaurado",
+  "retry": "Tentar novamente",
+  "title": "Reciclagem"
+}

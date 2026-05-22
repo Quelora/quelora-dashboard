@@ -1,0 +1,11 @@
+{
+  "clients": "客户",
+  "clientsTooltip": "已连接的客户",
+  "keys": "密钥",
+  "keysTooltip": "已存储的密钥",
+  "memoryTooltip": "Redis 使用的内存",
+  "ops": "操作/秒",
+  "opsTooltip": "每秒操作次数",
+  "title": "缓存 (CACHE)",
+  "uptimeTooltip": "Redis 服务器运行时长"
+}
